@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Cate</title>
+    <link rel="stylesheet" type="text/css" href="css/demo.css" />
+	<link rel="stylesheet" type="text/css" href="css/elastic_grid.min.css" />
+</head>
+<body style="background:#fff;">
+<div id="elastic_grid_demo"></div>
+
+<script src="http://cdn.bootcss.com/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
+<script>window.jQuery || document.write('<script src="js/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="js/modernizr.custom.js"></script>
+<script src="js/classie.js"></script>
+<!--- uncompress-->
+<!-- <script type="text/javascript" src="js/jquery.elastislide.js"></script>
+<script type="text/javascript" src="js/jquery.hoverdir.js"></script>
+<script type="text/javascript" src="js/elastic_grid.js"></script> -->
+
+<!-- compress version-->
+<script type="text/javascript" src="js/elastic_grid.min.js"></script>
+
+<script type="text/javascript">
+    $(function(){
+        $("#elastic_grid_demo").elastic_grid({
+            'showAllText' : 'All',
+            'filterEffect': 'popup', // moveup, scaleup, fallperspective, fly, flip, helix , popup
+            'hoverDirection': true,
+            'hoverDelay': 0,
+            'hoverInverse': false,
+            'expandingSpeed': 500,
+            'expandingHeight': 500,
+            'items' :
+            [
+                {
+                    'title'         : 'Quiet',
+                    'description'   : '安安静静、心无旁骛的吃饭，是一件非常美妙的事情这种全身心的投入，自在随心的选择，是对劳累一天的自己最大的安慰。',
+                    'thumbnail'     : ['images/small/1.jpg', 'images/small/2.jpg', 'images/small/3.jpg', 'images/small/10.jpg', 'images/small/11.jpg'],
+                    'large'         : ['images/large/1.jpg', 'images/large/2.jpg', 'images/large/3.jpg', 'images/large/10.jpg', 'images/large/11.jpg'],
+                    'button_list'   :
+                    [
+                        
+                    ],
+                    'tags'          : ['Self Portrait']
+                },
+                {
+                    'title'         : 'Not Empty',
+                    'description'   : '只要碗里满满的，人生就要不会空虚。',
+                    'thumbnail'     : ['images/small/4.jpg', 'images/small/5.jpg', 'images/small/6.jpg', 'images/small/7.jpg'],
+                    'large'         : ['images/large/4.jpg', 'images/large/5.jpg', 'images/large/6.jpg', 'images/large/7.jpg'],
+                    'button_list'   :
+                    [
+                        
+                    ],
+                    'tags'          : ['Landscape']
+                },
+                {
+                    'title'         : 'Smell',
+                    'description'   : '这是盐的味道，山的味道，风的味道，阳光的味道，也是时间的味道，人情的味道。这些味道，已经在漫长的时光中和故土、乡亲、念旧、勤俭、坚忍等等情感和信念混合在一起，才下舌尖，又上心间，让我们几乎分不清哪一个是滋味，哪一种是情怀。',
+                    'thumbnail'     : ['images/small/15.jpg','images/small/8.jpg', 'images/small/9.jpg', 'images/small/10.jpg'],
+                    'large'         : ['images/large/15.jpg','images/large/8.jpg', 'images/large/9.jpg', 'images/large/10.jpg'],
+                    'button_list'   :
+                    [
+                       
+                    ],
+                    'tags'          : ['Self Portrait', 'Landscape']
+                },
+                {
+                    'title'         : 'Far Away',
+                    'description'   : '王阿姨的厨房不到五平米，却装下了儿时八百里秦川。',
+                    'thumbnail'     : ['images/small/12.jpg', 'images/small/13.jpg', 'images/small/14.jpg', 'images/small/15.jpg', 'images/small/16.jpg'],
+                    'large'         : ['images/large/12.jpg', 'images/large/13.jpg', 'images/large/14.jpg', 'images/large/15.jpg', 'images/large/16.jpg'],
+                    'button_list'   :
+                    [
+                        
+                    ],
+                    'tags'          : ['Portrait']
+                },
+                {
+                    'title'         : 'Hot',
+                    'description'   : '要入口滚烫，气氛更滚烫。',
+                    'thumbnail'     : ['images/small/17.jpg', 'images/small/18.jpg', 'images/small/19.jpg', 'images/small/20.jpg'],
+                    'large'         : ['images/large/17.jpg', 'images/large/18.jpg', 'images/large/19.jpg', 'images/large/20.jpg'],
+                    'button_list'   :
+                    [
+                        
+                    ],
+                    'tags'          : ['Landscape']
+                },
+                {
+                    'title'         : 'Sense of Home',
+                    'description'   : '家常美味，也是人生百味。',
+                    'thumbnail'     : ['images/small/13.jpg','images/small/15.jpg', 'images/small/11.jpg', 'images/small/10.jpg'],
+                    'large'         : ['images/large/13.jpg','images/large/15.jpg', 'images/large/11.jpg', 'images/large/10.jpg'],
+                    'button_list'   :
+                    [
+                        
+                    ],
+                    'tags'          : ['Vintage']
+                },
+                {
+                    'title'         : 'Be Yourself',
+                    'description'   : '下辈子还要做自己，横行霸道，富得流油。',
+                    'thumbnail'     : ['images/small/7.jpg','images/small/8.jpg', 'images/small/9.jpg', 'images/small/10.jpg'],
+                    'large'         : ['images/large/7.jpg','images/large/8.jpg', 'images/large/9.jpg', 'images/large/10.jpg'],
+                    'button_list'   :
+                    [
+                        
+                    ],
+                    'tags'          : ['Portrait']
+                },
+                {
+                    'title'         : 'Eat Well',
+                    'description'   : '好吃点只要琢磨一下就好，吃好点却是一辈子在琢磨的事。',
+                    'thumbnail'     : ['images/small/16.jpg', 'images/small/13.jpg', 'images/small/14.jpg', 'images/small/15.jpg', 'images/small/16.jpg'],
+                    'large'         : ['images/large/16.jpg', 'images/large/13.jpg', 'images/large/14.jpg', 'images/large/15.jpg', 'images/large/16.jpg'],
+                    'button_list'   :
+                    [
+                        
+                    ],
+                    'tags'          : ['Vintage']
+                },
+                {
+                    'title'         : 'Treat Yourself Better',
+                    'description'   : '想在有酒有肉的日子，款待没心没肺的自己。',
+                    'thumbnail'     : ['images/small/18.jpg', 'images/small/18.jpg', 'images/small/19.jpg', 'images/small/20.jpg'],
+                    'large'         : ['images/large/18.jpg', 'images/large/18.jpg', 'images/large/19.jpg', 'images/large/20.jpg'],
+                    'button_list'   :
+                    [
+                        
+                    ],
+                    'tags'          : ['Landscape']
+                },
+                {
+                    'title'         : 'For Your Love',
+                    'description'   : '闻惯了的油烟，只有为你下厨时才变成烟火.',
+                    'thumbnail'     : ['images/small/11.jpg','images/small/15.jpg', 'images/small/11.jpg', 'images/small/10.jpg'],
+                    'large'         : ['images/large/11.jpg','images/large/15.jpg', 'images/large/11.jpg', 'images/large/10.jpg'],
+                    'button_list'   :
+                    [
+                        
+                    ],
+                    'tags'          : ['Portrait']
+                },
+                {
+                    'title'         : 'Life',
+                    'description'   : '锅碗瓢盆的生活，也很幸福。',
+                    'thumbnail'     : ['images/small/3.jpg','images/small/15.jpg', 'images/small/11.jpg', 'images/small/10.jpg'],
+                    'large'         : ['images/large/3.jpg','images/large/15.jpg', 'images/large/11.jpg', 'images/large/10.jpg'],
+                    'button_list'   :
+                    [
+                       
+                    ],
+                    'tags'          : ['Vintage']
+                },
+                {
+                    'title'         : 'Full',
+                    'description'   : '我总是徘徊在吃饱和吃撑之间。',
+                    'thumbnail'     : ['images/small/5.jpg','images/small/8.jpg', 'images/small/9.jpg', 'images/small/10.jpg'],
+                    'large'         : ['images/large/5.jpg','images/large/8.jpg', 'images/large/9.jpg', 'images/large/10.jpg'],
+                    'button_list'   :
+                    [
+                        
+                    ],
+                    'tags'          : ['Portrait', 'Landscape']
+                },
+                {
+                    'title'         : 'Cute',
+                    'description'   : '20%的美食碎片+80%的可爱拼凑成了我。',
+                    'thumbnail'     : ['images/small/6.jpg', 'images/small/13.jpg', 'images/small/14.jpg', 'images/small/15.jpg', 'images/small/16.jpg'],
+                    'large'         : ['images/large/6.jpg', 'images/large/13.jpg', 'images/large/14.jpg', 'images/large/15.jpg', 'images/large/16.jpg'],
+                    'button_list'   :
+                    [
+                        
+                    ],
+                    'tags'          : ['Vintage']
+                },
+                {
+                    'title'         : 'Fat,Though',
+                    'description'   : '我把自己吃的这么圆，就是为了不被别人看扁。',
+                    'thumbnail'     : ['images/small/8.jpg', 'images/small/18.jpg', 'images/small/19.jpg', 'images/small/20.jpg'],
+                    'large'         : ['images/large/8.jpg', 'images/large/18.jpg', 'images/large/19.jpg', 'images/large/20.jpg'],
+                    'button_list'   :
+                    [
+                        
+                    ],
+                    'tags'          : ['Landscape']
+                },
+                {
+                    'title'         : 'Quality',
+                    'description'   : '“美食者不必是饕餮客”——美食者重在食物的质，而非量。',
+                    'thumbnail'     : ['images/small/9.jpg','images/small/15.jpg', 'images/small/11.jpg', 'images/small/10.jpg'],
+                    'large'         : ['images/large/9.jpg','images/large/15.jpg', 'images/large/11.jpg', 'images/large/10.jpg'],
+                    'button_list'   :
+                    [
+                        
+                    ],
+                    'tags'          : ['Vintage', 'Landscape']
+                }
+
+            ]
+        });
+    });
+</script>
+</body>
+</html>
