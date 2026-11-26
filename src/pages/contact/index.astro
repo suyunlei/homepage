@@ -233,6 +233,56 @@ const emailCodes = site.contact.email ? encodeEmailForClient(site.contact.email)
           }
 
           {
+            site.contact.orcidUrl && (
+              <a
+                href={site.contact.orcidUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="editorial-card group flex flex-col justify-between rounded-2xl p-5 transition-colors hover:border-[#252528]/40"
+              >
+                <div>
+                  <p class="font-mono text-xs uppercase tracking-wider text-[#27445d]">ORCID</p>
+                  <h3 class="mt-1 text-base font-semibold text-[#252528]">
+                    <BiText zh="学术身份标识" en="ORCID iD" />
+                  </h3>
+                  <p class="mt-1.5 font-mono text-xs text-[#4a4f57]">
+                    {site.contact.orcidUrl.replace(/^https?:\/\/orcid\.org\//, '')}
+                  </p>
+                </div>
+                <span class="mt-4 font-mono text-xs text-[#252528] group-hover:underline">
+                  Visit ORCID ↗
+                </span>
+              </a>
+            )
+          }
+
+          {
+            site.contact.scholarUrl && (
+              <a
+                href={site.contact.scholarUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="editorial-card group flex flex-col justify-between rounded-2xl p-5 transition-colors hover:border-[#252528]/40"
+              >
+                <div>
+                  <p class="font-mono text-xs uppercase tracking-wider text-[#27445d]">
+                    Google Scholar
+                  </p>
+                  <h3 class="mt-1 text-base font-semibold text-[#252528]">
+                    <BiText zh="学术论文与引用" en="Publications & Citations" />
+                  </h3>
+                  <p class="mt-1.5 text-xs text-[#4a4f57]">
+                    7 papers · HKUST(GZ) / NUS
+                  </p>
+                </div>
+                <span class="mt-4 font-mono text-xs text-[#252528] group-hover:underline">
+                  Visit Scholar ↗
+                </span>
+              </a>
+            )
+          }
+
+          {
             site.contact.weiboUrl && (
               <a
                 href={site.contact.weiboUrl}
@@ -275,18 +325,6 @@ const emailCodes = site.contact.email ? encodeEmailForClient(site.contact.email)
               )}
             </div>
             <div class="mt-4 flex flex-wrap gap-2">
-              {
-                site.contact.scholarUrl && (
-                  <a
-                    href={site.contact.scholarUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="editorial-pill hover:border-[#252528]"
-                  >
-                    Scholar ↗
-                  </a>
-                )
-              }
               <a href={withBase('/projects/')} class="editorial-pill hover:border-[#252528]">
                 <BiText zh="项目与播客 →" en="Projects & Podcast →" />
               </a>

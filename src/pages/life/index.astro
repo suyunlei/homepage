@@ -118,6 +118,28 @@ const initialCover = albums[0] ? withBase(albums[0].data.cover) : '';
           })
         }
       </section>
+
+      <div class="mt-3 flex items-center justify-center gap-3 md:hidden" aria-label="影集滑动指示">
+        <div class="flex items-center gap-1.5">
+          {
+            albums.map((album, idx) => (
+              <button
+                type="button"
+                data-album-dot={idx}
+                aria-label={`切换到第 ${idx + 1} 个影集 ${album.data.title}`}
+                aria-pressed={idx === 0 ? 'true' : 'false'}
+                class:list={[
+                  'h-2 rounded-full transition-all duration-300',
+                  idx === 0 ? 'w-6 bg-[#252528]' : 'w-2 bg-[#252528]/25',
+                ]}
+              />
+            ))
+          }
+        </div>
+        <span id="life-mobile-counter" class="font-mono text-[11px] text-[#4a4f57]">
+          01 / {String(albums.length).padStart(2, '0')}
+        </span>
+      </div>
     </div>
   </div>
 

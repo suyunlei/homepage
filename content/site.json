@@ -91,7 +91,9 @@
       "titleEn": "Academic Space",
       "subtitle": "WebGIS · 城市数字孪生 · 人-建筑交互",
       "subtitleEn": "WebGIS · Urban Digital Twins · Human-Building Interaction",
-      "image": "/media/projects/img-3.webp",
+      "image": "/media/profile/academic-cover.webp",
+      "imageFit": "contain",
+      "imageBg": "#111313",
       "paragraphs": [
         "研究围绕城市数字孪生（Urban Digital Twins）、人-建筑交互（Human-Building Interaction）、VR 城市建模与眼动感知、以及多模态大语言模型驱动的城市建筑语义表征展开。",
         "已同步收录 Google Scholar 上的 7 篇期刊与国际会议论文（涵盖 JAG、Cities、3D GeoInfo Best Paper Award、SpatialDI、CUPUM 与 E3S），附带 DOI、BibTeX 与开源代码链接。"
@@ -176,7 +178,7 @@
     "githubUrl": "https://github.com/suyunlei",
     "weiboUrl": "https://weibo.com/u/5807394780",
     "scholarUrl": "https://scholar.google.com/citations?user=otnq_NsAAAAJ&hl=en",
-    "orcidUrl": "",
+    "orcidUrl": "https://orcid.org/0009-0006-8371-7972",
     "wechatQr": "/media/profile/wechat.webp",
     "wechatId": "",
     "wechatHint": "扫码添加微信，请备注来意（学术交流 / 播客串台 / 朋友问候）",

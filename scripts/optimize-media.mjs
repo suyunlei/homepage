@@ -72,6 +72,15 @@ function getPreset(relPath) {
   }
 
   if (normalized.startsWith('profile/')) {
+    if (/^academic-cover\./i.test(fileName)) {
+      return {
+        maxWidth: 1200,
+        maxHeight: 800,
+        quality: 88,
+        effort: 5,
+        skipSizeBytes: 120 * 1024,
+      };
+    }
     if (/^wechat\./i.test(fileName)) {
       return {
         maxWidth: 900,

@@ -15,6 +15,8 @@ const counterEl = document.getElementById('lightbox-counter');
 const closeBtn = document.getElementById('lightbox-close');
 const prevBtn = document.getElementById('lightbox-prev');
 const nextBtn = document.getElementById('lightbox-next');
+const mobilePrevBtn = document.getElementById('lightbox-mobile-prev');
+const mobileNextBtn = document.getElementById('lightbox-mobile-next');
 
 if (modal && dataHolder && imgEl) {
   let slides: LightboxSlide[] = [];
@@ -62,6 +64,31 @@ if (modal && dataHolder && imgEl) {
   closeBtn?.addEventListener('click', closeModal);
   prevBtn?.addEventListener('click', () => renderSlide(current - 1));
   nextBtn?.addEventListener('click', () => renderSlide(current + 1));
+  mobilePrevBtn?.addEventListener('click', () => renderSlide(current - 1));
+  mobileNextBtn?.addEventListener('click', () => renderSlide(current + 1));
+
+  // Touch horizontal swipe navigation inside lightbox
+  let swipeStart = { x: 0, y: 0 };
+  modal.addEventListener(
+    'touchstart',
+    (ev) => {
+      if (ev.touches.length !== 1) return;
+      swipeStart = { x: ev.touches[0].clientX, y: ev.touches[0].clientY };
+    },
+    { passive: true },
+  );
+  modal.addEventListener(
+    'touchend',
+    (ev) => {
+      if (ev.changedTouches.length !== 1) return;
+      const dx = ev.changedTouches[0].clientX - swipeStart.x;
+      const dy = ev.changedTouches[0].clientY - swipeStart.y;
+      if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+        renderSlide(dx < 0 ? current + 1 : current - 1);
+      }
+    },
+    { passive: true },
+  );
 
   modal.addEventListener('click', (ev) => {
     if (ev.target === modal) {

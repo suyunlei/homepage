@@ -13,6 +13,8 @@ export interface HomePanel {
   subtitle: string;
   subtitleEn?: string;
   image: string;
+  imageFit?: 'cover' | 'contain';
+  imageBg?: string;
   paragraphs: string[];
   paragraphsEn?: string[];
   ctaLabel: string;

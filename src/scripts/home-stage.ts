@@ -7,6 +7,7 @@ const MathUtils = {
     return m * currentVal + b;
   },
   lerp: (a: number, b: number, n: number) => (1 - n) * a + n * b,
+  clamp: (val: number, min: number, max: number) => Math.max(min, Math.min(max, val)),
   rand: (min: number, max: number) => Math.random() * (max - min) + min,
 };
 
@@ -24,6 +25,7 @@ function splitLetters(el: HTMLElement): HTMLSpanElement[] {
 }
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isTouchDevice = window.matchMedia('(hover: none), (pointer: coarse)').matches;
 const contentFirst = document.querySelector<HTMLElement>('.content--first');
 const contentMove = document.querySelector<HTMLElement>('.content__move');
 const columnsWrap = document.querySelector<HTMLElement>('.columns');
@@ -49,6 +51,10 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
   );
 
   let hasPointerMoved = false;
+  let isTouching = false;
+  let touchOrigin = { x: 0, y: 0 };
+  let touchOffset = { x: 0, y: 0 };
+  const tiltOffset = { x: 0, y: 0 };
 
   window.addEventListener(
     'mousemove',
@@ -59,8 +65,58 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
     { passive: true },
   );
 
-  // Column parallax state
-  const columnStates = columnEls.map((el) => {
+  // Touch-drag parallax on the homepage stage
+  contentFirst.addEventListener(
+    'touchstart',
+    (ev) => {
+      if (ev.touches.length !== 1) return;
+      const t = ev.touches[0];
+      touchOrigin = { x: t.clientX, y: t.clientY };
+      isTouching = true;
+    },
+    { passive: true },
+  );
+
+  contentFirst.addEventListener(
+    'touchmove',
+    (ev) => {
+      if (!isTouching || ev.touches.length !== 1) return;
+      const t = ev.touches[0];
+      touchOffset = {
+        x: MathUtils.clamp((t.clientX - touchOrigin.x) / (winsize.width * 0.35), -1, 1),
+        y: MathUtils.clamp((t.clientY - touchOrigin.y) / (winsize.height * 0.3), -1, 1),
+      };
+    },
+    { passive: true },
+  );
+
+  const resetTouchParallax = () => {
+    isTouching = false;
+    touchOffset = { x: 0, y: 0 };
+  };
+  contentFirst.addEventListener('touchend', resetTouchParallax, { passive: true });
+  contentFirst.addEventListener('touchcancel', resetTouchParallax, { passive: true });
+
+  // Passive gyroscope tilt on touch browsers without intrusive permission prompts
+  const OrientationCtor = (
+    window as unknown as {
+      DeviceOrientationEvent?: { requestPermission?: () => Promise<string> };
+    }
+  ).DeviceOrientationEvent;
+  if (isTouchDevice && OrientationCtor && typeof OrientationCtor.requestPermission !== 'function') {
+    window.addEventListener(
+      'deviceorientation',
+      (ev) => {
+        if (ev.gamma == null || ev.beta == null) return;
+        tiltOffset.x = MathUtils.clamp(ev.gamma, -30, 30) / 30;
+        tiltOffset.y = MathUtils.clamp(ev.beta - 45, -30, 30) / 30;
+      },
+      { passive: true },
+    );
+  }
+
+  // Column parallax state + mobile ambient drift parameters
+  const columnStates = columnEls.map((el, i) => {
     const isBottom = el.classList.contains('column--bottom');
     return {
       el,
@@ -70,20 +126,85 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
       randX: MathUtils.rand(6, 18),
       rY1: isBottom ? MathUtils.rand(10, 28) : MathUtils.rand(26, 68),
       rY2: isBottom ? MathUtils.rand(26, 68) : MathUtils.rand(10, 28),
+      driftPhase: i * 1.45,
+      driftSpeed: 0.55 + (i % 2) * 0.14,
+      driftAmpY: isBottom ? -18 : 18,
     };
   });
 
+  // Choreographed entrance reveal on page load
+  let entranceDone = prefersReducedMotion;
+  let introTl: gsap.core.Timeline | null = null;
+  if (!prefersReducedMotion) {
+    introTl = gsap.timeline({
+      onComplete: () => {
+        entranceDone = true;
+      },
+    });
+    introTl
+      .fromTo(
+        columnEls,
+        {
+          y: (i: number) => (i % 2 === 0 ? -24 : 24),
+          opacity: 0.6,
+        },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.75,
+          stagger: 0.06,
+          ease: 'power3.out',
+        },
+        0,
+      )
+      .fromTo(
+        menuBtns,
+        { y: 22, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.65,
+          stagger: 0.055,
+          ease: 'power3.out',
+        },
+        0.05,
+      );
+  }
+
   if (!prefersReducedMotion && columnStates.length > 0) {
     gsap.ticker.add(() => {
-      if (!activeTilt.columns || !hasPointerMoved || document.hidden) return;
-      for (const col of columnStates) {
-        const targetTx = MathUtils.lineEq(-col.randX, col.randX, winsize.width, 0, mousePos.x);
-        const targetTy = MathUtils.lineEq(-col.rY1, col.rY2, winsize.height, 0, mousePos.y);
-        if (Math.abs(targetTx - col.tx) < 0.06 && Math.abs(targetTy - col.ty) < 0.06) {
-          continue;
+      if (!activeTilt.columns || !entranceDone || document.hidden) return;
+
+      if (!isTouchDevice) {
+        if (!hasPointerMoved) return;
+        for (const col of columnStates) {
+          const targetTx = MathUtils.lineEq(-col.randX, col.randX, winsize.width, 0, mousePos.x);
+          const targetTy = MathUtils.lineEq(-col.rY1, col.rY2, winsize.height, 0, mousePos.y);
+          if (Math.abs(targetTx - col.tx) < 0.06 && Math.abs(targetTy - col.ty) < 0.06) {
+            continue;
+          }
+          col.tx = MathUtils.lerp(col.tx, targetTx, 0.035);
+          col.ty = MathUtils.lerp(col.ty, targetTy, 0.035);
+          gsap.set(col.el, {
+            x: col.tx,
+            y: col.ty,
+            rotation: 0.01,
+          });
         }
-        col.tx = MathUtils.lerp(col.tx, targetTx, 0.035);
-        col.ty = MathUtils.lerp(col.ty, targetTy, 0.035);
+        return;
+      }
+
+      const t = gsap.ticker.time;
+      const factor = isTouching ? 0.08 : 0.032;
+      for (const col of columnStates) {
+        const waveY = Math.sin(t * col.driftSpeed + col.driftPhase) * col.driftAmpY;
+        const waveX = Math.cos(t * col.driftSpeed * 0.8 + col.driftPhase) * 4;
+        const targetTx =
+          waveX + touchOffset.x * col.randX * 1.4 + tiltOffset.x * col.randX * 0.8;
+        const targetTy =
+          waveY + touchOffset.y * col.rY1 * 0.7 + tiltOffset.y * col.rY1 * 0.4;
+        col.tx = MathUtils.lerp(col.tx, targetTx, factor);
+        col.ty = MathUtils.lerp(col.ty, targetTy, factor);
         gsap.set(col.el, {
           x: col.tx,
           y: col.ty,
@@ -100,7 +221,9 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
     const backEl = el.querySelector<HTMLButtonElement>('.stage-back');
     let titleLetters: HTMLSpanElement[] = [];
     if (titleEl) {
-      const variants = Array.from(titleEl.querySelectorAll<HTMLElement>('.stage-title__zh, .stage-title__en'));
+      const variants = Array.from(
+        titleEl.querySelectorAll<HTMLElement>('.stage-title__zh, .stage-title__en'),
+      );
       if (variants.length > 0) {
         titleLetters = variants.flatMap((v) => splitLetters(v));
       } else {
@@ -119,6 +242,10 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
     }
   }
 
+  function pickRandomLetters(letters: HTMLSpanElement[], count: number): HTMLSpanElement[] {
+    return [...letters].sort(() => 0.5 - Math.random()).slice(0, count);
+  }
+
   const menuMeta = menuBtns.map((el) => {
     const letters = splitLetters(el);
     const totalRand = Math.min(3, letters.length);
@@ -134,8 +261,7 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
 
     if (!prefersReducedMotion) {
       el.addEventListener('mouseenter', () => {
-        const shuffled = [...letters].sort(() => 0.5 - Math.random());
-        randLetters = shuffled.slice(0, totalRand);
+        randLetters = pickRandomLetters(letters, totalRand);
       });
 
       el.addEventListener('mousemove', () => {
@@ -183,14 +309,50 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
       });
     }
 
-    return { el, letters };
+    return { el, letters, totalRand };
   });
 
   let isAnimating = false;
   let currentIndex = -1;
 
+  // Touch idle kinetic letter ripple + spotlight fill so the mobile hero feels alive
+  if (isTouchDevice && !prefersReducedMotion && menuMeta.length > 0) {
+    let pulseCursor = 0;
+    window.setInterval(() => {
+      if (currentIndex !== -1 || isAnimating || !entranceDone || document.hidden) return;
+      const targetMenu = menuMeta[pulseCursor % menuMeta.length];
+      pulseCursor += 1;
+
+      targetMenu.el.classList.add('is-pulse');
+      window.setTimeout(() => {
+        targetMenu.el.classList.remove('is-pulse');
+      }, 720);
+
+      const sample = pickRandomLetters(targetMenu.letters, targetMenu.totalRand);
+      if (sample.length === 0) return;
+
+      gsap
+        .timeline()
+        .to(sample, {
+          duration: 0.22,
+          ease: 'quad.out',
+          y: -8,
+          rotation: () => MathUtils.rand(-4, 4),
+          stagger: 0.03,
+        })
+        .to(sample, {
+          duration: 0.65,
+          ease: 'elastic.out(1, 0.5)',
+          y: 0,
+          rotation: 0,
+          stagger: 0.03,
+        });
+    }, 3400);
+  }
+
   function openItem(index: number) {
     if (isAnimating || index < 0 || index >= stageMeta.length) return;
+    introTl?.kill();
     ensurePanelImage(index);
     currentIndex = index;
     const activeStage = stageMeta[index];
@@ -209,6 +371,7 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
     isAnimating = true;
     activeTilt.columns = false;
     activeTilt.letters = false;
+    entranceDone = true;
 
     const duration = 0.95;
     const otherMenus = menuMeta.filter((_, i) => i !== index).map((m) => m.el);
@@ -359,13 +522,58 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
 
   menuMeta.forEach((m, idx) => {
     const preload = () => ensurePanelImage(idx);
+    const clearPressed = () => m.el.classList.remove('is-pressed');
+
     m.el.addEventListener('mouseenter', preload);
     m.el.addEventListener('focus', preload);
-    m.el.addEventListener('click', () => openItem(idx));
+    m.el.addEventListener('pointerdown', (ev) => {
+      ensurePanelImage(idx);
+      m.el.classList.add('is-pressed');
+      if (ev.pointerType === 'touch' && !prefersReducedMotion) {
+        const sample = pickRandomLetters(m.letters, m.totalRand);
+        gsap.to(sample, {
+          duration: 0.25,
+          ease: 'power2.out',
+          y: -6,
+          rotation: () => MathUtils.rand(-4, 4),
+          overwrite: 'auto',
+        });
+      }
+    });
+    m.el.addEventListener('pointerup', clearPressed);
+    m.el.addEventListener('pointercancel', clearPressed);
+    m.el.addEventListener('pointerleave', clearPressed);
+    m.el.addEventListener('click', () => {
+      clearPressed();
+      openItem(idx);
+    });
   });
 
   stageMeta.forEach((s) => {
     s.backEl?.addEventListener('click', () => closeItem());
+
+    // Mobile swipe-right to close panel
+    let swipeStart = { x: 0, y: 0 };
+    s.el.addEventListener(
+      'touchstart',
+      (ev) => {
+        if (ev.touches.length !== 1) return;
+        swipeStart = { x: ev.touches[0].clientX, y: ev.touches[0].clientY };
+      },
+      { passive: true },
+    );
+    s.el.addEventListener(
+      'touchend',
+      (ev) => {
+        if (currentIndex < 0 || ev.changedTouches.length !== 1) return;
+        const dx = ev.changedTouches[0].clientX - swipeStart.x;
+        const dy = ev.changedTouches[0].clientY - swipeStart.y;
+        if (dx > 75 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+          closeItem();
+        }
+      },
+      { passive: true },
+    );
   });
 
   window.addEventListener('keydown', (ev) => {
