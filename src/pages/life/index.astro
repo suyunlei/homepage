@@ -65,7 +65,7 @@ const initialCover = albums[0] ? withBase(albums[0].data.cover) : '';
         aria-label="影集列表"
       >
         {
-          albums.map((album) => {
+          albums.map((album, idx) => {
             const coverUrl = withBase(album.data.cover);
             return (
               <a
@@ -76,7 +76,9 @@ const initialCover = albums[0] ? withBase(albums[0].data.cover) : '';
                 <img
                   src={coverUrl}
                   alt={album.data.title}
-                  loading="lazy"
+                  loading={idx < 2 ? 'eager' : 'lazy'}
+                  fetchpriority={idx === 0 ? 'high' : 'auto'}
+                  decoding="async"
                   class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div

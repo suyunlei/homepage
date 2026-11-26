@@ -140,7 +140,33 @@ body {
   display: inline-block;
   white-space: pre;
   pointer-events: none;
-  will-change: transform;
+}
+
+@keyframes editorial-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reveal-section {
+  animation: editorial-reveal 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.reveal-section:nth-of-type(2) {
+  animation-delay: 0.05s;
+}
+
+.reveal-section:nth-of-type(3) {
+  animation-delay: 0.1s;
+}
+
+.reveal-section:nth-of-type(4) {
+  animation-delay: 0.15s;
 }
 
 /* Site-wide zero-flicker ZH / EN i18n visibility */
@@ -212,5 +238,9 @@ html:not([data-lang='en']) [data-i18n='en'] {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .reveal-section {
+    animation: none;
   }
 }

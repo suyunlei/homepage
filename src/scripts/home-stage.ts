@@ -48,21 +48,22 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
     { passive: true },
   );
 
+  let hasPointerMoved = false;
+
   window.addEventListener(
     'mousemove',
     (ev) => {
       mousePos = { x: ev.clientX, y: ev.clientY };
+      hasPointerMoved = true;
     },
     { passive: true },
   );
 
   // Column parallax state
   const columnStates = columnEls.map((el) => {
-    const rect = el.getBoundingClientRect();
     const isBottom = el.classList.contains('column--bottom');
     return {
       el,
-      height: rect.height || winsize.height,
       isBottom,
       tx: 0,
       ty: 0,
@@ -74,18 +75,15 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
 
   if (!prefersReducedMotion && columnStates.length > 0) {
     gsap.ticker.add(() => {
-      if (!activeTilt.columns) return;
+      if (!activeTilt.columns || !hasPointerMoved || document.hidden) return;
       for (const col of columnStates) {
-        col.tx = MathUtils.lerp(
-          col.tx,
-          MathUtils.lineEq(-col.randX, col.randX, winsize.width, 0, mousePos.x),
-          0.035,
-        );
-        col.ty = MathUtils.lerp(
-          col.ty,
-          MathUtils.lineEq(-col.rY1, col.rY2, winsize.height, 0, mousePos.y),
-          0.035,
-        );
+        const targetTx = MathUtils.lineEq(-col.randX, col.randX, winsize.width, 0, mousePos.x);
+        const targetTy = MathUtils.lineEq(-col.rY1, col.rY2, winsize.height, 0, mousePos.y);
+        if (Math.abs(targetTx - col.tx) < 0.06 && Math.abs(targetTy - col.ty) < 0.06) {
+          continue;
+        }
+        col.tx = MathUtils.lerp(col.tx, targetTx, 0.035);
+        col.ty = MathUtils.lerp(col.ty, targetTy, 0.035);
         gsap.set(col.el, {
           x: col.tx,
           y: col.ty,
@@ -97,6 +95,7 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
 
   // Split letters separately for ZH and EN title variants so toggling never concatenates languages
   const stageMeta = stageItems.map((el) => {
+    const imgEl = el.querySelector<HTMLElement>('.stage-item__img');
     const titleEl = el.querySelector<HTMLElement>('.stage-title');
     const backEl = el.querySelector<HTMLButtonElement>('.stage-back');
     let titleLetters: HTMLSpanElement[] = [];
@@ -108,8 +107,17 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
         titleLetters = splitLetters(titleEl);
       }
     }
-    return { el, backEl, titleLetters };
+    return { el, imgEl, backEl, titleLetters };
   });
+
+  function ensurePanelImage(index: number) {
+    const imgEl = stageMeta[index]?.imgEl;
+    const bg = imgEl?.dataset.bg;
+    if (imgEl && bg) {
+      imgEl.style.backgroundImage = `url('${bg}')`;
+      delete imgEl.dataset.bg;
+    }
+  }
 
   const menuMeta = menuBtns.map((el) => {
     const letters = splitLetters(el);
@@ -183,6 +191,7 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
 
   function openItem(index: number) {
     if (isAnimating || index < 0 || index >= stageMeta.length) return;
+    ensurePanelImage(index);
     currentIndex = index;
     const activeStage = stageMeta[index];
     const activeMenu = menuMeta[index];
@@ -216,8 +225,8 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
         {
           duration,
           ease: 'power3.inOut',
-          y: (i, target: HTMLElement) => {
-            const h = columnStates[i]?.height || winsize.height;
+          y: (_i, target: HTMLElement) => {
+            const h = target.offsetHeight || winsize.height;
             return target.classList.contains('column--bottom')
               ? h + winsize.height * 0.2
               : -h - winsize.height * 0.2;
@@ -349,6 +358,9 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
   }
 
   menuMeta.forEach((m, idx) => {
+    const preload = () => ensurePanelImage(idx);
+    m.el.addEventListener('mouseenter', preload);
+    m.el.addEventListener('focus', preload);
     m.el.addEventListener('click', () => openItem(idx));
   });
 

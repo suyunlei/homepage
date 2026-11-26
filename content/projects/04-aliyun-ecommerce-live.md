@@ -9,7 +9,7 @@ categoryEn: "Interactive Web Engineering"
 organization: "阿里云创新中心 · Alibaba Cloud Innovation Center"
 organizationEn: "Alibaba Cloud Innovation Center"
 date: "2020-09"
-cover: "/media/projects/img-1.jpg"
+cover: "/media/projects/img-1.webp"
 summary: "在阿里云创新中心实习期间参与打造的新零售直播电商桌面端核心门户与控制台，聚焦高信息密度业务场景下的自适应栅格架构、模块解耦与实时交互体验。"
 summaryEn: "Built a desktop e-commerce live-streaming portal during my internship at Alibaba Cloud Innovation Center, emphasizing responsive grid engineering, decoupled event-driven interactions, and high-density layout clarity."
 tags:

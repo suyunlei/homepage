@@ -5,7 +5,7 @@ subtitle: "数据爬取与多工具联合专题制图"
 category: "Cartography & Research"
 organization: "安徽大学"
 date: "2019-04"
-cover: "/media/projects/img-4.jpg"
+cover: "/media/projects/img-4.webp"
 summary: "围绕「一带一路」沿线国家公共卫生主题，通过 Python 自动化抓取医疗统计数据，结合 GIS 空间制图与矢量排版完成可视化表达。"
 tags:
   - "Python"
@@ -18,6 +18,6 @@ highlights:
   - "在 Adobe Illustrator 中完成图面视觉层级优化与出版级排版"
 links:
   - label: "查看成图预览"
-    href: "/media/projects/img-4.jpg"
+    href: "/media/projects/img-4.webp"
     kind: "external"
 ---

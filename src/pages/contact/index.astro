@@ -36,6 +36,9 @@ const emailCodes = site.contact.email ? encodeEmailForClient(site.contact.email)
           <img
             src={withBase(site.owner.avatar)}
             alt={site.owner.nameZh}
+            width="96"
+            height="96"
+            decoding="async"
             class="h-24 w-24 rounded-full border-2 border-[#f4f6f8] object-cover shadow-md"
           />
           <h2 class="mt-4 text-xl font-bold text-[#252528]">
@@ -322,6 +325,8 @@ const emailCodes = site.contact.email ? encodeEmailForClient(site.contact.email)
           <img
             src={withBase(site.contact.wechatQr)}
             alt="微信二维码"
+            loading="lazy"
+            decoding="async"
             class="mt-4 w-full rounded-2xl border editorial-hairline object-contain"
           />
           <p class="mt-3 text-xs text-[#4a4f57]">

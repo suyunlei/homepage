@@ -9,7 +9,7 @@ categoryEn: "Enterprise Web Systems"
 organization: "阿里云创新中心 · Alibaba Cloud Innovation Center"
 organizationEn: "Alibaba Cloud Innovation Center"
 date: "2020-09"
-cover: "/media/projects/img-5.jpg"
+cover: "/media/projects/img-5.webp"
 summary: "深度参与企业级生产环境 Web 门户的全流程前端交付，在真实商业需求与多端兼容约束下完成大规模模块化站点架构、复杂交互集成与跨浏览器工程化调优。"
 summaryEn: "Delivered end-to-end production frontend engineering for an enterprise client portal under real commercial constraints, focusing on large-codebase modularity, interactive component orchestration, and cross-browser compatibility."
 tags:

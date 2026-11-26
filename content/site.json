@@ -13,64 +13,51 @@
     "tagline": "非典型理工博士生 · 《待会儿再说》节目主持人 · WebGIS / Urban Digital Twins / HBI",
     "taglineEn": "Unconventional STEM PhD Student · Host of Podcast \"Talk Later\" · WebGIS / Urban Digital Twins / HBI",
     "location": "Guangzhou, China",
-    "avatar": "/media/profile/avatar.jpg"
+    "avatar": "/media/profile/avatar.webp"
   },
   "homeColumns": [
     {
       "bottom": false,
       "images": [
-        "/media/home/2.jpg",
-        "/media/home/21.jpg",
-        "/media/home/13.jpg",
-        "/media/home/14.jpg",
-        "/media/home/5.jpg",
-        "/media/home/6.jpg",
-        "/media/home/7.jpg",
-        "/media/home/8.jpg",
-        "/media/home/9.jpg"
+        "/media/home/2.webp",
+        "/media/home/21.webp",
+        "/media/home/13.webp",
+        "/media/home/14.webp",
+        "/media/home/5.webp",
+        "/media/home/6.webp"
       ]
     },
     {
       "bottom": true,
       "images": [
-        "/media/home/22.jpg",
-        "/media/home/11.jpg",
-        "/media/home/1.jpg",
-        "/media/home/15.jpg",
-        "/media/home/14.jpg",
-        "/media/home/13.jpg",
-        "/media/home/12.jpg",
-        "/media/home/3.jpg",
-        "/media/home/15.jpg"
+        "/media/home/22.webp",
+        "/media/home/11.webp",
+        "/media/home/1.webp",
+        "/media/home/12.webp",
+        "/media/home/3.webp",
+        "/media/home/15.webp"
       ]
     },
     {
       "bottom": false,
       "images": [
-        "/media/home/18.jpg",
-        "/media/home/4.jpg",
+        "/media/home/18.webp",
+        "/media/home/4.webp",
         "/media/home/9.jpg",
-        "/media/home/11.jpg",
-        "/media/home/16.jpg",
-        "/media/home/20.jpg",
-        "/media/home/2.jpg",
-        "/media/home/1.jpg",
-        "/media/home/5.jpg",
-        "/media/home/14.jpg"
+        "/media/home/16.webp",
+        "/media/home/20.webp",
+        "/media/home/7.webp"
       ]
     },
     {
       "bottom": true,
       "images": [
-        "/media/home/1.jpg",
-        "/media/home/2.jpg",
-        "/media/home/19.jpg",
-        "/media/home/7.jpg",
-        "/media/home/23.jpg",
-        "/media/home/19.jpg",
-        "/media/home/17.jpg",
-        "/media/home/8.jpg",
-        "/media/home/10.jpg"
+        "/media/home/23.webp",
+        "/media/home/19.webp",
+        "/media/home/17.webp",
+        "/media/home/8.webp",
+        "/media/home/10.webp",
+        "/media/home/14.webp"
       ]
     }
   ],
@@ -81,7 +68,7 @@
       "titleEn": "Yunlei Su (Ray)",
       "subtitle": "非典型理工博士生 · 《待会儿再说》节目主持人",
       "subtitleEn": "Unconventional STEM PhD Student · Host of \"Talk Later\"",
-      "image": "/media/home/11.jpg",
+      "image": "/media/home/11.webp",
       "paragraphs": [
         "本科毕业于安徽大学地理信息科学专业，硕士就读于新加坡国立大学（NUS）应用地理信息系统专业，目前在香港科技大学（广州）攻读博士学位；也是独立产品「阿薄」作者，以及小宇宙播客《待会儿再说》节目主持人。",
         "Welcome to My World, My Lord, and My Lady.",
@@ -104,7 +91,7 @@
       "titleEn": "Academic Space",
       "subtitle": "WebGIS · 城市数字孪生 · 人-建筑交互",
       "subtitleEn": "WebGIS · Urban Digital Twins · Human-Building Interaction",
-      "image": "/media/projects/img-3.jpg",
+      "image": "/media/projects/img-3.webp",
       "paragraphs": [
         "研究围绕城市数字孪生（Urban Digital Twins）、人-建筑交互（Human-Building Interaction）、VR 城市建模与眼动感知、以及多模态大语言模型驱动的城市建筑语义表征展开。",
         "已同步收录 Google Scholar 上的 7 篇期刊与国际会议论文（涵盖 JAG、Cities、3D GeoInfo Best Paper Award、SpatialDI、CUPUM 与 E3S），附带 DOI、BibTeX 与开源代码链接。"
@@ -123,7 +110,7 @@
       "titleEn": "Life & Photography",
       "subtitle": "Life is full of Art",
       "subtitleEn": "Life is full of Art",
-      "image": "/media/home/19.jpg",
+      "image": "/media/home/19.webp",
       "paragraphs": [
         "时间流逝得太快，许多事都记不清了。",
         "谨以此篇记录那些叫做回忆的东西——球场、朋友、杭州、母校与烟火人间。",
@@ -144,7 +131,7 @@
       "titleEn": "Projects & Podcast",
       "subtitle": "产品 · 空间工程 · 《待会儿再说》",
       "subtitleEn": "Indie Product · WebGIS · Podcast \"Talk Later\"",
-      "image": "/media/home/8.jpg",
+      "image": "/media/home/8.webp",
       "paragraphs": [
         "Still Young, Still Creative.",
         "既有独立全栈健康产品「阿薄（BOJI）」、WebGIS 与企业前端工程实践，也有我和朋友们在小宇宙一起成长的播客节目《待会儿再说》。",
@@ -165,7 +152,7 @@
       "titleEn": "Get in Touch",
       "subtitle": "Let us begin our story",
       "subtitleEn": "Let us begin our story",
-      "image": "/media/home/4.jpg",
+      "image": "/media/home/4.webp",
       "paragraphs": [
         "可能我们许久未联系了，老朋友。",
         "可能我们初次相识，新朋友。",
@@ -190,7 +177,7 @@
     "weiboUrl": "https://weibo.com/u/5807394780",
     "scholarUrl": "https://scholar.google.com/citations?user=otnq_NsAAAAJ&hl=en",
     "orcidUrl": "",
-    "wechatQr": "/media/profile/wechat.jpg",
+    "wechatQr": "/media/profile/wechat.webp",
     "wechatId": "",
     "wechatHint": "扫码添加微信，请备注来意（学术交流 / 播客串台 / 朋友问候）",
     "wechatHintEn": "Scan to add on WeChat (please mention research, podcast, or greeting)",

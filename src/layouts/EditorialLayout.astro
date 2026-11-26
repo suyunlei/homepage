@@ -19,22 +19,3 @@ const { title, titleEn, description } = Astro.props;
   </main>
   <Footer />
 </BaseLayout>
-
-<script>
-  import gsap from 'gsap';
-
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (!reduceMotion) {
-    const targets = document.querySelectorAll('.reveal-section');
-    if (targets.length > 0) {
-      gsap.from(targets, {
-        y: 18,
-        opacity: 0,
-        duration: 0.55,
-        stagger: 0.08,
-        ease: 'power2.out',
-        clearProps: 'transform,opacity',
-      });
-    }
-  }
-</script>

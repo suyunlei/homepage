@@ -75,6 +75,8 @@ const categories = Array.from(new Set(projects.map((p) => p.data.category)));
                       src={withBase(data.cover)}
                       alt={data.title}
                       loading="eager"
+                      decoding="async"
+                      fetchpriority="high"
                       class="max-h-[440px] w-auto object-contain transition-transform duration-500 group-hover:scale-[1.02]"
                     />
                   </div>
@@ -85,6 +87,7 @@ const categories = Array.from(new Set(projects.map((p) => p.data.category)));
                           src={withBase(data.badgeImage)}
                           alt={data.miniProgramName || data.title}
                           loading="lazy"
+                          decoding="async"
                           class="h-8 w-auto object-contain"
                         />
                       )}
@@ -199,6 +202,7 @@ const categories = Array.from(new Set(projects.map((p) => p.data.category)));
                   src={withBase(data.cover)}
                   alt={data.title}
                   loading="lazy"
+                  decoding="async"
                   class:list={[
                     'h-full w-full transition-transform duration-500',
                     isContain

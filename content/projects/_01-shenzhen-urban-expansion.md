@@ -5,7 +5,7 @@ subtitle: "E3S Web of Conferences · 空间格局与城镇化驱动力定量分�
 category: "Cartography & Research"
 organization: "安徽大学 · 中山大学"
 date: "2021-09"
-cover: "/media/projects/img-3.jpg"
+cover: "/media/projects/img-3.webp"
 summary: "基于 1995–2015 年多期遥感土地覆被数据，运用景观扩张指数（LEI）、城市化增长指数（UGI）与 Pearson 相关分析，定量揭示深圳市城市扩张形态演替规律及教育/人口核心驱动力。"
 tags:
   - "EI Paper"

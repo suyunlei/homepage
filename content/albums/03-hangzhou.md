@@ -7,27 +7,27 @@ location: "Hangzhou, Zhejiang"
 headline: "The past is just A Moment"
 description: "西湖、雷峰塔与夏末水面上的四帧独白。"
 descriptionEn: "Four quiet frames across West Lake, Leifeng Pagoda, and late-summer waters in Hangzhou."
-cover: "/media/life/covers/img-3.jpg"
+cover: "/media/life/covers/img-3.webp"
 layout: "editorial-stories"
 items:
   - title: "一人"
     subtitle: "驿外断桥边，寂寞开无主"
-    image: "/media/life/hangzhou/img-1.jpg"
+    image: "/media/life/hangzhou/img-1.webp"
     paragraphs:
       - "驿外断桥边，寂寞开无主。"
   - title: "孤塔"
     subtitle: "看倒影金轮，逆光朱户"
-    image: "/media/life/hangzhou/img-2.jpg"
+    image: "/media/life/hangzhou/img-2.webp"
     paragraphs:
       - "看倒影金轮，逆光朱户。"
   - title: "夏末"
     subtitle: "欲把西湖比西子，淡妆浓抹总相宜"
-    image: "/media/life/hangzhou/img-3.jpg"
+    image: "/media/life/hangzhou/img-3.webp"
     paragraphs:
       - "欲把西湖比西子，淡妆浓抹总相宜。"
   - title: "独舟"
     subtitle: "自说孤舟寒水畔，不曾逢着独醒人"
-    image: "/media/life/hangzhou/img-4.jpg"
+    image: "/media/life/hangzhou/img-4.webp"
     paragraphs:
       - "自说孤舟寒水畔，不曾逢着独醒人。"
 ---

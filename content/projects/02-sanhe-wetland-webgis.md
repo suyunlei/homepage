@@ -9,7 +9,7 @@ categoryEn: "Spatial Systems & WebGIS"
 organization: "安徽大学 · Anhui University"
 organizationEn: "Anhui University"
 date: "2020-06"
-cover: "/media/projects/img-2.jpg"
+cover: "/media/projects/img-2.webp"
 summary: "面向安徽三河湿地生态保护与野外巡护需求构建的一体化 WebGIS 空间信息管理平台，推动传统纸质与分散式监测记录向标准化、服务化、可交互的空间数据底座演进。"
 summaryEn: "An integrated WebGIS ecological management platform built for Sanhe Wetland conservation, transforming legacy paper records and fragmented field logs into an interactive, OGC-compliant spatial data infrastructure."
 tags:

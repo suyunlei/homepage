@@ -7,12 +7,12 @@ location: "Taiyuan & Hefei"
 headline: "Life is more than Basketball"
 description: "从太原五中野球场到合肥安大资环院队，关于青春、汗水与一辈子兄弟的四个故事。"
 descriptionEn: "Four chapters of youth, sweat, and lifelong teammates from Taiyuan No.5 High School to AHU."
-cover: "/media/life/covers/img-2.jpg"
+cover: "/media/life/covers/img-2.webp"
 layout: "editorial-stories"
 items:
   - title: "Story 1 · 一代人离开，一代人再来"
     subtitle: "似相识已久，似从未相识，似从未离开"
-    image: "/media/life/basketball/img-1.jpg"
+    image: "/media/life/basketball/img-1.webp"
     paragraphs:
       - "这里是南方篮球，这里是安大，这里是资环；"
       - "大学的时光过得真的很快，一批人好像刚认识，一批人要走了，然后新认识了一批人。好像投篮不会百发百中一样，人也不会一直陪在身边。"
@@ -21,7 +21,7 @@ items:
       - "充满着感谢 ————来自永远是安大资环篮球队的一员"
   - title: "Story 2 · 出道即巅峰，团队篮球的胜利"
     subtitle: "2018 年夏天的尾巴，合肥与第一座冠军"
-    image: "/media/life/basketball/img-2.jpg"
+    image: "/media/life/basketball/img-2.webp"
     paragraphs:
       - "第一次在大学打球，原来大学是这样打球的。就像这张照片一样，夺冠了。"
       - "2018 年夏天的尾巴，人生第一次来了合肥，北方男孩带着无限的憧憬来到了南方的大学。第一时间加入了院队，跟刚认识的朋友们就做了队友。老油条们凌晨五点把我们拉出来拉体能，犹如衣冠禽兽。原来 9 月份的合肥凌晨五点篮板上有露，10 月份有霜。原来打全场这么累，一个人是 C 不动 40 分钟的。原来南方人打球也有很强硬的，原来一起干其他院的人这么团结这么爽。"
@@ -29,7 +29,7 @@ items:
       - "这是永远的记忆。"
   - title: "Story 3 · 太原五中，永远有篮球的一席之地"
     subtitle: "传承与信仰"
-    image: "/media/life/basketball/img-3.jpg"
+    image: "/media/life/basketball/img-3.webp"
     paragraphs:
       - "山西人都知道太原五中篮球很「拧」，甚至懂高中篮球的都知道？当然名声是校队传出去的，但大环境下孕育出来的五中野球场水平，来试试就知道了。"
       - "一代一代又一代，初中时候就看高中的大哥们在球场上飞，他们的后仰几乎可以叫后躺跳投了。在我们这一届踏入高中球场的时候，他们已经奔赴全球各地了。球场上奔跑跳跃的成了我们。每个人都逃课，每个人都挨过班主任的打。有的人篮球被扎爆了，有的人一家子都被叫到了主任办公室。没错，我都经历过。"
@@ -37,7 +37,7 @@ items:
       - "我们都是篮球的信徒。"
   - title: "Story 4 · 投不进，没关系，再来"
     subtitle: "三五好友，一颗篮球，一下午"
-    image: "/media/life/basketball/img-4.jpg"
+    image: "/media/life/basketball/img-4.webp"
     paragraphs:
       - "印象中我每年似乎都有至少一场类似的球赛，或许是我其中几个好交朋友的伙伴组织能力强吧，总能把不同学校不同届的同志们呼唤到一起打比赛。我们能做的，就是上场，享受这样的比赛。"
       - "和最信任、最了解的朋友们当队友是很幸福的一件事，可以自信地从他们手里接到传球，可以信任地将球传于他们手中。"
