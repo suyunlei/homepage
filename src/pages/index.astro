@@ -100,9 +100,6 @@ const quickLinks = [
           <span class="preloader__dot"></span>
           <span>LOADING ARCHIVE</span>
         </span>
-        <span class="preloader__corner preloader__corner--br">
-          <BiText zh="点按任意处互动 ✦" en="Tap anywhere ✦" />
-        </span>
       </div>
 
       <div id="preloader-core" class="preloader__core">
@@ -356,6 +353,10 @@ const quickLinks = [
               el.removeAttribute('data-pending');
             }
 
+            function isReallyLoaded(img) {
+              return Boolean(img.complete && img.naturalWidth > 0);
+            }
+
             function bindClear(el, onSettle) {
               var settled = false;
               var finish = function () {
@@ -366,7 +367,7 @@ const quickLinks = [
               };
               el.addEventListener('load', finish, { once: true });
               el.addEventListener('error', finish, { once: true });
-              if (el.complete) finish();
+              if (isReallyLoaded(el)) finish();
             }
 
             function waitDecode(img) {
@@ -376,24 +377,29 @@ const quickLinks = [
                   if (done) return;
                   done = true;
                   markLoaded(img);
-                  if (typeof img.decode === 'function') {
+                  if (img.naturalWidth > 0 && typeof img.decode === 'function') {
                     img.decode().catch(function () {}).finally(resolve);
                   } else {
                     resolve();
                   }
                 };
-                if (img.complete) {
-                  finish();
-                  return;
-                }
                 img.addEventListener('load', finish, { once: true });
                 img.addEventListener('error', finish, { once: true });
+                Promise.resolve().then(function () {
+                  if (!done && isReallyLoaded(img)) {
+                    finish();
+                  }
+                });
               });
             }
 
-            function activatePicture(img) {
+            function activatePicture(img, priority) {
               var url = img.getAttribute('data-src');
               if (!url) return false;
+              if (priority) {
+                img.setAttribute('fetchpriority', priority);
+              }
+              bindClear(img, null);
               var pic = img.parentElement;
               if (pic && pic.tagName === 'PICTURE') {
                 var sources = pic.querySelectorAll('source[data-srcset]');
@@ -406,9 +412,8 @@ const quickLinks = [
                 }
               }
               img.removeAttribute('data-src');
-              bindClear(img, null);
               img.setAttribute('src', url);
-              if (img.complete) markLoaded(img);
+              if (isReallyLoaded(img)) markLoaded(img);
               return true;
             }
 
@@ -418,7 +423,7 @@ const quickLinks = [
               window.dispatchEvent(new Event('home-tier1-ready'));
             }
 
-            function hydrateWave(wave, forceDesktop) {
+            function hydrateWave(wave, forceDesktop, priority) {
               var desktopNow = Boolean(forceDesktop) || window.innerWidth >= 848;
               if (doneWaves[wave] && (!desktopNow || doneDesktopWaves[wave])) return [];
               doneWaves[wave] = true;
@@ -440,7 +445,7 @@ const quickLinks = [
                 if (!desktopNow && colEl && colEl.getAttribute('data-desktop-only') === '1') {
                   continue;
                 }
-                if (activatePicture(img)) {
+                if (activatePicture(img, priority)) {
                   hydrated.push(img);
                 }
               }
@@ -452,13 +457,13 @@ const quickLinks = [
               hydrateWave('2');
             };
 
-            window.__hydrateAllPanels = function () {
+            window.__hydrateAllPanels = function (priority) {
               if (panelsHydrated) return [];
               panelsHydrated = true;
               var imgs = document.querySelectorAll('.stage-item__photo[data-src]');
               var list = [];
               for (var i = 0; i < imgs.length; i++) {
-                activatePicture(imgs[i]);
+                activatePicture(imgs[i], priority);
                 list.push(imgs[i]);
               }
               return list;
@@ -510,12 +515,16 @@ const quickLinks = [
               var wallImgs = Array.prototype.slice.call(
                 document.querySelectorAll('.column__photo[src]'),
               );
-              var wave1Imgs = hydrateWave('1');
-              for (var k = 0; k < wave1Imgs.length; k++) {
-                wallImgs.push(wave1Imgs[k]);
+              var wave1Imgs = hydrateWave('1', false, 'high');
+              var wave2Imgs = hydrateWave('2', false, 'high');
+              for (var k1 = 0; k1 < wave1Imgs.length; k1++) {
+                wallImgs.push(wave1Imgs[k1]);
+              }
+              for (var k2 = 0; k2 < wave2Imgs.length; k2++) {
+                wallImgs.push(wave2Imgs[k2]);
               }
 
-              var panelImgs = window.__hydrateAllPanels();
+              var panelImgs = window.__hydrateAllPanels('auto');
               if (panelImgs.length === 0) {
                 panelImgs = Array.prototype.slice.call(
                   document.querySelectorAll('.stage-item__photo'),
@@ -525,6 +534,9 @@ const quickLinks = [
               var wallDone = 0;
               var wallTotal = Math.max(1, wallImgs.length);
               wallImgs.forEach(function (img) {
+                if (!isReallyLoaded(img)) {
+                  img.setAttribute('data-pending', '');
+                }
                 waitDecode(img).then(function () {
                   wallDone += 1;
                 });
@@ -621,21 +633,9 @@ const quickLinks = [
 
               var t0 = performance.now();
               var minDuration = 1050;
-              var maxWait = 3200;
+              var maxWait = 7000;
               var displayPct = 0;
               var finished = false;
-
-              var scheduleWave2After = function () {
-                if ('requestIdleCallback' in window) {
-                  window.requestIdleCallback(function () {
-                    hydrateWave('2');
-                  }, { timeout: 1200 });
-                } else {
-                  window.setTimeout(function () {
-                    hydrateWave('2');
-                  }, 450);
-                }
-              };
 
               var finishReveal = function () {
                 if (finished) return;
@@ -662,10 +662,7 @@ const quickLinks = [
                     preloaderEl.removeEventListener('pointerdown', onPreloaderTap);
                     window.setTimeout(function () {
                       preloaderEl.style.display = 'none';
-                      scheduleWave2After();
                     }, 740);
-                  } else {
-                    scheduleWave2After();
                   }
                 }, 220);
               };
@@ -673,22 +670,21 @@ const quickLinks = [
               var tickPreloader = function (now) {
                 if (finished) return;
                 var elapsed = now - t0;
+                var allLoaded =
+                  wallDone >= wallTotal && panelDone >= panelTotal && extrasDone >= extrasTotal;
                 var realPct =
                   55 * (wallDone / wallTotal) +
                   30 * (panelDone / panelTotal) +
                   15 * (extrasDone / extrasTotal);
 
-                if (elapsed >= maxWait) {
-                  realPct = 100;
-                }
-
                 var minRatio = Math.min(1, elapsed / minDuration);
-                var cappedTarget =
-                  minRatio < 1
-                    ? Math.min(realPct, 12 + minRatio * 80)
-                    : realPct >= 99.5
-                      ? 100
-                      : Math.min(96, realPct);
+                var cappedTarget;
+                if (elapsed >= maxWait || (allLoaded && elapsed >= minDuration)) {
+                  cappedTarget = 100;
+                } else {
+                  cappedTarget = Math.min(realPct, 12 + minRatio * 84);
+                  if (cappedTarget > 96) cappedTarget = 96;
+                }
 
                 displayPct += (Math.max(displayPct, cappedTarget) - displayPct) * 0.16;
                 if (cappedTarget >= 100 && displayPct > 98.6) {
@@ -727,7 +723,7 @@ const quickLinks = [
 
               for (var i = 0; i < tier1.length; i++) {
                 var img = tier1[i];
-                if (!img.complete) {
+                if (!isReallyLoaded(img)) {
                   remaining += 1;
                   img.setAttribute('data-pending', '');
                   bindClear(img, onTier1Settle);
@@ -1012,7 +1008,7 @@ const quickLinks = [
     color: var(--ink-primary);
     overflow: hidden;
     user-select: none;
-    cursor: pointer;
+    cursor: default;
     transition: transform 0.72s cubic-bezier(0.76, 0, 0.24, 1);
     will-change: transform;
   }
@@ -1083,12 +1079,6 @@ const quickLinks = [
   .preloader__corner--bl {
     bottom: 0;
     left: 0;
-  }
-
-  .preloader__corner--br {
-    bottom: 0;
-    right: 0;
-    text-align: right;
   }
 
   @media (max-width: 52.99em) {
