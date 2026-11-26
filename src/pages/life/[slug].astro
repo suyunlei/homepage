@@ -3,7 +3,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import EditorialLayout from '@/layouts/EditorialLayout.astro';
 import Lightbox from '@/components/Lightbox.astro';
 import BiText from '@/components/BiText.astro';
-import { getAlbumSlug, withBase } from '@/lib/paths';
+import { getAlbumSlug, getLifeThumbPath, withBase } from '@/lib/paths';
 import type { LightboxSlide } from '@/scripts/lightbox';
 
 export async function getStaticPaths() {
@@ -110,9 +110,10 @@ for (const item of data.items) {
                 data-lightbox-index={itemSlideStartIndex[idx]}
               >
                 <img
-                  src={withBase(item.image)}
+                  src={withBase(getLifeThumbPath(item.image))}
                   alt={item.title}
-                  loading="lazy"
+                  loading={idx < 2 ? 'eager' : 'lazy'}
+                  fetchpriority={idx === 0 ? 'high' : 'auto'}
                   decoding="async"
                   class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
@@ -169,16 +170,17 @@ for (const item of data.items) {
             {data.items.map((item, idx) => (
               <button
                 type="button"
-                class="group editorial-card flex cursor-zoom-in flex-col overflow-hidden rounded-2xl text-left transition-colors hover:border-[#252528]/35"
+                class="group editorial-card-lite flex cursor-zoom-in flex-col overflow-hidden rounded-2xl text-left transition-colors hover:border-[#252528]/35"
                 data-lightbox-trigger
                 data-lightbox-index={itemSlideStartIndex[idx]}
                 data-item-tags={item.tags.join('|')}
               >
                 <div class="relative aspect-[4/3] w-full overflow-hidden bg-[#9ea6ad]/40">
                   <img
-                    src={withBase(item.image)}
+                    src={withBase(getLifeThumbPath(item.image))}
                     alt={item.title}
-                    loading="lazy"
+                    loading={idx < 3 ? 'eager' : 'lazy'}
+                    fetchpriority={idx === 0 ? 'high' : 'auto'}
                     decoding="async"
                     class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />

@@ -16,3 +16,11 @@ export function isExternalHref(href: string): boolean {
 export function getAlbumSlug(id: string): string {
   return id.replace(/^\d+-/, '');
 }
+
+export function getLifeThumbPath(imagePath: string): string {
+  const match = imagePath.match(/^\/media\/life\/([^/]+)\/(.+)\.[^.]+$/);
+  if (!match) return imagePath;
+  const [, folder, stem] = match;
+  if (folder === 'covers' || folder === 'thumbs') return imagePath;
+  return `/media/life/thumbs/${folder}/${stem}.webp`;
+}

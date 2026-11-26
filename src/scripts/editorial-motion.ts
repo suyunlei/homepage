@@ -2,7 +2,7 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 
 if (!reduceMotion && 'IntersectionObserver' in window) {
   const cards = Array.from(
-    document.querySelectorAll<HTMLElement>('.editorial-card, .project-card'),
+    document.querySelectorAll<HTMLElement>('.editorial-card, .editorial-card-lite, .project-card'),
   );
   const foldY = window.innerHeight * 0.96;
 

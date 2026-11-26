@@ -50,12 +50,65 @@ body {
   color: #f4f6f8;
 }
 
+/* Custom Editorial Scrollbars */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(37, 37, 40, 0.28);
+  border-radius: 9999px;
+  border: 1.5px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(37, 37, 40, 0.52);
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(37, 37, 40, 0.34) transparent;
+  }
+}
+
+.editorial-scroll-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.editorial-scroll-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Editorial surfaces */
 .editorial-card {
   background: var(--bg-card);
   border: 1px solid var(--hairline);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+}
+
+.editorial-card-lite {
+  background: rgba(242, 245, 247, 0.78);
+  border: 1px solid var(--hairline);
 }
 
 .editorial-card-solid {

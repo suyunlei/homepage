@@ -38,6 +38,10 @@ if (modal && dataHolder && imgEl) {
     if (subtitleEl) subtitleEl.textContent = item.subtitle || '';
     if (captionEl) captionEl.textContent = item.caption || '';
     if (counterEl) counterEl.textContent = `${current + 1} / ${slides.length}`;
+    if (slides.length > 1) {
+      const nextPreload = new Image();
+      nextPreload.src = slides[(current + 1) % slides.length].src;
+    }
   };
 
   const openModal = (index: number) => {

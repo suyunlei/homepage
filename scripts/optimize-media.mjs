@@ -53,21 +53,21 @@ function getPreset(relPath) {
 
   if (normalized.startsWith('life/covers/')) {
     return {
-      maxWidth: 1000,
-      maxHeight: 1000,
-      quality: 75,
+      maxWidth: 720,
+      maxHeight: 900,
+      quality: 72,
       effort: 5,
-      skipSizeBytes: 120 * 1024,
+      skipSizeBytes: 85 * 1024,
     };
   }
 
   if (normalized.startsWith('life/')) {
     return {
-      maxWidth: 1280,
-      maxHeight: 1280,
-      quality: 75,
+      maxWidth: 1200,
+      maxHeight: 1200,
+      quality: 72,
       effort: 5,
-      skipSizeBytes: 185 * 1024,
+      skipSizeBytes: 155 * 1024,
     };
   }
 
@@ -153,15 +153,100 @@ async function collectContentFiles() {
   return targets;
 }
 
+const STORY_ALBUM_FOLDERS = new Set(['basketball', 'hangzhou']);
+
+async function generateLifeThumbnails(forceThumbs) {
+  const lifeRoot = path.join(MEDIA_ROOT, 'life');
+  const thumbsRoot = path.join(lifeRoot, 'thumbs');
+  const allLifeFiles = (await walkFiles(lifeRoot)).sort();
+  const expectedThumbs = new Set();
+
+  let generated = 0;
+  let skipped = 0;
+  let totalBytes = 0;
+
+  for (const srcPath of allLifeFiles) {
+    const rel = path.relative(lifeRoot, srcPath).replace(/\\/g, '/');
+    const parts = rel.split('/');
+    if (parts.length !== 2) continue;
+    const [folder, fileName] = parts;
+    if (folder === 'covers' || folder === 'thumbs') continue;
+    if (folder === 'ahu' && /^header\./i.test(fileName)) continue;
+
+    const ext = path.extname(fileName).toLowerCase();
+    if (!SUPPORTED_EXTS.has(ext)) continue;
+
+    const stem = path.posix.parse(fileName).name;
+    const destRel = `${folder}/${stem}.webp`;
+    const destPath = path.join(thumbsRoot, folder, `${stem}.webp`);
+    expectedThumbs.add(destRel);
+
+    const srcStat = await fs.stat(srcPath);
+    let destStat = null;
+    try {
+      destStat = await fs.stat(destPath);
+    } catch {
+      destStat = null;
+    }
+
+    if (!forceThumbs && destStat && destStat.mtimeMs >= srcStat.mtimeMs) {
+      skipped += 1;
+      totalBytes += destStat.size;
+      continue;
+    }
+
+    const isStory = STORY_ALBUM_FOLDERS.has(folder);
+    const maxDim = isStory ? 760 : 540;
+    const quality = isStory ? 70 : 66;
+    const srcBuf = await fs.readFile(srcPath);
+    const outBuf = await sharp(srcBuf)
+      .rotate()
+      .resize({
+        width: maxDim,
+        height: maxDim,
+        fit: 'inside',
+        withoutEnlargement: true,
+      })
+      .webp({
+        quality,
+        effort: 5,
+      })
+      .toBuffer();
+
+    await fs.mkdir(path.dirname(destPath), { recursive: true });
+    await fs.writeFile(destPath, outBuf);
+    generated += 1;
+    totalBytes += outBuf.length;
+  }
+
+  // Prune orphaned thumbnails whose source file was removed
+  let removed = 0;
+  const existingThumbs = await walkFiles(thumbsRoot);
+  for (const thumbPath of existingThumbs) {
+    const rel = path.relative(thumbsRoot, thumbPath).replace(/\\/g, '/');
+    if (!expectedThumbs.has(rel)) {
+      await fs.unlink(thumbPath);
+      removed += 1;
+    }
+  }
+
+  console.log('\n=== Life Thumbnails Summary ===');
+  console.log(
+    `Thumbnails: ${expectedThumbs.size} total (${generated} generated, ${skipped} up-to-date, ${removed} pruned), ${(totalBytes / 1024).toFixed(1)} KB total`,
+  );
+}
+
 async function main() {
   const rawArgs = process.argv.slice(2).filter((arg) => arg !== '--');
-  const filters = rawArgs.map((arg) =>
-    arg.replace(/\\/g, '/').replace(/^\/+|\/+$/g, ''),
-  );
+  const forceThumbs = rawArgs.includes('--force-thumbs');
+  const filters = rawArgs
+    .filter((arg) => !arg.startsWith('--'))
+    .map((arg) => arg.replace(/\\/g, '/').replace(/^\/+|\/+$/g, ''));
 
   const allFiles = (await walkFiles(MEDIA_ROOT)).sort();
   const targetFiles = allFiles.filter((filePath) => {
     const rel = path.relative(MEDIA_ROOT, filePath).replace(/\\/g, '/');
+    if (rel.startsWith('life/thumbs/')) return false;
     if (filters.length === 0) return true;
     return filters.some((f) => rel === f || rel.startsWith(`${f}/`));
   });
@@ -313,6 +398,13 @@ async function main() {
   console.log(
     `Total size: ${(totalBefore / 1024 / 1024).toFixed(2)} MB -> ${(totalAfter / 1024 / 1024).toFixed(2)} MB (-${(savedBytes / 1024 / 1024).toFixed(2)} MB, -${savedPct}%)`,
   );
+
+  if (
+    filters.length === 0 ||
+    filters.some((f) => f === 'life' || f.startsWith('life/'))
+  ) {
+    await generateLifeThumbnails(forceThumbs);
+  }
 }
 
 main().catch((err) => {
