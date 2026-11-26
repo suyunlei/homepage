@@ -95,11 +95,19 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
     });
   }
 
-  // Split letters on stage titles and menu buttons
+  // Split letters separately for ZH and EN title variants so toggling never concatenates languages
   const stageMeta = stageItems.map((el) => {
     const titleEl = el.querySelector<HTMLElement>('.stage-title');
     const backEl = el.querySelector<HTMLButtonElement>('.stage-back');
-    const titleLetters = titleEl ? splitLetters(titleEl) : [];
+    let titleLetters: HTMLSpanElement[] = [];
+    if (titleEl) {
+      const variants = Array.from(titleEl.querySelectorAll<HTMLElement>('.stage-title__zh, .stage-title__en'));
+      if (variants.length > 0) {
+        titleLetters = variants.flatMap((v) => splitLetters(v));
+      } else {
+        titleLetters = splitLetters(titleEl);
+      }
+    }
     return { el, backEl, titleLetters };
   });
 

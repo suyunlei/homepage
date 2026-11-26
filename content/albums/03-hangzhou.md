@@ -6,6 +6,7 @@ titleZh: "杭州 · 刹那光影"
 location: "Hangzhou, Zhejiang"
 headline: "The past is just A Moment"
 description: "西湖、雷峰塔与夏末水面上的四帧独白。"
+descriptionEn: "Four quiet frames across West Lake, Leifeng Pagoda, and late-summer waters in Hangzhou."
 cover: "/media/life/covers/img-3.jpg"
 layout: "editorial-stories"
 items:

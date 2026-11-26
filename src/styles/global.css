@@ -136,11 +136,20 @@ body {
 }
 
 .menu-stroke-text span,
-.stage-title span {
+.stage-title [data-i18n] > span {
   display: inline-block;
   white-space: pre;
   pointer-events: none;
   will-change: transform;
+}
+
+/* Site-wide zero-flicker ZH / EN i18n visibility */
+html[data-lang='en'] [data-i18n='zh'] {
+  display: none !important;
+}
+
+html:not([data-lang='en']) [data-i18n='en'] {
+  display: none !important;
 }
 
 /* Custom pointer cursor on fine-pointer desktop devices */

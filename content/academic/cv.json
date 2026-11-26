@@ -1,10 +1,16 @@
 {
-  "position": "PhD Student · Thrust of Urban Governance and Design (UGOD)",
-  "affiliation": "The Hong Kong University of Science and Technology (Guangzhou) · Urban Morphology Studio",
+  "position": "非典型理工博士生 · 《待会儿再说》节目主持人 · HKUST(GZ) UGOD",
+  "positionEn": "Unconventional STEM PhD Student · Host of Podcast \"Talk Later\" · HKUST(GZ) UGOD",
+  "affiliation": "香港科技大学（广州）· 社会枢纽城市治理与设计学域 · Urban Morphology Studio",
+  "affiliationEn": "The Hong Kong University of Science and Technology (Guangzhou) · Urban Morphology Studio",
   "cvPdf": "",
   "bioParagraphs": [
-    "苏云雷（Yunlei Su），香港科技大学（广州）社会枢纽城市治理与设计学域（UGOD）Urban Morphology Studio 在读博士生；先后于安徽大学（地理信息科学）获本科学位、新加坡国立大学（NUS，应用地理信息系统）获理学硕士学位，并曾于工业界担任前端开发与项目经理及科研助理。",
-    "研究兴趣聚焦于 WebGIS、城市数字孪生（Urban Digital Twins）、人-建筑交互（Human-Building Interaction）、虚拟现实（VR）城市建模与眼动感知实验，以及结合街景与卫星多视角影像和多模态大语言模型的城市建筑精细化表征。"
+    "苏云雷（Yunlei Su），非典型理工博士生，同时也是小宇宙播客《待会儿再说》节目主持人。目前就读于香港科技大学（广州）社会枢纽城市治理与设计学域（UGOD）Urban Morphology Studio；此前先后在安徽大学（地理信息科学）获本科学位、新加坡国立大学（NUS，应用地理信息系统）获理学硕士学位，并曾于工业界担任前端开发与项目经理及科研助理。",
+    "学术研究聚焦于 WebGIS、城市数字孪生（Urban Digital Twins）、人-建筑交互（Human-Building Interaction）、虚拟现实（VR）城市建模与眼动感知实验，以及结合街景与卫星多视角影像和多模态大语言模型的城市建筑精细化表征；研究之余热衷于独立全栈产品开发（如「阿薄 / BOJI」）与围绕 AI 和人生议题的播客对谈。"
+  ],
+  "bioParagraphsEn": [
+    "Yunlei Su is an unconventional STEM PhD student in the Thrust of Urban Governance and Design (UGOD), Urban Morphology Studio at The Hong Kong University of Science and Technology (Guangzhou), and the host of the Xiaoyuzhou podcast \"Talk Later\" (《待会儿再说》). He previously earned his BSc in GIS from Anhui University and MSc in Applied GIS from the National University of Singapore (NUS), alongside industry experience in frontend engineering and project management.",
+    "His research centers on WebGIS, Urban Digital Twins, Human-Building Interaction (HBI), VR city modeling with eye-tracking perception, and multimodal LLM-driven urban building characterization. Outside research, he builds full-stack indie products (BOJI / 阿薄) and hosts unhurried conversations on AI and life."
   ],
   "researchInterests": [
     {
@@ -12,6 +18,7 @@
       "title": "Urban Digital Twins & Human-Centric Sensing",
       "titleZh": "城市数字孪生与以人为本的感知计算",
       "summary": "探索「人即传感器（Humans as Sensors）」理念在城市数字孪生中的应用，将个体行为与步行舒适度等社会感知数据接入物理–社会–虚拟融合的城市信息系统。",
+      "summaryEn": "Integrating the \"Humans as Sensors\" paradigm into urban digital twins to bridge physical infrastructure, participatory human sensing, and virtual decision systems.",
       "keywords": ["Urban Digital Twins", "3D GeoInfo", "Humans as Sensors", "Urban Analytics"]
     },
     {
@@ -19,6 +26,7 @@
       "title": "Human-Building Interaction & VR Perception",
       "titleZh": "人-建筑交互与 VR 城市建模感知",
       "summary": "结合沉浸式虚拟现实与眼动追踪技术，量化建筑立面与建成环境元素对人类注视行为的吸引机制，并提出感知驱动的三维城市模型 LOD 优化框架。",
+      "summaryEn": "Combining immersive VR and eye-tracking experiments to measure human visual attention in built environments and formulate perception-driven 3D city LOD design.",
       "keywords": ["Human-Building Interaction", "VR City Modeling", "Eye-Tracking", "LOD Design"]
     },
     {
@@ -26,6 +34,7 @@
       "title": "Multimodal GeoAI & Street-View Analytics",
       "titleZh": "多模态 GeoAI 与街景/多视角影像分析",
       "summary": "融合街景影像、遥感影像与 OpenStreetMap 空间信息，利用微调多模态大语言模型（MLLM）自动提取多尺度建筑属性，并量化连续街景序列异质性对感知的影响。",
+      "summaryEn": "Fusing street-view imagery, satellite observations, and OpenStreetMap via fine-tuned multimodal LLMs for multi-scale building characterization and sequential perception analysis.",
       "keywords": ["Multimodal LLM", "Street View Imagery", "Building Characterization", "GeoAI"]
     },
     {
@@ -33,6 +42,7 @@
       "title": "WebGIS & Urban Spatial Dynamics",
       "titleZh": "WebGIS 系统与城市空间格局演替",
       "summary": "基于 OpenLayers、Cesium、GeoServer 与空间统计模型构建生态与城市多源空间管理平台，定量分析快速城镇化区域的土地利用转移与驱动力机制。",
+      "summaryEn": "Building multi-source 2D/3D WebGIS platforms with OpenLayers, CesiumJS, and GeoServer while quantifying rapid urban expansion patterns and socioeconomic drivers.",
       "keywords": ["WebGIS", "CesiumJS", "OpenLayers", "GeoServer"]
     }
   ],
@@ -40,67 +50,110 @@
     {
       "period": "Current",
       "institution": "香港科技大学（广州）· HKUST(GZ)",
+      "institutionEn": "The Hong Kong University of Science and Technology (Guangzhou)",
       "location": "广州 · Guangzhou",
+      "locationEn": "Guangzhou, China",
       "degree": "博士研究生 (PhD Student) · Thrust of Urban Governance and Design (UGOD)",
-      "details": "所属 Urban Morphology Studio，研究聚焦 VR 城市建模 LOD 感知设计、人-建筑交互（HBI）与多模态大模型驱动的城市空间表征。"
+      "degreeEn": "PhD Student · Thrust of Urban Governance and Design (UGOD)",
+      "details": "所属 Urban Morphology Studio，研究聚焦 VR 城市建模 LOD 感知设计、人-建筑交互（HBI）与多模态大模型驱动的城市空间表征。",
+      "detailsEn": "Member of Urban Morphology Studio focusing on perception-driven VR city modeling LOD design, human-building interaction (HBI), and multimodal LLM spatial analytics."
     },
     {
       "period": "2022 – 2023",
       "institution": "新加坡国立大学 · National University of Singapore (NUS)",
+      "institutionEn": "National University of Singapore (NUS)",
       "location": "新加坡 · Singapore",
+      "locationEn": "Singapore",
       "degree": "理学硕士 (MSc in Applied GIS) · Department of Geography",
-      "details": "系统研习应用地理信息系统与城市分析方法，期间与 Urban Analytics Lab 合作开展以人为本的城市数字孪生研究。"
+      "degreeEn": "MSc in Applied GIS · Department of Geography",
+      "details": "系统研习应用地理信息系统与城市分析方法，期间与 Urban Analytics Lab 合作开展以人为本的城市数字孪生研究。",
+      "detailsEn": "Completed graduate training in applied GIS and urban analytics, collaborating with the Urban Analytics Lab on human-centric urban digital twins."
     },
     {
       "period": "2018 – 2022",
       "institution": "安徽大学 · Anhui University",
+      "institutionEn": "Anhui University",
       "location": "合肥 · Hefei",
+      "locationEn": "Hefei, China",
       "degree": "学士学位 (B.S. / B.A. in Geographic Information Science)",
-      "details": "资源与环境工程学院地理信息科学专业；主持参与湿地 WebGIS 创新创业项目并合作发表深圳城市扩张 EI 论文。"
+      "degreeEn": "Bachelor in Geographic Information Science",
+      "details": "资源与环境工程学院地理信息科学专业；主持参与湿地 WebGIS 创新创业项目并合作发表深圳城市扩张 EI 论文。",
+      "detailsEn": "School of Resources and Environmental Engineering; led a wetland WebGIS innovation project and co-authored an EI conference paper on Shenzhen urban expansion."
     }
   ],
   "experience": [
     {
       "period": "2024.09 – 2025.01",
       "organization": "香港科技大学（广州）AI4City 实验室 · AI4City Lab, HKUST(GZ)",
+      "organizationEn": "AI4City Lab, HKUST(GZ)",
       "location": "广州 · Guangzhou",
+      "locationEn": "Guangzhou, China",
       "role": "科研助理 · Research Assistant",
+      "roleEn": "Research Assistant",
       "details": "参与城市人工智能与地理信息交叉方向科研工作，围绕多视角城市建筑语义表征、多模态大模型空间数据管线与人-建筑交互实验提供研究与工程支持。",
-      "highlights": []
+      "detailsEn": "Conducted research at the intersection of Urban AI and GIS, supporting multi-view urban building characterization, multimodal LLM spatial pipelines, and HBI experiments.",
+      "highlights": [],
+      "highlightsEn": []
     },
     {
       "period": "2023.09 – 2024.09",
       "organization": "中国建筑国际集团有限公司 · China State Construction International (CSCI)",
+      "organizationEn": "China State Construction International (CSCI)",
       "location": "海之子 · Full-time",
+      "locationEn": "Management Trainee · Full-time",
       "role": "前端开发工程师 & 项目经理（海之子）· Frontend Engineer & Project Manager",
+      "roleEn": "Frontend Engineer & Project Manager",
       "details": "作为「海之子」管培生，统筹前端架构研发与数字化系统项目管理，推动多套企业级研发与运维平台落地。",
+      "detailsEn": "As a management trainee, led frontend architecture development and digital system project delivery across multiple enterprise platforms.",
       "highlights": [
         "主导并开发企业级科技管理平台，支撑科研立项、技术成果与研发流程数字化管理",
         "设计并开发多款飞书小程序应用，打通企业内部移动协同与业务审批链路",
         "负责公司舆情监测系统的统筹管理与持续迭代优化",
         "负责智能楼宇系统的运行管理、数据接入与数字化协同对接"
+      ],
+      "highlightsEn": [
+        "Led frontend engineering of the enterprise Sci-Tech Management Platform supporting R&D workflows and project lifecycle tracking",
+        "Designed and shipped multiple Feishu (Lark) mini-programs streamlining internal mobile collaboration and approval workflows",
+        "Managed and iteratively improved the corporate public-opinion monitoring system",
+        "Oversaw operations, data integration, and digital coordination for smart-building management systems"
       ]
     },
     {
       "period": "2021.07 – 2022.01",
       "organization": "合肥泰瑞数创科技有限公司 · TerraIT (SmartEarth)",
+      "organizationEn": "Hefei TerraIT Technology Co., Ltd. (SmartEarth)",
       "location": "合肥 · Hefei",
+      "locationEn": "Hefei, China",
       "role": "WebGIS 开发实习生 · WebGIS Development Intern",
+      "roleEn": "WebGIS Development Intern",
       "details": "大三暑期起进行为期 6 个月的深度 WebGIS 工程实习，参与多行业三维地理信息系统研发及底层 SDK 能力沉淀。",
+      "detailsEn": "Completed a 6-month WebGIS engineering internship starting in junior summer, building 3D geospatial applications and core SDK capabilities.",
       "highlights": [
         "参与交付多套三维 WebGIS 业务系统，涵盖面向军工研究所等高可靠性场景的空间可视化与应用开发",
         "基于 Cesium 底层引擎参与研发泰瑞自研三维地理信息 SDK，封装常用空间标绘、场景控制与数据加载能力"
+      ],
+      "highlightsEn": [
+        "Delivered multiple 3D WebGIS applications, including high-reliability spatial visualization systems for defense research institutes",
+        "Co-developed TerraIT's proprietary 3D GIS SDK built on Cesium, encapsulating spatial plotting, camera control, and multi-source data loading"
       ]
     },
     {
       "period": "2020.07 – 2020.09",
       "organization": "阿里云创新中心 · Alibaba Cloud Innovation Center",
+      "organizationEn": "Alibaba Cloud Innovation Center",
       "location": "实习 · Internship",
+      "locationEn": "Internship",
       "role": "前端开发实习生 · Frontend Development Intern",
+      "roleEn": "Frontend Development Intern",
       "details": "参与阿里云创新中心新零售电商直播桌面端及企业客户 Web 门户项目研发，完成多分辨率自适应布局与模块化交互交付。",
+      "detailsEn": "Contributed to desktop live-commerce web portals and enterprise client web systems with responsive grid layouts and modular UI interactions.",
       "highlights": [
         "负责阿里云电商直播桌面端响应式栅格架构与事件驱动交互模块开发",
         "参与企业级生产门户「小橘科技」多页面模块化前端工程搭建与浏览器兼容性调优"
+      ],
+      "highlightsEn": [
+        "Engineered responsive grid layouts and event-driven UI modules for Alibaba Cloud's desktop live-commerce portal",
+        "Delivered multi-page modular frontend components and cross-browser optimizations for Xiaoju Tech enterprise portal"
       ]
     }
   ],
@@ -108,20 +161,29 @@
     {
       "year": "2023",
       "title": "Best Paper Award — 18th International 3D GeoInfo Conference",
+      "titleEn": "Best Paper Award — 18th International 3D GeoInfo Conference",
       "role": "Munich, Germany · Co-author (Humans as Sensors in Urban Digital Twins)",
-      "note": "提出的「Humans as Sensors」人本城市数字孪生框架及 NUS 校园步行舒适度实证获大会最佳论文奖。"
+      "roleEn": "Munich, Germany · Co-author (Humans as Sensors in Urban Digital Twins)",
+      "note": "提出的「Humans as Sensors」人本城市数字孪生框架及 NUS 校园步行舒适度实证获大会最佳论文奖。",
+      "noteEn": "Awarded Best Paper for the human-centric Urban Digital Twins conceptual framework and NUS campus walking-comfort validation."
     },
     {
       "year": "2020",
       "title": "大学生创新创业训练计划：三河湿地 WebGIS 管理系统",
+      "titleEn": "Undergraduate Innovation Project: Sanhe Wetland WebGIS Platform",
       "role": "安徽大学 · 空间系统设计与全栈实现",
-      "note": "基于 OpenLayers + GeoServer 实现矢量、栅格与监测数据的在线上传与 WMS/WFS 服务发布。"
+      "roleEn": "Anhui University · Spatial System Architecture & Implementation",
+      "note": "基于 OpenLayers + GeoServer 实现矢量、栅格与监测数据的在线上传与 WMS/WFS 服务发布。",
+      "noteEn": "Built an OpenLayers + GeoServer spatial management platform supporting vector, raster, and monitoring data via WMS/WFS."
     },
     {
       "year": "2019",
       "title": "「一带一路」沿线国家健康指数与人均寿命专题地图集",
+      "titleEn": "Thematic Cartography: Health Index & Life Expectancy along Belt & Road",
       "role": "安徽大学 · 数据爬取与专题制图",
-      "note": "Python 自动采集公共医疗数据，结合 ArcGIS、QGIS 与 Adobe Illustrator 完成专题地图设计。"
+      "roleEn": "Anhui University · Data Scraping & Thematic Cartography",
+      "note": "Python 自动采集公共医疗数据，结合 ArcGIS、QGIS 与 Adobe Illustrator 完成专题地图设计。",
+      "noteEn": "Automated healthcare data collection with Python and produced publication-grade thematic maps via ArcGIS, QGIS, and Adobe Illustrator."
     }
   ],
   "serviceAndSkills": [

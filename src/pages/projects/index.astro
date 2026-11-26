@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import EditorialLayout from '@/layouts/EditorialLayout.astro';
+import BiText from '@/components/BiText.astro';
 import { isExternalHref, withBase } from '@/lib/paths';
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
@@ -8,21 +9,25 @@ const categories = Array.from(new Set(projects.map((p) => p.data.category)));
 ---
 
 <EditorialLayout
-  title="实践项目 · Projects · 苏云雷"
-  description="苏云雷（Yunlei Su）的独立产品与工程实践项目：阿薄/薄迹 BOJI、三河湿地 WebGIS、阿里云电商直播与小橘科技。"
+  title="实践项目与播客 · Projects · 苏云雷"
+  titleEn="Projects & Podcast · Yunlei Su"
+  description="苏云雷（Yunlei Su）的独立产品、播客与工程实践：阿薄/薄迹 BOJI、小宇宙播客《待会儿再说》、三河湿地 WebGIS 与企业前端工程。"
 >
   <div class="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
     <header class="reveal-section border-b editorial-hairline pb-8">
       <p class="font-mono text-xs uppercase tracking-[0.2em] text-[#4a4f57]">
-        Projects · 实践与创造
+        <BiText zh="Projects & Media · 实践、创造与发声" en="Projects & Media" />
       </p>
       <div class="mt-2 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-[#252528] sm:text-4xl">
-            可视化自己的进步
+            <BiText zh="可视化自己的进步" en="Building, Thinking & Hosting" />
           </h1>
           <p class="mt-2 max-w-2xl text-sm leading-relaxed text-[#4a4f57] sm:text-base">
-            记录从独立产品全栈落地、空间信息平台研发到企业级前端工程实践中的代表作品。
+            <BiText
+              zh="记录从独立产品全栈落地、小宇宙播客《待会儿再说》、空间信息平台研发到企业级前端工程实践中的代表作品。"
+              en={'Selected works across full-stack indie products (BOJI), my Xiaoyuzhou podcast "Talk Later" (《待会儿再说》), WebGIS spatial platforms, and enterprise web engineering.'}
+            />
           </p>
         </div>
         <span class="font-mono text-xs text-[#4a4f57]">
@@ -54,14 +59,14 @@ const categories = Array.from(new Set(projects.map((p) => p.data.category)));
       </div>
     </header>
 
-    <section class="reveal-section mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <section class="reveal-section mt-10 grid gap-6 md:grid-cols-2">
       {
         projects.map((project) => {
           const { data } = project;
           if (data.featured) {
             return (
               <article
-                class="project-card group editorial-card md:col-span-2 lg:col-span-3 grid overflow-hidden rounded-3xl transition-colors hover:border-[#252528]/35 lg:grid-cols-12"
+                class="project-card group editorial-card md:col-span-2 grid overflow-hidden rounded-3xl transition-colors hover:border-[#252528]/35 lg:grid-cols-12"
                 data-project-category={data.category}
               >
                 <div class="flex flex-col items-center justify-center gap-4 border-b editorial-hairline bg-[#f4eee6] p-6 sm:p-8 lg:col-span-5 lg:border-r lg:border-b-0">
@@ -85,7 +90,10 @@ const categories = Array.from(new Set(projects.map((p) => p.data.category)));
                       )}
                       {data.miniProgramName && (
                         <span class="font-mono text-xs text-[#252528]">
-                          微信小程序搜「{data.miniProgramName}」
+                          <BiText
+                            zh={`微信小程序搜「${data.miniProgramName}」`}
+                            en={`WeChat Mini Program: ${data.miniProgramName}`}
+                          />
                         </span>
                       )}
                     </div>
@@ -98,32 +106,46 @@ const categories = Array.from(new Set(projects.map((p) => p.data.category)));
                       Flagship · {data.category}
                     </span>
                     <div class="flex items-center gap-3 font-mono text-xs text-[#5d636c]">
-                      <span>{data.organization}</span>
+                      <span>
+                        <BiText zh={data.organization} en={data.organizationEn || data.organization} />
+                      </span>
                       <span>·</span>
                       <span>{data.date}</span>
                     </div>
                   </div>
 
                   <h2 class="mt-4 text-2xl font-bold tracking-tight text-[#252528] sm:text-3xl">
-                    {data.title}
+                    <BiText zh={data.title} en={data.titleEn || data.title} />
                   </h2>
                   {data.subtitle && (
-                    <p class="mt-1 text-sm font-medium text-[#27445d]">{data.subtitle}</p>
+                    <p class="mt-1 text-sm font-medium text-[#27445d]">
+                      <BiText zh={data.subtitle} en={data.subtitleEn || data.subtitle} />
+                    </p>
                   )}
 
                   <p class="mt-4 text-sm leading-relaxed text-[#4a4f57] sm:text-base">
-                    {data.summary}
+                    <BiText zh={data.summary} en={data.summaryEn || data.summary} />
                   </p>
 
                   {data.highlights.length > 0 && (
-                    <ul class="mt-5 space-y-2 text-sm leading-relaxed text-[#252528]/90">
-                      {data.highlights.map((item) => (
-                        <li class="flex gap-2.5">
-                          <span class="font-mono text-[#27445d]">—</span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <>
+                      <ul class="mt-5 space-y-2 text-sm leading-relaxed text-[#252528]/90" data-i18n="zh">
+                        {data.highlights.map((item) => (
+                          <li class="flex gap-2.5">
+                            <span class="font-mono text-[#27445d]">—</span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <ul class="mt-5 space-y-2 text-sm leading-relaxed text-[#252528]/90" data-i18n="en">
+                        {(data.highlightsEn.length > 0 ? data.highlightsEn : data.highlights).map((item) => (
+                          <li class="flex gap-2.5">
+                            <span class="font-mono text-[#27445d]">—</span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </>
                   )}
 
                   <div class="mt-5 flex flex-wrap gap-1.5">
@@ -144,14 +166,14 @@ const categories = Array.from(new Set(projects.map((p) => p.data.category)));
                           rel={openNew ? 'noopener noreferrer' : undefined}
                           class="editorial-btn editorial-btn--primary"
                         >
-                          <span>{link.label}</span>
+                          <BiText zh={link.label} en={link.labelEn || link.label} />
                           <span aria-hidden="true">{openNew ? '↗' : '→'}</span>
                         </a>
                       );
                     })}
                     {data.miniProgramName && (
                       <span class="rounded-full border border-[#252528]/20 bg-white/60 px-3.5 py-2 font-mono text-xs text-[#252528]">
-                        微信入口：{data.miniProgramName}
+                        <BiText zh={`微信入口：${data.miniProgramName}`} en={`WeChat: ${data.miniProgramName}`} />
                       </span>
                     )}
                   </div>
@@ -160,47 +182,75 @@ const categories = Array.from(new Set(projects.map((p) => p.data.category)));
             );
           }
 
+          const isContain = data.coverFit === 'contain';
           return (
             <article
               class="project-card group editorial-card flex flex-col overflow-hidden rounded-2xl transition-colors hover:border-[#252528]/35"
               data-project-category={data.category}
             >
-              <div class="relative aspect-[16/10] overflow-hidden bg-[#9ea6ad]/40">
+              <div
+                class:list={[
+                  'relative aspect-[16/10] overflow-hidden',
+                  !isContain && 'bg-[#9ea6ad]/40',
+                ]}
+                style={isContain && data.coverBg ? `background-color: ${data.coverBg};` : undefined}
+              >
                 <img
                   src={withBase(data.cover)}
                   alt={data.title}
                   loading="lazy"
-                  class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  class:list={[
+                    'h-full w-full transition-transform duration-500',
+                    isContain
+                      ? 'object-contain p-3 group-hover:scale-[1.03]'
+                      : 'object-cover group-hover:scale-105',
+                  ]}
                 />
                 <span class="absolute top-3 left-3 rounded-full bg-[#252528]/85 px-3 py-1 font-mono text-[11px] text-[#f4f6f8] backdrop-blur-sm">
-                  {data.category}
+                  <BiText zh={data.category} en={data.categoryEn || data.category} />
                 </span>
               </div>
 
               <div class="flex flex-1 flex-col p-6">
                 <div class="flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-[#5d636c]">
-                  <span>{data.organization}</span>
+                  <span>
+                    <BiText zh={data.organization} en={data.organizationEn || data.organization} />
+                  </span>
                   <span>{data.date}</span>
                 </div>
 
                 <h2 class="mt-2.5 text-xl font-bold tracking-tight text-[#252528]">
-                  {data.title}
+                  <BiText zh={data.title} en={data.titleEn || data.title} />
                 </h2>
                 {data.subtitle && (
-                  <p class="mt-0.5 text-xs font-medium text-[#27445d]">{data.subtitle}</p>
+                  <p class="mt-0.5 text-xs font-medium text-[#27445d]">
+                    <BiText zh={data.subtitle} en={data.subtitleEn || data.subtitle} />
+                  </p>
                 )}
 
-                <p class="mt-3 text-sm leading-relaxed text-[#4a4f57]">{data.summary}</p>
+                <p class="mt-3 text-sm leading-relaxed text-[#4a4f57]">
+                  <BiText zh={data.summary} en={data.summaryEn || data.summary} />
+                </p>
 
                 {data.highlights.length > 0 && (
-                  <ul class="mt-4 space-y-1.5 text-xs leading-relaxed text-[#252528]/85">
-                    {data.highlights.map((item) => (
-                      <li class="flex gap-2">
-                        <span class="font-mono text-[#27445d]">—</span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <>
+                    <ul class="mt-4 space-y-1.5 text-xs leading-relaxed text-[#252528]/85" data-i18n="zh">
+                      {data.highlights.map((item) => (
+                        <li class="flex gap-2">
+                          <span class="font-mono text-[#27445d]">—</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <ul class="mt-4 space-y-1.5 text-xs leading-relaxed text-[#252528]/85" data-i18n="en">
+                      {(data.highlightsEn.length > 0 ? data.highlightsEn : data.highlights).map((item) => (
+                        <li class="flex gap-2">
+                          <span class="font-mono text-[#27445d]">—</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
                 )}
 
                 <div class="mt-5 flex flex-wrap gap-1.5">
@@ -212,6 +262,12 @@ const categories = Array.from(new Set(projects.map((p) => p.data.category)));
                 </div>
 
                 <div class="mt-auto pt-5">
+                  {data.platformBadge && (
+                    <p class="inline-flex items-center gap-2 rounded-full border border-[#27445d]/30 bg-[#27445d]/10 px-3.5 py-1.5 font-mono text-xs font-medium text-[#27445d]">
+                      <BiText zh={data.platformBadge} en={data.platformBadgeEn || data.platformBadge} />
+                    </p>
+                  )}
+
                   {data.links.length > 0 && (
                     <div class="flex flex-wrap gap-2">
                       {data.links.map((link) => {
@@ -228,7 +284,7 @@ const categories = Array.from(new Set(projects.map((p) => p.data.category)));
                                 : 'hover:border-[#252528]',
                             ]}
                           >
-                            <span>{link.label}</span>
+                            <BiText zh={link.label} en={link.labelEn || link.label} />
                             <span aria-hidden="true">{openNew ? '↗' : '→'}</span>
                           </a>
                         );
@@ -238,7 +294,7 @@ const categories = Array.from(new Set(projects.map((p) => p.data.category)));
 
                   {data.archiveNote && (
                     <p class="mt-3 rounded-xl border border-[#252528]/12 bg-white/35 px-3 py-2 font-mono text-[11px] text-[#5d636c]">
-                      {data.archiveNote}
+                      <BiText zh={data.archiveNote} en={data.archiveNoteEn || data.archiveNote} />
                     </p>
                   )}
                 </div>
@@ -251,11 +307,14 @@ const categories = Array.from(new Set(projects.map((p) => p.data.category)));
 
     <section class="reveal-section editorial-card mt-12 rounded-2xl p-6 text-center sm:p-8">
       <p class="text-sm text-[#4a4f57]">
-        要做与记录的东西还会有很多。如果想查看学术论文全文与引用格式，可以前往学术成果空间：
+        <BiText
+          zh="要做与记录的东西还会有很多。如果想查看学术论文全文与引用格式，可以前往学术成果空间："
+          en="More builds and conversations are on the way. Looking for full papers, BibTeX citations, or research background?"
+        />
       </p>
       <div class="mt-4">
         <a href={withBase('/academic/#publications')} class="editorial-btn editorial-btn--primary">
-          进入学术论文列表 →
+          <BiText zh="进入学术论文列表 →" en="Explore Academic Publications →" />
         </a>
       </div>
     </section>

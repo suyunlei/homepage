@@ -6,6 +6,7 @@ titleZh: "唯美食不可辜负"
 location: "Guangzhou, Guangdong"
 headline: "Only good food Can't live up to"
 description: "盐的味道、山的味道、风的味道，也是一人食与烟火人间的十五种滋味。"
+descriptionEn: "Fifteen tastes of salt, mountains, late-night warmth, and everyday comfort food."
 cover: "/media/life/covers/img-5.jpg"
 layout: "masonry-gallery"
 items:

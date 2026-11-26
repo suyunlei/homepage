@@ -1,14 +1,17 @@
 {
   "siteTitle": "苏云雷 · Yunlei Su",
-  "siteDescription": "苏云雷（Yunlei Su / Ray）的个人主页——HKUST(GZ) 在读博士生，研究方向涵盖 WebGIS、城市数字孪生（Urban Digital Twins）与人-建筑交互（Human-Building Interaction）。",
+  "siteTitleEn": "Yunlei Su · Personal Homepage",
+  "siteDescription": "苏云雷（Yunlei Su / Ray）的个人主页——非典型理工博士生，《待会儿再说》播客主持人，关注 WebGIS、城市数字孪生与人-建筑交互。",
   "heroFrameTitle": "Welcome to Yunlei Su's World",
-  "heroFrameSubtitle": "WebGIS · Urban Digital Twins · HBI",
+  "heroFrameSubtitle": "非典型理工博士生 · 《待会儿再说》播客主持人 · WebGIS & Urban Digital Twins",
+  "heroFrameSubtitleEn": "Unconventional STEM PhD Student · Host of \"Talk Later\" · WebGIS & Urban Digital Twins",
   "owner": {
     "nameZh": "苏云雷",
     "nameEn": "Yunlei Su",
     "nickname": "Ray",
     "handle": "@东曦不知道是什么东西",
-    "tagline": "PhD Student @ HKUST(GZ) · WebGIS · Urban Digital Twins · Human-Building Interaction",
+    "tagline": "非典型理工博士生 · 《待会儿再说》节目主持人 · WebGIS / Urban Digital Twins / HBI",
+    "taglineEn": "Unconventional STEM PhD Student · Host of Podcast \"Talk Later\" · WebGIS / Urban Digital Twins / HBI",
     "location": "Guangzhou, China",
     "avatar": "/media/profile/avatar.jpg"
   },
@@ -75,72 +78,113 @@
     {
       "menuLabel": "Author",
       "title": "苏云雷 Ray",
-      "subtitle": "HKUST(GZ) PhD Student · 一个善良的愣头青",
+      "titleEn": "Yunlei Su (Ray)",
+      "subtitle": "非典型理工博士生 · 《待会儿再说》节目主持人",
+      "subtitleEn": "Unconventional STEM PhD Student · Host of \"Talk Later\"",
       "image": "/media/home/11.jpg",
       "paragraphs": [
-        "本科毕业于安徽大学地理信息科学专业，硕士就读于新加坡国立大学（NUS）应用地理信息系统专业，目前在香港科技大学（广州）城市治理与设计学域攻读博士学位。",
+        "本科毕业于安徽大学地理信息科学专业，硕士就读于新加坡国立大学（NUS）应用地理信息系统专业，目前在香港科技大学（广州）攻读博士学位；也是独立产品「阿薄」作者，以及小宇宙播客《待会儿再说》节目主持人。",
         "Welcome to My World, My Lord, and My Lady.",
         "我的朋友，我希望我们的友谊长久；如果与您初识，希望我们可以成为朋友。",
-        "这里既记录我的学术探索，也珍藏一路走来的生活影像与故事。"
+        "这里既记录我的学术探索，也收藏独立开发、播客对谈与生活影像。"
+      ],
+      "paragraphsEn": [
+        "BSc in GIS from Anhui University, MSc in Applied GIS from the National University of Singapore (NUS), and currently a PhD student at HKUST(GZ). Also an indie product builder (BOJI) and host of the Xiaoyuzhou podcast \"Talk Later\" (《待会儿再说》).",
+        "Welcome to My World, My Lord, and My Lady.",
+        "Whether we are old friends or meeting for the first time, I hope our conversations and friendships last.",
+        "This space brings together my academic publications, engineering builds, podcast talks, and moments from daily life."
       ],
       "ctaLabel": "查看学术档案与简介",
+      "ctaLabelEn": "Explore Academic Profile",
       "ctaHref": "/academic/#about"
     },
     {
       "menuLabel": "Academic",
       "title": "学术成果",
-      "subtitle": "WebGIS · Urban Digital Twins · HBI",
+      "titleEn": "Academic Space",
+      "subtitle": "WebGIS · 城市数字孪生 · 人-建筑交互",
+      "subtitleEn": "WebGIS · Urban Digital Twins · Human-Building Interaction",
       "image": "/media/projects/img-3.jpg",
       "paragraphs": [
         "研究围绕城市数字孪生（Urban Digital Twins）、人-建筑交互（Human-Building Interaction）、VR 城市建模与眼动感知、以及多模态大语言模型驱动的城市建筑语义表征展开。",
         "已同步收录 Google Scholar 上的 7 篇期刊与国际会议论文（涵盖 JAG、Cities、3D GeoInfo Best Paper Award、SpatialDI、CUPUM 与 E3S），附带 DOI、BibTeX 与开源代码链接。"
       ],
+      "paragraphsEn": [
+        "My research focuses on Urban Digital Twins, Human-Building Interaction, VR city modeling and eye-tracking perception, and multimodal LLM-powered urban building characterization.",
+        "Includes all 7 peer-reviewed journal and conference publications synced from Google Scholar (JAG, Cities, 3D GeoInfo Best Paper Award, SpatialDI, CUPUM, and E3S) with DOI, BibTeX, and open-source links."
+      ],
       "ctaLabel": "进入学术成果主页",
+      "ctaLabelEn": "Enter Academic Space",
       "ctaHref": "/academic/"
     },
     {
       "menuLabel": "Life Style",
       "title": "艺术篇章",
+      "titleEn": "Life & Photography",
       "subtitle": "Life is full of Art",
+      "subtitleEn": "Life is full of Art",
       "image": "/media/home/19.jpg",
       "paragraphs": [
         "时间流逝得太快，许多事都记不清了。",
         "谨以此篇记录那些叫做回忆的东西——球场、朋友、杭州、母校与烟火人间。",
         "Always Remember."
       ],
+      "paragraphsEn": [
+        "Time moves so fast that details easily fade away.",
+        "This collection preserves the memories worth keeping — friends, basketball courts, Hangzhou, campus years at AHU, and everyday food.",
+        "Always Remember."
+      ],
       "ctaLabel": "浏览生活与摄影影集",
+      "ctaLabelEn": "View Photo Albums",
       "ctaHref": "/life/"
     },
     {
       "menuLabel": "Project",
-      "title": "实践项目",
-      "subtitle": "可视化自己的进步",
+      "title": "实践与播客",
+      "titleEn": "Projects & Podcast",
+      "subtitle": "产品 · 空间工程 · 《待会儿再说》",
+      "subtitleEn": "Indie Product · WebGIS · Podcast \"Talk Later\"",
       "image": "/media/home/8.jpg",
       "paragraphs": [
         "Still Young, Still Creative.",
-        "记录那些在科研训练、WebGIS 开发、专题地图制图与前端工程实践中创造的故事。",
+        "既有独立全栈健康产品「阿薄（BOJI）」、WebGIS 与企业前端工程实践，也有我和朋友们在小宇宙一起成长的播客节目《待会儿再说》。",
         "Time passed quickly."
       ],
-      "ctaLabel": "查看全部项目档案",
+      "paragraphsEn": [
+        "Still Young, Still Creative.",
+        "Featuring the full-stack indie AI wellness product BOJI (阿薄), WebGIS and enterprise web engineering projects, and our Xiaoyuzhou podcast \"Talk Later\" (《待会儿再说》).",
+        "Time passed quickly."
+      ],
+      "ctaLabel": "查看全部项目与播客",
+      "ctaLabelEn": "Explore Projects & Podcast",
       "ctaHref": "/projects/"
     },
     {
       "menuLabel": "Contact",
       "title": "联系我",
+      "titleEn": "Get in Touch",
       "subtitle": "Let us begin our story",
+      "subtitleEn": "Let us begin our story",
       "image": "/media/home/4.jpg",
       "paragraphs": [
         "可能我们许久未联系了，老朋友。",
         "可能我们初次相识，新朋友。",
-        "可能我们仍未相识，陌生人。欢迎随时来信交流学术问题、项目合作或生活近况。"
+        "可能我们仍未相识，陌生人。欢迎随时来信交流学术问题、产品合作、播客串台或生活近况。"
+      ],
+      "paragraphsEn": [
+        "Perhaps we haven't caught up in a while, old friend.",
+        "Perhaps we are meeting for the first time, or haven't crossed paths yet.",
+        "Feel free to reach out about research collaborations, indie products, podcast conversations, or just to say hello."
       ],
       "ctaLabel": "前往联系方式",
+      "ctaLabelEn": "Go to Contact Page",
       "ctaHref": "/contact/"
     }
   ],
   "contact": {
     "introQuote": "Please allow me to offer you my greatest gratitude. I will continuously update my homepage — welcome back anytime.",
-    "bioLine": "PhD Student @ HKUST(GZ) · 持续记录科研探索与生活细节",
+    "bioLine": "非典型理工博士生 · 《待会儿再说》节目主持人 · 持续记录科研、创造与生活",
+    "bioLineEn": "Unconventional STEM PhD Student · Host of \"Talk Later\" · Research, Making & Life",
     "email": "",
     "githubUrl": "https://github.com/suyunlei",
     "weiboUrl": "https://weibo.com/u/5807394780",
@@ -148,14 +192,16 @@
     "orcidUrl": "",
     "wechatQr": "/media/profile/wechat.jpg",
     "wechatId": "",
-    "wechatHint": "扫码添加微信，请备注来意（学术交流 / 朋友问候）",
-    "miniProgramNote": "微信小程序搜索「苏云雷」",
+    "wechatHint": "扫码添加微信，请备注来意（学术交流 / 播客串台 / 朋友问候）",
+    "wechatHintEn": "Scan to add on WeChat (please mention research, podcast, or greeting)",
+    "miniProgramNote": "微信小程序「阿薄努力成为薄肌」· 小宇宙播客《待会儿再说》",
+    "miniProgramNoteEn": "WeChat Mini Program \"阿薄努力成为薄肌\" · Xiaoyuzhou Podcast \"Talk Later\"",
     "chatNotes": [
-      { "side": "visitor", "text": "So upset these days :(" },
-      { "side": "visitor", "text": "Do you know someone that I can chat with?" },
-      { "side": "ray", "text": "Don't worry dude!" },
-      { "side": "ray", "text": "Contact Ray right now!" },
-      { "side": "ray", "text": "无论学术探讨还是叙旧闲聊，都很欢迎来找我。" }
+      { "side": "visitor", "text": "So upset these days :(", "textEn": "So upset these days :(" },
+      { "side": "visitor", "text": "Do you know someone that I can chat with?", "textEn": "Do you know someone that I can chat with?" },
+      { "side": "ray", "text": "Don't worry dude!", "textEn": "Don't worry dude!" },
+      { "side": "ray", "text": "Contact Ray right now!", "textEn": "Contact Ray right now!" },
+      { "side": "ray", "text": "无论学术探讨、产品交流还是播客聊天，都很欢迎来找我。", "textEn": "Always open to research chats, indie builds, or podcast talks." }
     ]
   }
 }

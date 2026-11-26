@@ -1,4 +1,5 @@
 import { copyText } from './clipboard';
+import { getLang } from './i18n';
 
 const typeButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-filter-type]'));
 const yearSelect = document.getElementById('pub-year-select') as HTMLSelectElement | null;
@@ -81,7 +82,8 @@ cards.forEach((card) => {
     copyBtn.addEventListener('click', async () => {
       const ok = await copyText(preEl.textContent || '');
       const original = copyBtn.textContent;
-      copyBtn.textContent = ok ? 'Copied ✓' : 'Copy manually';
+      const isZh = getLang() === 'zh';
+      copyBtn.textContent = ok ? (isZh ? '已复制 ✓' : 'Copied ✓') : 'Copy manually';
       setTimeout(() => {
         copyBtn.textContent = original || 'Copy BibTeX';
       }, 1800);
@@ -96,6 +98,7 @@ if (academicEmailBtn?.dataset.emailCodes) {
     const codes = JSON.parse(academicEmailBtn.dataset.emailCodes || '[]') as number[];
     const decoded = String.fromCharCode(...codes.map((c) => c - 3));
     const copied = await copyText(decoded);
-    academicEmailBtn.textContent = copied ? `${decoded} (Copied)` : decoded;
+    const suffix = getLang() === 'zh' ? ' (已复制)' : ' (Copied)';
+    academicEmailBtn.textContent = copied ? `${decoded}${suffix}` : decoded;
   });
 }

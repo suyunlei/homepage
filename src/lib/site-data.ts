@@ -9,29 +9,37 @@ export interface HomeColumn {
 export interface HomePanel {
   menuLabel: string;
   title: string;
+  titleEn?: string;
   subtitle: string;
+  subtitleEn?: string;
   image: string;
   paragraphs: string[];
+  paragraphsEn?: string[];
   ctaLabel: string;
+  ctaLabelEn?: string;
   ctaHref: string;
 }
 
 export interface ChatNote {
   side: 'visitor' | 'ray';
   text: string;
+  textEn?: string;
 }
 
 export interface SiteData {
   siteTitle: string;
+  siteTitleEn?: string;
   siteDescription: string;
   heroFrameTitle: string;
   heroFrameSubtitle: string;
+  heroFrameSubtitleEn?: string;
   owner: {
     nameZh: string;
     nameEn: string;
     nickname: string;
     handle: string;
     tagline: string;
+    taglineEn?: string;
     location: string;
     avatar: string;
   };
@@ -40,6 +48,7 @@ export interface SiteData {
   contact: {
     introQuote: string;
     bioLine: string;
+    bioLineEn?: string;
     email: string;
     githubUrl: string;
     weiboUrl: string;
@@ -48,7 +57,9 @@ export interface SiteData {
     wechatQr: string;
     wechatId: string;
     wechatHint: string;
+    wechatHintEn?: string;
     miniProgramNote: string;
+    miniProgramNoteEn?: string;
     office?: string;
     chatNotes: ChatNote[];
   };
@@ -59,31 +70,44 @@ export interface ResearchInterest {
   title: string;
   titleZh: string;
   summary: string;
+  summaryEn?: string;
   keywords: string[];
 }
 
 export interface EducationEntry {
   period: string;
   institution: string;
+  institutionEn?: string;
   location: string;
+  locationEn?: string;
   degree: string;
+  degreeEn?: string;
   details: string;
+  detailsEn?: string;
 }
 
 export interface ExperienceEntry {
   period: string;
   organization: string;
+  organizationEn?: string;
   location: string;
+  locationEn?: string;
   role: string;
+  roleEn?: string;
   details: string;
+  detailsEn?: string;
   highlights?: string[];
+  highlightsEn?: string[];
 }
 
 export interface HonorEntry {
   year: string;
   title: string;
+  titleEn?: string;
   role: string;
+  roleEn?: string;
   note: string;
+  noteEn?: string;
 }
 
 export interface SkillGroup {
@@ -93,9 +117,12 @@ export interface SkillGroup {
 
 export interface CvData {
   position: string;
+  positionEn?: string;
   affiliation: string;
+  affiliationEn?: string;
   cvPdf: string;
   bioParagraphs: string[];
+  bioParagraphsEn?: string[];
   researchInterests: ResearchInterest[];
   education: EducationEntry[];
   experience: ExperienceEntry[];

@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import EditorialLayout from '@/layouts/EditorialLayout.astro';
+import BiText from '@/components/BiText.astro';
 import { getAlbumSlug, withBase } from '@/lib/paths';
 
 const albums = (await getCollection('albums')).sort((a, b) => a.data.order - b.data.order);
@@ -9,6 +10,7 @@ const initialCover = albums[0] ? withBase(albums[0].data.cover) : '';
 
 <EditorialLayout
   title="生活碎片 · Life Style · 苏云雷"
+  titleEn="Life & Photography · Yunlei Su"
   description="生活碎片与摄影故事集：朋友们、篮球与青春、杭州光影、安徽大学校园四年与人间烟火美食。"
 >
   <div class="relative overflow-hidden">
@@ -24,13 +26,16 @@ const initialCover = albums[0] ? withBase(albums[0].data.cover) : '';
       <header class="reveal-section flex flex-wrap items-end justify-between gap-6 border-b editorial-hairline pb-8">
         <div>
           <p class="font-mono text-xs uppercase tracking-[0.2em] text-[#4a4f57]">
-            Life Style · 艺术篇章与生活碎片
+            <BiText zh="Life Style · 艺术篇章与生活碎片" en="Life Style · Photo Stories" />
           </p>
           <h1 class="mt-2 text-3xl font-bold tracking-tight text-[#252528] sm:text-4xl">
             Life is full of Art
           </h1>
           <p class="mt-2 max-w-2xl text-sm leading-relaxed text-[#4a4f57] sm:text-base">
-            时间流逝得太快，许多事都记不清了。谨以这五个影集与篇章，留住走过的城市、母校、球场、老友与烟火滋味。
+            <BiText
+              zh="时间流逝得太快，许多事都记不清了。谨以这五个影集与篇章，留住走过的城市、母校、球场、老友与烟火滋味。"
+              en="Time moves fast. Five curated chapters preserving friendships, basketball courts, Hangzhou moments, campus life at AHU, and favorite comfort food."
+            />
           </p>
         </div>
 
@@ -96,7 +101,9 @@ const initialCover = albums[0] ? withBase(albums[0].data.cover) : '';
                   <h2 class="text-2xl font-bold leading-tight tracking-tight text-white">
                     {album.data.headline}
                   </h2>
-                  <p class="text-xs leading-relaxed text-white/80">{album.data.description}</p>
+                  <p class="text-xs leading-relaxed text-white/80">
+                    <BiText zh={album.data.description} en={album.data.descriptionEn || album.data.description} />
+                  </p>
                   <div class="pt-2">
                     <span class="inline-flex items-center gap-2 rounded-full bg-[#27445d] px-3.5 py-1.5 font-mono text-xs text-white transition-colors group-hover:bg-white group-hover:text-[#252528]">
                       <span>Read the Story</span>

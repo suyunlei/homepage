@@ -6,6 +6,7 @@ titleZh: "那些名叫朋友的家伙"
 location: "All around the World"
 headline: "Make some things For Fun"
 description: "散落在各地的兄弟们，和那些至今提起来还会笑出声的语录。"
+descriptionEn: "Friends scattered around the world and the inside jokes that still make us laugh."
 cover: "/media/life/covers/img-1.jpg"
 layout: "masonry-gallery"
 items:

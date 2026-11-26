@@ -1,4 +1,5 @@
 import { copyText } from './clipboard';
+import { getLang } from './i18n';
 
 // Interactive accordion on Contact identity card
 const accordionButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-accordion-btn]'));
@@ -43,7 +44,8 @@ emailCopyBtn?.addEventListener('click', async () => {
   if (!decodedEmail) return;
   const ok = await copyText(decodedEmail);
   const prev = emailCopyBtn.textContent;
-  emailCopyBtn.textContent = ok ? 'Copied ✓' : 'Select & Copy';
+  const isZh = getLang() === 'zh';
+  emailCopyBtn.textContent = ok ? (isZh ? '已复制 ✓' : 'Copied ✓') : 'Select & Copy';
   setTimeout(() => {
     emailCopyBtn.textContent = prev || 'Copy';
   }, 1800);

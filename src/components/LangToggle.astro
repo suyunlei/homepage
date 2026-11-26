@@ -1,0 +1,26 @@
+<div
+  class="pointer-events-auto inline-flex items-center rounded-full border border-[#252528]/25 bg-white/45 p-0.5 backdrop-blur-sm"
+  role="group"
+  aria-label="语言切换 / Language Switcher"
+>
+  <button
+    type="button"
+    data-lang-option="zh"
+    aria-pressed="true"
+    class="cursor-pointer rounded-full px-2.5 py-1 font-mono text-[11px] font-semibold transition-colors"
+  >
+    中
+  </button>
+  <button
+    type="button"
+    data-lang-option="en"
+    aria-pressed="false"
+    class="cursor-pointer rounded-full px-2.5 py-1 font-mono text-[11px] font-semibold transition-colors"
+  >
+    EN
+  </button>
+</div>
+
+<script>
+  import '../scripts/i18n';
+</script>

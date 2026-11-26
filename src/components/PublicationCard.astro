@@ -1,6 +1,7 @@
 ---
 import { render, type CollectionEntry } from 'astro:content';
 import { withBase } from '@/lib/paths';
+import BiText from '@/components/BiText.astro';
 
 interface Props {
   publication: CollectionEntry<'publications'>;
@@ -59,7 +60,7 @@ const searchHaystack = [
 
   {
     data.titleZh && (
-      <p class="mt-1 text-sm text-[#4a4f57]">{data.titleZh}</p>
+      <p class="mt-1 text-sm text-[#4a4f57]" data-i18n="zh">{data.titleZh}</p>
     )
   }
 
@@ -108,7 +109,7 @@ const searchHaystack = [
       data-toggle-drawer="abstract"
       aria-expanded="false"
     >
-      Abstract & Highlights
+      <BiText zh="摘要与亮点 · Abstract" en="Abstract & Highlights" />
     </button>
 
     {
@@ -180,7 +181,7 @@ const searchHaystack = [
   <!-- Abstract & Highlights Drawer -->
   <div class="pub-drawer mt-4 hidden border-t editorial-hairline pt-4" data-drawer="abstract">
     <p class="text-sm leading-relaxed text-[#252528]/90">{data.abstract}</p>
-    <div class="prose-academic mt-3">
+    <div class="prose-academic mt-3" data-i18n="zh">
       <Content />
     </div>
   </div>

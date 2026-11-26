@@ -2,6 +2,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import EditorialLayout from '@/layouts/EditorialLayout.astro';
 import Lightbox from '@/components/Lightbox.astro';
+import BiText from '@/components/BiText.astro';
 import { getAlbumSlug, withBase } from '@/lib/paths';
 import type { LightboxSlide } from '@/scripts/lightbox';
 
@@ -35,8 +36,7 @@ const itemSlideStartIndex: number[] = [];
 
 for (const item of data.items) {
   itemSlideStartIndex.push(slides.length);
-  const rawImages =
-    item.gallery.length > 0 ? item.gallery : [item.image];
+  const rawImages = item.gallery.length > 0 ? item.gallery : [item.image];
   const uniqueImages = Array.from(new Set([item.image, ...rawImages]));
   for (const imgPath of uniqueImages) {
     slides.push({
@@ -51,6 +51,7 @@ for (const item of data.items) {
 
 <EditorialLayout
   title={`${data.title} · ${data.titleZh} · 苏云雷`}
+  titleEn={`${data.title} · Life Style · Yunlei Su`}
   description={data.description}
 >
   <article class="mx-auto max-w-6xl px-5 py-10 sm:px-8 sm:py-14">
@@ -80,12 +81,13 @@ for (const item of data.items) {
         </div>
 
         <div class="max-w-3xl space-y-2">
-          <p class="text-sm text-white/75">{data.titleZh}</p>
+          <p class="text-sm text-white/75" data-i18n="zh">{data.titleZh}</p>
+          <p class="text-sm text-white/75" data-i18n="en">{data.title}</p>
           <h1 class="text-3xl font-bold tracking-tight text-white sm:text-5xl">
             {data.headline}
           </h1>
           <p class="pt-2 text-sm leading-relaxed text-white/80 sm:text-base">
-            {data.description}
+            <BiText zh={data.description} en={data.descriptionEn || data.description} />
           </p>
         </div>
       </div>
@@ -112,7 +114,7 @@ for (const item of data.items) {
                   class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <span class="absolute bottom-3 right-3 rounded-full bg-black/60 px-2.5 py-1 font-mono text-[11px] text-white opacity-90 backdrop-blur-sm">
-                  点击放大
+                  <BiText zh="点击放大" en="Zoom" />
                 </span>
               </button>
 
@@ -214,7 +216,7 @@ for (const item of data.items) {
       >
         <p class="font-mono text-xs text-[#5d636c]">← Previous Album</p>
         <p class="mt-1 text-base font-semibold text-[#252528] group-hover:text-[#27445d]">
-          {prevAlbum.data.number} · {prevAlbum.data.titleZh}
+          {prevAlbum.data.number} · <BiText zh={prevAlbum.data.titleZh} en={prevAlbum.data.title} />
         </p>
       </a>
 
@@ -224,7 +226,7 @@ for (const item of data.items) {
       >
         <p class="font-mono text-xs text-[#5d636c]">Next Album →</p>
         <p class="mt-1 text-base font-semibold text-[#252528] group-hover:text-[#27445d]">
-          {nextAlbum.data.number} · {nextAlbum.data.titleZh}
+          {nextAlbum.data.number} · <BiText zh={nextAlbum.data.titleZh} en={nextAlbum.data.title} />
         </p>
       </a>
     </nav>

@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import EditorialLayout from '@/layouts/EditorialLayout.astro';
 import PublicationCard from '@/components/PublicationCard.astro';
+import BiText from '@/components/BiText.astro';
 import { withBase } from '@/lib/paths';
 import { encodeEmailForClient, loadSiteAndCvData } from '@/lib/site-data';
 
@@ -29,7 +30,8 @@ const filterTypes = [
 ---
 
 <EditorialLayout
-  title={`学术成果 · ${site.owner.nameEn}`}
+  title={`学术成果 · ${site.owner.nameZh} (${site.owner.nameEn})`}
+  titleEn={`Academic · ${site.owner.nameEn}`}
   description="苏云雷（Yunlei Su）的学术主页：研究方向、论文发表、PDF 与 BibTeX 引用、教育与科研实践履历。"
 >
   <div class="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
@@ -44,19 +46,23 @@ const filterTypes = [
           />
           <div>
             <p class="font-mono text-xs uppercase tracking-[0.2em] text-[#4a4f57]">
-              Academic Profile · 学术成果空间
+              <BiText zh="Academic Profile · 学术成果空间" en="Academic Profile" />
             </p>
             <h1 class="mt-1.5 text-3xl font-bold tracking-tight text-[#252528] sm:text-4xl">
-              {site.owner.nameZh} · {site.owner.nameEn}
+              <span data-i18n="zh">{site.owner.nameZh} · </span>{site.owner.nameEn}
             </h1>
-            <p class="mt-1.5 text-base font-medium text-[#27445d]">{cv.position}</p>
-            <p class="mt-0.5 text-sm text-[#4a4f57]">{cv.affiliation}</p>
+            <p class="mt-1.5 text-base font-medium text-[#27445d]">
+              <BiText zh={cv.position} en={cv.positionEn || cv.position} />
+            </p>
+            <p class="mt-0.5 text-sm text-[#4a4f57]">
+              <BiText zh={cv.affiliation} en={cv.affiliationEn || cv.affiliation} />
+            </p>
           </div>
         </div>
 
         <div class="mt-6 flex flex-wrap gap-2.5">
           <a href="#publications" class="editorial-btn editorial-btn--primary">
-            Publications ↓
+            <BiText zh="论文列表 ↓" en="Publications ↓" />
           </a>
           {
             cv.cvPdf && (
@@ -114,11 +120,11 @@ const filterTypes = [
                 class="editorial-btn"
                 data-email-codes={JSON.stringify(emailCodes)}
               >
-                Reveal Academic Email
+                <BiText zh="显示学术邮箱" en="Reveal Academic Email" />
               </button>
             ) : (
               <a href={withBase('/contact/')} class="editorial-btn">
-                Contact →
+                <BiText zh="联系交流 →" en="Contact →" />
               </a>
             )
           }
@@ -150,13 +156,18 @@ const filterTypes = [
     <section id="about" class="reveal-section mt-14 scroll-mt-24">
       <div class="flex items-baseline justify-between gap-4 border-b editorial-hairline pb-3">
         <h2 class="text-xl font-bold tracking-tight text-[#252528] sm:text-2xl">
-          01 / 研究简介与方向 · Research Profile
+          <BiText zh="01 / 研究简介与方向 · Research Profile" en="01 / Research Profile" />
         </h2>
         <span class="font-mono text-xs uppercase tracking-wider text-[#5d636c]">Overview</span>
       </div>
 
-      <div class="mt-6 space-y-3 text-base leading-relaxed text-[#252528]/90">
+      <div class="mt-6 space-y-3 text-base leading-relaxed text-[#252528]/90" data-i18n="zh">
         {cv.bioParagraphs.map((para) => <p>{para}</p>)}
+      </div>
+      <div class="mt-6 space-y-3 text-base leading-relaxed text-[#252528]/90" data-i18n="en">
+        {(cv.bioParagraphsEn && cv.bioParagraphsEn.length > 0 ? cv.bioParagraphsEn : cv.bioParagraphs).map((para) => (
+          <p>{para}</p>
+        ))}
       </div>
 
       <div class="mt-8 grid gap-4 md:grid-cols-2">
@@ -167,10 +178,12 @@ const filterTypes = [
                 <span class="font-mono text-xs font-semibold tracking-widest text-[#27445d]">
                   {item.code}
                 </span>
-                <span class="text-xs text-[#5d636c]">{item.titleZh}</span>
+                <span class="text-xs text-[#5d636c]" data-i18n="zh">{item.titleZh}</span>
               </div>
               <h3 class="mt-2 text-lg font-semibold text-[#252528]">{item.title}</h3>
-              <p class="mt-2 text-sm leading-relaxed text-[#4a4f57]">{item.summary}</p>
+              <p class="mt-2 text-sm leading-relaxed text-[#4a4f57]">
+                <BiText zh={item.summary} en={item.summaryEn || item.summary} />
+              </p>
               <div class="mt-4 flex flex-wrap gap-1.5">
                 {item.keywords.map((kw) => (
                   <span class="rounded-md bg-[#252528]/[0.06] px-2 py-0.5 font-mono text-[11px] text-[#4a4f57]">
@@ -188,7 +201,7 @@ const filterTypes = [
     <section id="publications" class="reveal-section mt-16 scroll-mt-24">
       <div class="flex flex-wrap items-baseline justify-between gap-4 border-b editorial-hairline pb-3">
         <h2 class="text-xl font-bold tracking-tight text-[#252528] sm:text-2xl">
-          02 / 学术论文与成果 · Publications
+          <BiText zh="02 / 学术论文与成果 · Publications" en="02 / Publications" />
         </h2>
         <span class="font-mono text-xs text-[#4a4f57]">
           Showing <strong id="pub-visible-count">{publications.length}</strong> of {publications.length}
@@ -226,7 +239,9 @@ const filterTypes = [
           <input
             id="pub-search-input"
             type="search"
-            placeholder="Search title, author, keyword..."
+            placeholder="按标题、作者、期刊或关键词检索..."
+            data-placeholder-zh="按标题、作者、期刊或关键词检索..."
+            data-placeholder-en="Search title, author, venue, keyword..."
             class="w-full rounded-full border editorial-hairline bg-white/55 px-4 py-1.5 text-sm text-[#252528] placeholder:text-[#5d636c] outline-none focus:border-[#252528] sm:w-64"
           />
         </div>
@@ -240,7 +255,10 @@ const filterTypes = [
         id="pub-empty-state"
         class="editorial-card mt-6 hidden rounded-2xl p-8 text-center text-sm text-[#4a4f57]"
       >
-        没有找到符合当前筛选条件的学术成果，请尝试切换类别、年份或清空搜索关键词。
+        <BiText
+          zh="没有找到符合当前筛选条件的学术成果，请尝试切换类别、年份或清空搜索关键词。"
+          en="No matching publications found. Try clearing filters or changing the search query."
+        />
       </p>
     </section>
 
@@ -248,7 +266,7 @@ const filterTypes = [
     <section id="cv" class="reveal-section mt-16 scroll-mt-24">
       <div class="flex items-baseline justify-between gap-4 border-b editorial-hairline pb-3">
         <h2 class="text-xl font-bold tracking-tight text-[#252528] sm:text-2xl">
-          03 / 教育与实践履历 · Education & Experience
+          <BiText zh="03 / 教育与实践履历 · Education & Experience" en="03 / Education & Experience" />
         </h2>
         <span class="font-mono text-xs uppercase tracking-wider text-[#5d636c]">Curriculum Vitae</span>
       </div>
@@ -256,18 +274,26 @@ const filterTypes = [
       <div class="mt-6 grid gap-6 lg:grid-cols-2">
         <div class="space-y-4">
           <h3 class="font-mono text-xs uppercase tracking-[0.18em] text-[#4a4f57]">
-            Education · 教育背景
+            <BiText zh="Education · 教育背景" en="Education" />
           </h3>
           {
             cv.education.map((edu) => (
               <div class="editorial-card rounded-2xl p-5 sm:p-6">
                 <div class="flex flex-wrap items-center justify-between gap-2">
                   <span class="font-mono text-xs font-semibold text-[#27445d]">{edu.period}</span>
-                  <span class="font-mono text-xs text-[#5d636c]">{edu.location}</span>
+                  <span class="font-mono text-xs text-[#5d636c]">
+                    <BiText zh={edu.location} en={edu.locationEn || edu.location} />
+                  </span>
                 </div>
-                <h4 class="mt-2 text-lg font-semibold text-[#252528]">{edu.institution}</h4>
-                <p class="mt-0.5 text-sm font-medium text-[#4a4f57]">{edu.degree}</p>
-                <p class="mt-2 text-sm leading-relaxed text-[#4a4f57]">{edu.details}</p>
+                <h4 class="mt-2 text-lg font-semibold text-[#252528]">
+                  <BiText zh={edu.institution} en={edu.institutionEn || edu.institution} />
+                </h4>
+                <p class="mt-0.5 text-sm font-medium text-[#4a4f57]">
+                  <BiText zh={edu.degree} en={edu.degreeEn || edu.degree} />
+                </p>
+                <p class="mt-2 text-sm leading-relaxed text-[#4a4f57]">
+                  <BiText zh={edu.details} en={edu.detailsEn || edu.details} />
+                </p>
               </div>
             ))
           }
@@ -275,29 +301,47 @@ const filterTypes = [
 
         <div class="space-y-4">
           <h3 class="font-mono text-xs uppercase tracking-[0.18em] text-[#4a4f57]">
-            Experience · 实习与工作经历
+            <BiText zh="Experience · 实习与工作经历" en="Experience" />
           </h3>
           {
             cv.experience.map((exp) => (
               <div class="editorial-card rounded-2xl p-5 sm:p-6">
                 <div class="flex flex-wrap items-center justify-between gap-2">
                   <span class="font-mono text-xs font-semibold text-[#27445d]">{exp.period}</span>
-                  <span class="font-mono text-xs text-[#5d636c]">{exp.location}</span>
+                  <span class="font-mono text-xs text-[#5d636c]">
+                    <BiText zh={exp.location} en={exp.locationEn || exp.location} />
+                  </span>
                 </div>
-                <h4 class="mt-2 text-lg font-semibold text-[#252528]">{exp.organization}</h4>
-                <p class="mt-0.5 text-sm font-medium text-[#4a4f57]">{exp.role}</p>
+                <h4 class="mt-2 text-lg font-semibold text-[#252528]">
+                  <BiText zh={exp.organization} en={exp.organizationEn || exp.organization} />
+                </h4>
+                <p class="mt-0.5 text-sm font-medium text-[#4a4f57]">
+                  <BiText zh={exp.role} en={exp.roleEn || exp.role} />
+                </p>
                 {exp.details && (
-                  <p class="mt-2 text-sm leading-relaxed text-[#4a4f57]">{exp.details}</p>
+                  <p class="mt-2 text-sm leading-relaxed text-[#4a4f57]">
+                    <BiText zh={exp.details} en={exp.detailsEn || exp.details} />
+                  </p>
                 )}
                 {exp.highlights && exp.highlights.length > 0 && (
-                  <ul class="mt-3 space-y-1.5 text-sm leading-relaxed text-[#4a4f57]">
-                    {exp.highlights.map((item) => (
-                      <li class="flex gap-2">
-                        <span class="font-mono text-[#27445d]">—</span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <>
+                    <ul class="mt-3 space-y-1.5 text-sm leading-relaxed text-[#4a4f57]" data-i18n="zh">
+                      {exp.highlights.map((item) => (
+                        <li class="flex gap-2">
+                          <span class="font-mono text-[#27445d]">—</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <ul class="mt-3 space-y-1.5 text-sm leading-relaxed text-[#4a4f57]" data-i18n="en">
+                      {(exp.highlightsEn && exp.highlightsEn.length > 0 ? exp.highlightsEn : exp.highlights).map((item) => (
+                        <li class="flex gap-2">
+                          <span class="font-mono text-[#27445d]">—</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
                 )}
               </div>
             ))
@@ -306,14 +350,14 @@ const filterTypes = [
       </div>
     </section>
 
-    <!-- Section 04: Selected Research Projects & Skills -->
+    <!-- Section 04: Selected Research Projects, Honors & Skills -->
     <section id="honors" class="reveal-section mt-16 scroll-mt-24">
       <div class="flex items-baseline justify-between gap-4 border-b editorial-hairline pb-3">
         <h2 class="text-xl font-bold tracking-tight text-[#252528] sm:text-2xl">
-          04 / 代表研究项目与技能 · Projects & Stack
+          <BiText zh="04 / 荣誉奖项、代表项目与技术栈 · Honors & Stack" en="04 / Honors, Projects & Stack" />
         </h2>
         <a href={withBase('/projects/')} class="font-mono text-xs text-[#27445d] hover:underline">
-          All Projects →
+          <BiText zh="全部项目与播客 →" en="All Projects →" />
         </a>
       </div>
 
@@ -322,9 +366,15 @@ const filterTypes = [
           cv.honorsAndProjects.map((item) => (
             <div class="editorial-card rounded-2xl p-5 sm:p-6">
               <span class="font-mono text-xs font-semibold text-[#27445d]">{item.year}</span>
-              <h3 class="mt-1.5 text-base font-semibold text-[#252528] sm:text-lg">{item.title}</h3>
-              <p class="mt-0.5 text-xs font-medium text-[#4a4f57]">{item.role}</p>
-              <p class="mt-2 text-sm leading-relaxed text-[#4a4f57]">{item.note}</p>
+              <h3 class="mt-1.5 text-base font-semibold text-[#252528] sm:text-lg">
+                <BiText zh={item.title} en={item.titleEn || item.title} />
+              </h3>
+              <p class="mt-0.5 text-xs font-medium text-[#4a4f57]">
+                <BiText zh={item.role} en={item.roleEn || item.role} />
+              </p>
+              <p class="mt-2 text-sm leading-relaxed text-[#4a4f57]">
+                <BiText zh={item.note} en={item.noteEn || item.note} />
+              </p>
             </div>
           ))
         }

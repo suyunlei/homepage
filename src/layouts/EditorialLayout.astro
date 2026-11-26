@@ -5,13 +5,14 @@ import Footer from '@/components/Footer.astro';
 
 interface Props {
   title: string;
+  titleEn?: string;
   description?: string;
 }
 
-const { title, description } = Astro.props;
+const { title, titleEn, description } = Astro.props;
 ---
 
-<BaseLayout title={title} description={description} bodyClass="min-h-screen flex flex-col">
+<BaseLayout title={title} titleEn={titleEn} description={description} bodyClass="min-h-screen flex flex-col">
   <Navbar />
   <main class="flex-1">
     <slot />

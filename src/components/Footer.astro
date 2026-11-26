@@ -1,6 +1,7 @@
 ---
 import { withBase } from '@/lib/paths';
 import { loadSiteAndCvData } from '@/lib/site-data';
+import BiText from '@/components/BiText.astro';
 
 const { site } = loadSiteAndCvData();
 const year = new Date().getFullYear();
@@ -10,18 +11,26 @@ const year = new Date().getFullYear();
   <div class="mx-auto flex max-w-6xl flex-col gap-6 px-5 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-8">
     <div class="space-y-1">
       <p class="font-mono text-xs uppercase tracking-[0.16em] text-[#252528]">
-        © {year} {site.owner.nameEn} · {site.owner.nameZh}
+        © {year} {site.owner.nameEn} <span data-i18n="zh">· {site.owner.nameZh}</span>
       </p>
       <p class="text-xs text-[#4a4f57]">
-        {site.owner.tagline}
+        <BiText zh={site.owner.tagline} en={site.owner.taglineEn || site.owner.tagline} />
       </p>
     </div>
 
     <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[#4a4f57]">
-      <a href={withBase('/academic/')} class="hover:text-[#252528]">Academic</a>
-      <a href={withBase('/projects/')} class="hover:text-[#252528]">Projects</a>
-      <a href={withBase('/life/')} class="hover:text-[#252528]">Life Style</a>
-      <a href={withBase('/contact/')} class="hover:text-[#252528]">Contact</a>
+      <a href={withBase('/academic/')} class="hover:text-[#252528]">
+        <BiText zh="学术成果" en="Academic" />
+      </a>
+      <a href={withBase('/projects/')} class="hover:text-[#252528]">
+        <BiText zh="项目与播客" en="Projects" />
+      </a>
+      <a href={withBase('/life/')} class="hover:text-[#252528]">
+        <BiText zh="生活碎片" en="Life Style" />
+      </a>
+      <a href={withBase('/contact/')} class="hover:text-[#252528]">
+        <BiText zh="联系我" en="Contact" />
+      </a>
       {
         site.contact.githubUrl && (
           <a

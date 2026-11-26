@@ -1,5 +1,6 @@
 ---
 import EditorialLayout from '@/layouts/EditorialLayout.astro';
+import BiText from '@/components/BiText.astro';
 import { withBase } from '@/lib/paths';
 import { encodeEmailForClient, loadSiteAndCvData } from '@/lib/site-data';
 
@@ -9,7 +10,8 @@ const emailCodes = site.contact.email ? encodeEmailForClient(site.contact.email)
 
 <EditorialLayout
   title={`联系我 · Contact · ${site.owner.nameZh}`}
-  description="联系苏云雷（Yunlei Su）：学术交流邮箱、微信二维码、GitHub、微博与个人简介。"
+  titleEn={`Contact · ${site.owner.nameEn}`}
+  description="联系苏云雷（Yunlei Su）：学术交流邮箱、微信二维码、GitHub、小宇宙播客《待会儿再说》与个人简介。"
 >
   <div class="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
     <header class="reveal-section border-b editorial-hairline pb-8">
@@ -17,10 +19,13 @@ const emailCodes = site.contact.email ? encodeEmailForClient(site.contact.email)
         Contact · Let us begin our story
       </p>
       <h1 class="mt-2 text-3xl font-bold tracking-tight text-[#252528] sm:text-4xl">
-        联系我 · Get in Touch
+        <BiText zh="联系我 · Get in Touch" en="Get in Touch" />
       </h1>
       <p class="mt-2 max-w-2xl text-sm leading-relaxed text-[#4a4f57] sm:text-base">
-        可能我们许久未联系了，老朋友；可能我们初次相识，新朋友。无论学术探讨、项目协作还是叙旧问候，都欢迎随时联系。
+        <BiText
+          zh="可能我们许久未联系了，老朋友；可能我们初次相识，新朋友。无论学术探讨、项目协作、播客串台还是叙旧问候，都欢迎随时联系。"
+          en="Whether we haven't caught up in a while or are connecting for the first time—feel free to reach out for research collaboration, indie products, podcast guesting, or a casual chat."
+        />
       </p>
     </header>
 
@@ -34,10 +39,12 @@ const emailCodes = site.contact.email ? encodeEmailForClient(site.contact.email)
             class="h-24 w-24 rounded-full border-2 border-[#f4f6f8] object-cover shadow-md"
           />
           <h2 class="mt-4 text-xl font-bold text-[#252528]">
-            {site.owner.nameZh} · {site.owner.nickname}
+            <span data-i18n="zh">{site.owner.nameZh} · </span>{site.owner.nameEn} ({site.owner.nickname})
           </h2>
           <p class="mt-0.5 font-mono text-xs text-[#4a4f57]">{site.owner.handle}</p>
-          <p class="mt-2 text-sm text-[#4a4f57]">{site.contact.bioLine}</p>
+          <p class="mt-2 text-sm text-[#4a4f57]">
+            <BiText zh={site.contact.bioLine} en={site.contact.bioLineEn || site.contact.bioLine} />
+          </p>
         </div>
 
         <div class="mt-6 divide-y divide-[#252528]/15 border-t border-b editorial-hairline">
@@ -48,12 +55,15 @@ const emailCodes = site.contact.email ? encodeEmailForClient(site.contact.email)
               data-accordion-btn="about"
               aria-expanded="true"
             >
-              <span>About · 关于我</span>
+              <span><BiText zh="About · 关于我" en="About" /></span>
               <span class="font-mono text-xs text-[#5d636c]">01</span>
             </button>
             <div class="pb-4 text-sm leading-relaxed text-[#4a4f57]" data-accordion-panel="about">
-              <p>
-                {site.owner.nameEn}（{site.owner.nameZh}），本科毕业于安徽大学、硕士毕业于新加坡国立大学（NUS），目前于香港科技大学（广州）攻读博士学位；专注 WebGIS、城市数字孪生与人-建筑交互研究，也是球场和美食的忠实爱好者。
+              <p data-i18n="zh">
+                苏云雷（Yunlei Su），非典型理工博士生，小宇宙播客《待会儿再说》节目主持人。本科毕业于安徽大学、硕士毕业于新加坡国立大学（NUS），目前于香港科技大学（广州）攻读博士学位；专注 WebGIS、城市数字孪生与人-建筑交互研究，也热爱独立开发、球场和美食。
+              </p>
+              <p data-i18n="en">
+                Yunlei Su — an unconventional STEM PhD student at HKUST(GZ) and host of the Xiaoyuzhou podcast "Talk Later" (《待会儿再说》). Previously BSc at Anhui University and MSc at NUS, researching WebGIS, Urban Digital Twins, and Human-Building Interaction while building indie products.
               </p>
             </div>
           </div>
@@ -65,7 +75,7 @@ const emailCodes = site.contact.email ? encodeEmailForClient(site.contact.email)
               data-accordion-btn="chat"
               aria-expanded="false"
             >
-              <span>Chat Notes · 对话便签</span>
+              <span><BiText zh="Chat Notes · 对话便签" en="Chat Notes" /></span>
               <span class="font-mono text-xs text-[#5d636c]">02</span>
             </button>
             <div class="hidden space-y-2 pb-4" data-accordion-panel="chat">
@@ -85,7 +95,7 @@ const emailCodes = site.contact.email ? encodeEmailForClient(site.contact.email)
                           : 'bg-[#27445d] text-[#f4f6f8]',
                       ]}
                     >
-                      {msg.text}
+                      <BiText zh={msg.text} en={msg.textEn || msg.text} />
                     </span>
                   </div>
                 ))
@@ -100,7 +110,7 @@ const emailCodes = site.contact.email ? encodeEmailForClient(site.contact.email)
               data-accordion-btn="thanks"
               aria-expanded="false"
             >
-              <span>Thanks · 致谢</span>
+              <span><BiText zh="Thanks · 致谢" en="Thanks" /></span>
               <span class="font-mono text-xs text-[#5d636c]">03</span>
             </button>
             <div class="hidden space-y-2 pb-4 text-sm text-[#4a4f57]" data-accordion-panel="thanks">
@@ -120,7 +130,9 @@ const emailCodes = site.contact.email ? encodeEmailForClient(site.contact.email)
               <p class="font-mono text-xs uppercase tracking-wider text-[#27445d]">
                 Academic & Direct Email
               </p>
-              <h2 class="mt-1 text-lg font-bold text-[#252528]">电子邮箱</h2>
+              <h2 class="mt-1 text-lg font-bold text-[#252528]">
+                <BiText zh="电子邮箱" en="Email" />
+              </h2>
             </div>
             <span class="rounded-full bg-[#252528]/[0.07] px-2.5 py-1 font-mono text-[11px] text-[#4a4f57]">
               Anti-Scrape Protected
@@ -136,7 +148,7 @@ const emailCodes = site.contact.email ? encodeEmailForClient(site.contact.email)
                   class="editorial-btn editorial-btn--primary"
                   data-email-codes={JSON.stringify(emailCodes)}
                 >
-                  点击显示邮箱地址
+                  <BiText zh="点击显示邮箱地址" en="Reveal Email Address" />
                 </button>
                 <span
                   id="contact-email-output"
@@ -152,7 +164,10 @@ const emailCodes = site.contact.email ? encodeEmailForClient(site.contact.email)
               </div>
             ) : (
               <p class="mt-3 text-sm leading-relaxed text-[#4a4f57]">
-                当前公开仓库未明文托管私人邮箱地址。可通过右侧/下方微信二维码或 GitHub 联系，站长亦可在本地构建配置 <code class="font-mono text-xs">content/private.local.json</code> 中注入邮箱后自动开启一键解码复制。
+                <BiText
+                  zh="当前未配置公开邮箱，请通过下方微信或 GitHub 联系。"
+                  en="Email is hidden; please reach out via WeChat or GitHub below."
+                />
               </p>
             )
           }
@@ -165,9 +180,11 @@ const emailCodes = site.contact.email ? encodeEmailForClient(site.contact.email)
               <div class="editorial-card flex flex-col justify-between rounded-2xl p-5">
                 <div>
                   <p class="font-mono text-xs uppercase tracking-wider text-[#27445d]">WeChat</p>
-                  <h3 class="mt-1 text-base font-semibold text-[#252528]">微信联系</h3>
+                  <h3 class="mt-1 text-base font-semibold text-[#252528]">
+                    <BiText zh="微信联系" en="WeChat" />
+                  </h3>
                   <p class="mt-1.5 text-xs leading-relaxed text-[#4a4f57]">
-                    {site.contact.wechatHint}
+                    <BiText zh={site.contact.wechatHint} en={site.contact.wechatHintEn || site.contact.wechatHint} />
                   </p>
                   {site.contact.wechatId && (
                     <p class="mt-2 font-mono text-xs text-[#252528]">
@@ -181,7 +198,7 @@ const emailCodes = site.contact.email ? encodeEmailForClient(site.contact.email)
                     id="wechat-qr-open"
                     class="editorial-btn w-full"
                   >
-                    查看微信二维码
+                    <BiText zh="查看微信二维码" en="Show WeChat QR" />
                   </button>
                 </div>
               </div>
@@ -198,7 +215,9 @@ const emailCodes = site.contact.email ? encodeEmailForClient(site.contact.email)
               >
                 <div>
                   <p class="font-mono text-xs uppercase tracking-wider text-[#27445d]">GitHub</p>
-                  <h3 class="mt-1 text-base font-semibold text-[#252528]">开源代码与仓库</h3>
+                  <h3 class="mt-1 text-base font-semibold text-[#252528]">
+                    <BiText zh="开源代码与仓库" en="Open Source & Repos" />
+                  </h3>
                   <p class="mt-1.5 font-mono text-xs text-[#4a4f57]">
                     {site.contact.githubUrl.replace(/^https?:\/\//, '')}
                   </p>
@@ -220,8 +239,12 @@ const emailCodes = site.contact.email ? encodeEmailForClient(site.contact.email)
               >
                 <div>
                   <p class="font-mono text-xs uppercase tracking-wider text-[#27445d]">Weibo</p>
-                  <h3 class="mt-1 text-base font-semibold text-[#252528]">微博动态</h3>
-                  <p class="mt-1.5 text-xs text-[#4a4f57]">日常碎片与随手记录</p>
+                  <h3 class="mt-1 text-base font-semibold text-[#252528]">
+                    <BiText zh="微博动态" en="Weibo" />
+                  </h3>
+                  <p class="mt-1.5 text-xs text-[#4a4f57]">
+                    <BiText zh="日常碎片与随手记录" en="Daily thoughts & fragments" />
+                  </p>
                 </div>
                 <span class="mt-4 font-mono text-xs text-[#252528] group-hover:underline">
                   Open Weibo ↗
@@ -233,11 +256,16 @@ const emailCodes = site.contact.email ? encodeEmailForClient(site.contact.email)
           <div class="editorial-card flex flex-col justify-between rounded-2xl p-5">
             <div>
               <p class="font-mono text-xs uppercase tracking-wider text-[#27445d]">
-                Mini Program / Links
+                Podcast & Products
               </p>
-              <h3 class="mt-1 text-base font-semibold text-[#252528]">其他渠道</h3>
+              <h3 class="mt-1 text-base font-semibold text-[#252528]">
+                <BiText zh="播客与独立作品" en="Podcast & Indie Works" />
+              </h3>
               <p class="mt-1.5 text-xs leading-relaxed text-[#4a4f57]">
-                {site.contact.miniProgramNote}
+                <BiText
+                  zh={site.contact.miniProgramNote}
+                  en={site.contact.miniProgramNoteEn || site.contact.miniProgramNote}
+                />
               </p>
               {site.contact.office && (
                 <p class="mt-1 font-mono text-xs text-[#5d636c]">{site.contact.office}</p>
@@ -256,20 +284,11 @@ const emailCodes = site.contact.email ? encodeEmailForClient(site.contact.email)
                   </a>
                 )
               }
-              {
-                site.contact.orcidUrl && (
-                  <a
-                    href={site.contact.orcidUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="editorial-pill hover:border-[#252528]"
-                  >
-                    ORCID ↗
-                  </a>
-                )
-              }
+              <a href={withBase('/projects/')} class="editorial-pill hover:border-[#252528]">
+                <BiText zh="项目与播客 →" en="Projects & Podcast →" />
+              </a>
               <a href={withBase('/academic/')} class="editorial-pill hover:border-[#252528]">
-                Academic Page →
+                <BiText zh="学术主页 →" en="Academic →" />
               </a>
             </div>
           </div>
@@ -297,13 +316,17 @@ const emailCodes = site.contact.email ? encodeEmailForClient(site.contact.email)
             ✕
           </button>
           <p class="font-mono text-xs uppercase tracking-widest text-[#27445d]">WeChat QR</p>
-          <h3 class="mt-1 text-base font-bold text-[#252528]">添加微信好友</h3>
+          <h3 class="mt-1 text-base font-bold text-[#252528]">
+            <BiText zh="添加微信好友" en="Add on WeChat" />
+          </h3>
           <img
             src={withBase(site.contact.wechatQr)}
             alt="微信二维码"
             class="mt-4 w-full rounded-2xl border editorial-hairline object-contain"
           />
-          <p class="mt-3 text-xs text-[#4a4f57]">{site.contact.wechatHint}</p>
+          <p class="mt-3 text-xs text-[#4a4f57]">
+            <BiText zh={site.contact.wechatHint} en={site.contact.wechatHintEn || site.contact.wechatHint} />
+          </p>
         </div>
       </div>
     )

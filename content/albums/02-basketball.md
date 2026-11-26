@@ -6,6 +6,7 @@ titleZh: "不止篮球"
 location: "Taiyuan & Hefei"
 headline: "Life is more than Basketball"
 description: "从太原五中野球场到合肥安大资环院队，关于青春、汗水与一辈子兄弟的四个故事。"
+descriptionEn: "Four chapters of youth, sweat, and lifelong teammates from Taiyuan No.5 High School to AHU."
 cover: "/media/life/covers/img-2.jpg"
 layout: "editorial-stories"
 items:
