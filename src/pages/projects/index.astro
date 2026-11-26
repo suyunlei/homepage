@@ -9,7 +9,7 @@ const categories = Array.from(new Set(projects.map((p) => p.data.category)));
 
 <EditorialLayout
   title="实践项目 · Projects · 苏云雷"
-  description="苏云雷（Yunlei Su）的研究工程与开发实践项目：WebGIS、专题地图制图、遥感城市扩张分析与前端作品。"
+  description="苏云雷（Yunlei Su）的独立产品与工程实践项目：阿薄/薄迹 BOJI、三河湿地 WebGIS、阿里云电商直播与小橘科技。"
 >
   <div class="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
     <header class="reveal-section border-b editorial-hairline pb-8">
@@ -22,7 +22,7 @@ const categories = Array.from(new Set(projects.map((p) => p.data.category)));
             可视化自己的进步
           </h1>
           <p class="mt-2 max-w-2xl text-sm leading-relaxed text-[#4a4f57] sm:text-base">
-            记录在空间信息工程、地图制图、科研分析与早期前端实习中创造的项目与思考。
+            记录从独立产品全栈落地、空间信息平台研发到企业级前端工程实践中的代表作品。
           </p>
         </div>
         <span class="font-mono text-xs text-[#4a4f57]">
@@ -54,10 +54,112 @@ const categories = Array.from(new Set(projects.map((p) => p.data.category)));
       </div>
     </header>
 
-    <section class="reveal-section mt-10 grid gap-6 md:grid-cols-2">
+    <section class="reveal-section mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {
         projects.map((project) => {
           const { data } = project;
+          if (data.featured) {
+            return (
+              <article
+                class="project-card group editorial-card md:col-span-2 lg:col-span-3 grid overflow-hidden rounded-3xl transition-colors hover:border-[#252528]/35 lg:grid-cols-12"
+                data-project-category={data.category}
+              >
+                <div class="flex flex-col items-center justify-center gap-4 border-b editorial-hairline bg-[#f4eee6] p-6 sm:p-8 lg:col-span-5 lg:border-r lg:border-b-0">
+                  <div class="overflow-hidden rounded-[28px] border-[6px] border-[#252528] bg-[#f8f3ec] shadow-xl">
+                    <img
+                      src={withBase(data.cover)}
+                      alt={data.title}
+                      loading="eager"
+                      class="max-h-[440px] w-auto object-contain transition-transform duration-500 group-hover:scale-[1.02]"
+                    />
+                  </div>
+                  {(data.badgeImage || data.miniProgramName) && (
+                    <div class="flex flex-wrap items-center justify-center gap-3 rounded-2xl border border-[#252528]/12 bg-white/95 px-4 py-2.5 shadow-sm">
+                      {data.badgeImage && (
+                        <img
+                          src={withBase(data.badgeImage)}
+                          alt={data.miniProgramName || data.title}
+                          loading="lazy"
+                          class="h-8 w-auto object-contain"
+                        />
+                      )}
+                      {data.miniProgramName && (
+                        <span class="font-mono text-xs text-[#252528]">
+                          微信小程序搜「{data.miniProgramName}」
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div class="flex flex-col justify-center p-6 sm:p-8 lg:col-span-7 lg:p-10">
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <span class="rounded-full bg-[#27445d] px-3 py-1 font-mono text-[11px] uppercase tracking-wider text-[#f4f6f8]">
+                      Flagship · {data.category}
+                    </span>
+                    <div class="flex items-center gap-3 font-mono text-xs text-[#5d636c]">
+                      <span>{data.organization}</span>
+                      <span>·</span>
+                      <span>{data.date}</span>
+                    </div>
+                  </div>
+
+                  <h2 class="mt-4 text-2xl font-bold tracking-tight text-[#252528] sm:text-3xl">
+                    {data.title}
+                  </h2>
+                  {data.subtitle && (
+                    <p class="mt-1 text-sm font-medium text-[#27445d]">{data.subtitle}</p>
+                  )}
+
+                  <p class="mt-4 text-sm leading-relaxed text-[#4a4f57] sm:text-base">
+                    {data.summary}
+                  </p>
+
+                  {data.highlights.length > 0 && (
+                    <ul class="mt-5 space-y-2 text-sm leading-relaxed text-[#252528]/90">
+                      {data.highlights.map((item) => (
+                        <li class="flex gap-2.5">
+                          <span class="font-mono text-[#27445d]">—</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  <div class="mt-5 flex flex-wrap gap-1.5">
+                    {data.tags.map((tag) => (
+                      <span class="rounded-md bg-[#252528]/[0.06] px-2.5 py-0.5 font-mono text-[11px] text-[#4a4f57]">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div class="mt-6 flex flex-wrap items-center gap-3">
+                    {data.links.map((link) => {
+                      const openNew = link.kind === 'pdf' || isExternalHref(link.href);
+                      return (
+                        <a
+                          href={withBase(link.href)}
+                          target={openNew ? '_blank' : undefined}
+                          rel={openNew ? 'noopener noreferrer' : undefined}
+                          class="editorial-btn editorial-btn--primary"
+                        >
+                          <span>{link.label}</span>
+                          <span aria-hidden="true">{openNew ? '↗' : '→'}</span>
+                        </a>
+                      );
+                    })}
+                    {data.miniProgramName && (
+                      <span class="rounded-full border border-[#252528]/20 bg-white/60 px-3.5 py-2 font-mono text-xs text-[#252528]">
+                        微信入口：{data.miniProgramName}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </article>
+            );
+          }
+
           return (
             <article
               class="project-card group editorial-card flex flex-col overflow-hidden rounded-2xl transition-colors hover:border-[#252528]/35"

@@ -91,6 +91,17 @@
         "参与交付多套三维 WebGIS 业务系统，涵盖面向军工研究所等高可靠性场景的空间可视化与应用开发",
         "基于 Cesium 底层引擎参与研发泰瑞自研三维地理信息 SDK，封装常用空间标绘、场景控制与数据加载能力"
       ]
+    },
+    {
+      "period": "2021.07 – 2021.08",
+      "organization": "阿里云创新中心 · Alibaba Cloud Innovation Center",
+      "location": "实习 · Internship",
+      "role": "前端开发实习生 · Frontend Development Intern",
+      "details": "参与阿里云创新中心新零售电商直播桌面端及企业客户 Web 门户项目研发，完成多分辨率自适应布局与模块化交互交付。",
+      "highlights": [
+        "负责阿里云电商直播桌面端响应式栅格架构与事件驱动交互模块开发",
+        "参与企业级生产门户「小橘科技」多页面模块化前端工程搭建与浏览器兼容性调优"
+      ]
     }
   ],
   "honorsAndProjects": [
