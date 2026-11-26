@@ -71,14 +71,24 @@ function getPreset(relPath) {
     };
   }
 
+  if (normalized.startsWith('panels/')) {
+    return {
+      maxWidth: 1200,
+      maxHeight: 1600,
+      quality: 86,
+      effort: 6,
+      skipSizeBytes: 220 * 1024,
+    };
+  }
+
   if (normalized.startsWith('profile/')) {
     if (/^academic-cover\./i.test(fileName)) {
       return {
-        maxWidth: 1200,
-        maxHeight: 800,
-        quality: 88,
-        effort: 5,
-        skipSizeBytes: 120 * 1024,
+        maxWidth: 1440,
+        maxHeight: 900,
+        quality: 92,
+        effort: 6,
+        skipSizeBytes: 180 * 1024,
       };
     }
     if (/^wechat\./i.test(fileName)) {
@@ -253,6 +263,35 @@ async function generateAvifSidecars(forceAvif, scopes) {
     }
   }
 
+  if (scopes.includes('panels')) {
+    for (const filePath of await walkFiles(path.join(MEDIA_ROOT, 'panels'))) {
+      const ext = path.extname(filePath).toLowerCase();
+      if (SUPPORTED_EXTS.has(ext)) {
+        candidates.push({
+          srcPath: filePath,
+          maxWidth: 1200,
+          maxHeight: 1600,
+          quality: 68,
+        });
+      }
+    }
+  }
+
+  if (scopes.includes('profile')) {
+    const academicCover = path.join(MEDIA_ROOT, 'profile', 'academic-cover.webp');
+    try {
+      await fs.stat(academicCover);
+      candidates.push({
+        srcPath: academicCover,
+        maxWidth: 1440,
+        maxHeight: 900,
+        quality: 76,
+      });
+    } catch {
+      // optional cover
+    }
+  }
+
   if (scopes.includes('life/covers')) {
     for (const filePath of await walkFiles(path.join(MEDIA_ROOT, 'life', 'covers'))) {
       if (filePath.toLowerCase().endsWith('.webp')) {
@@ -300,7 +339,7 @@ async function generateAvifSidecars(forceAvif, scopes) {
   const expectedAvifs = new Set();
 
   for (const item of candidates) {
-    const avifPath = item.srcPath.replace(/\.webp$/i, '.avif');
+    const avifPath = item.srcPath.replace(/\.(?:webp|jpe?g|png)$/i, '.avif');
     expectedAvifs.add(avifPath);
 
     const srcStat = await fs.stat(item.srcPath);
@@ -341,6 +380,7 @@ async function generateAvifSidecars(forceAvif, scopes) {
   let removed = 0;
   const dirsToPrune = [];
   if (scopes.includes('home')) dirsToPrune.push(path.join(MEDIA_ROOT, 'home'));
+  if (scopes.includes('panels')) dirsToPrune.push(path.join(MEDIA_ROOT, 'panels'));
   if (scopes.includes('life/covers')) dirsToPrune.push(path.join(MEDIA_ROOT, 'life', 'covers'));
   if (scopes.includes('life/thumbs')) dirsToPrune.push(path.join(MEDIA_ROOT, 'life', 'thumbs'));
 
@@ -533,6 +573,12 @@ async function main() {
   const avifScopes = [];
   if (filters.length === 0 || filters.some((f) => f === 'home' || f.startsWith('home/'))) {
     avifScopes.push('home');
+  }
+  if (filters.length === 0 || filters.some((f) => f === 'panels' || f.startsWith('panels/'))) {
+    avifScopes.push('panels');
+  }
+  if (filters.length === 0 || filters.some((f) => f === 'profile' || f.startsWith('profile/'))) {
+    avifScopes.push('profile');
   }
   if (filters.length === 0 || filters.some((f) => f === 'life' || f.startsWith('life/covers'))) {
     avifScopes.push('life/covers');

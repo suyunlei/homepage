@@ -27,7 +27,14 @@ export function getLifeThumbPath(imagePath: string): string {
 
 export function toAvifPath(imagePath: string): string {
   if (!imagePath) return '';
-  if (!/^\/media\/(?:home\/|life\/covers\/|life\/thumbs\/|life\/ahu\/header\.webp$)/i.test(imagePath)) {
+  if (/^\/media\/panels\/.+\.(?:webp|jpe?g|png)(\?.*)?$/i.test(imagePath)) {
+    return imagePath.replace(/\.(?:webp|jpe?g|png)(\?.*)?$/i, '.avif$1');
+  }
+  if (
+    !/^\/media\/(?:home\/|profile\/academic-cover\.webp$|life\/covers\/|life\/thumbs\/|life\/ahu\/header\.webp$)/i.test(
+      imagePath,
+    )
+  ) {
     return imagePath;
   }
   return imagePath.replace(/\.webp(\?.*)?$/i, '.avif$1');

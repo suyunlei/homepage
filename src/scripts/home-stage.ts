@@ -106,6 +106,7 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
       if (!hasPointerMoved) return;
       let moving = false;
       for (const col of columnStates) {
+        if (col.el.offsetParent === null) continue;
         const targetTx = MathUtils.lineEq(-col.randX, col.randX, winsize.width, 0, mousePos.x);
         const targetTy = MathUtils.lineEq(-col.rY1, col.rY2, winsize.height, 0, mousePos.y);
         if (Math.abs(targetTx - col.tx) < 0.06 && Math.abs(targetTy - col.ty) < 0.06) {
@@ -125,6 +126,7 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
     const t = now * 0.001;
     const factor = isTouching ? 0.08 : 0.032;
     for (const col of columnStates) {
+      if (col.el.offsetParent === null) continue;
       const waveY = Math.sin(t * col.driftSpeed + col.driftPhase) * col.driftAmpY;
       const waveX = Math.cos(t * col.driftSpeed * 0.8 + col.driftPhase) * 4;
       const targetTx =
@@ -270,11 +272,27 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
 
   function ensurePanelImage(index: number) {
     const imgEl = stageMeta[index]?.imgEl;
-    const bg = imgEl?.dataset.bg;
-    if (imgEl && bg) {
-      imgEl.style.backgroundImage = `url('${bg}')`;
-      delete imgEl.dataset.bg;
+    if (!imgEl) return;
+    const photo = imgEl.querySelector<HTMLImageElement>('img.stage-item__photo[data-src]');
+    if (!photo) return;
+    const src = photo.dataset.src;
+    if (!src) return;
+    const pic = photo.parentElement;
+    if (pic && pic.tagName === 'PICTURE') {
+      pic.querySelectorAll<HTMLSourceElement>('source[data-srcset]').forEach((source) => {
+        const sUrl = source.dataset.srcset;
+        if (sUrl) {
+          source.srcset = sUrl;
+          delete source.dataset.srcset;
+        }
+      });
     }
+    delete photo.dataset.src;
+    const clear = () => photo.removeAttribute('data-pending');
+    photo.addEventListener('load', clear, { once: true });
+    photo.addEventListener('error', clear, { once: true });
+    photo.src = src;
+    if (photo.complete) clear();
   }
 
   function pickRandomLetters(letters: HTMLSpanElement[], count: number): HTMLSpanElement[] {

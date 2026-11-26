@@ -22,6 +22,17 @@ homeLqipEntries.forEach(([imgPath, uri], idx) => {
 });
 const homeLqipCss = lqipVars.length > 0 ? `:root{${lqipVars.join(';')}}` : '';
 
+const panelAssets = await Promise.all(
+  site.homePanels.map(async (panel) => {
+    const avifPath = toAvifPath(panel.image);
+    return {
+      lqip: panel.imageFit === 'contain' ? '' : await getLqipDataUri(panel.image),
+      avifUrl: avifPath !== panel.image ? withBase(avifPath) : '',
+      webpUrl: withBase(panel.image),
+    };
+  }),
+);
+
 const quickLinks = [
   { label: 'Academic', href: '/academic/' },
   { label: 'Projects', href: '/projects/' },
@@ -41,17 +52,17 @@ const quickLinks = [
     <!-- Fixed Editorial Frame -->
     <header class="stage-frame">
       <div class="stage-frame__top">
-        <div class="space-y-1">
-          <h1 class="text-sm font-medium tracking-tight text-[#252528] sm:text-base">
+        <div class="stage-frame__intro min-w-0 flex-1 space-y-1">
+          <h1 class="stage-frame__title text-sm font-medium tracking-tight text-[#252528] sm:text-base">
             {site.heroFrameTitle}
           </h1>
-          <p class="font-mono text-[11px] uppercase tracking-[0.14em] text-[#4a4f57]">
+          <p class="stage-frame__subtitle font-mono text-[10px] leading-relaxed uppercase tracking-[0.12em] text-[#4a4f57] sm:text-[11px] sm:tracking-[0.14em]">
             <span data-i18n="zh">{site.owner.nameZh} · {site.heroFrameSubtitle}</span>
             <span data-i18n="en">{site.owner.nameEn} · {site.heroFrameSubtitleEn || site.heroFrameSubtitle}</span>
           </p>
         </div>
 
-        <div class="flex flex-wrap items-center gap-4 sm:gap-6">
+        <div class="stage-frame__actions ml-auto flex shrink-0 items-center gap-4 sm:gap-6">
           <nav
             class="stage-frame__links pointer-events-auto flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-medium tracking-wide text-[#252528]"
             aria-label="快速入口"
@@ -76,17 +87,40 @@ const quickLinks = [
     <!-- Second Layer: Split-Screen Editorial Previews -->
     <section class="content--second" aria-label="板块预览详情">
       {
-        site.homePanels.map((panel, index) => (
-          <article class="stage-item" data-panel-index={index}>
-            <div
-              class:list={[
-                'stage-item__img',
-                panel.imageFit === 'contain' && 'stage-item__img--contain',
-              ]}
-              style={panel.imageBg ? `background-color: ${panel.imageBg};` : undefined}
-              data-bg={withBase(panel.image)}
-              aria-hidden="true"
-            />
+        site.homePanels.map((panel, index) => {
+          const media = panelAssets[index];
+          return (
+            <article class="stage-item" data-panel-index={index}>
+              <div
+                class:list={[
+                  'stage-item__img',
+                  panel.imageFit === 'contain' && 'stage-item__img--contain',
+                ]}
+                style={
+                  panel.imageFit === 'contain'
+                    ? panel.imageBg
+                      ? `background-color: ${panel.imageBg};`
+                      : undefined
+                    : media.lqip
+                      ? `background-image: url("${media.lqip}"); background-size: cover; background-position: center;`
+                      : undefined
+                }
+                aria-hidden="true"
+              >
+                <picture class="stage-item__picture">
+                  {media.avifUrl && <source type="image/avif" data-srcset={media.avifUrl} />}
+                  <img
+                    data-src={media.webpUrl}
+                    alt=""
+                    decoding="async"
+                    class:list={[
+                      'stage-item__photo',
+                      panel.imageFit === 'contain' && 'stage-item__photo--contain',
+                    ]}
+                    data-pending=""
+                  />
+                </picture>
+              </div>
             <div class="stage-item__content">
               <button type="button" class="stage-back">
                 <BiText zh="← 返回" en="← back" />
@@ -119,63 +153,74 @@ const quickLinks = [
               </div>
             </div>
           </article>
-        ))
+          );
+        })
       }
     </section>
 
-    <!-- First Layer: 4-Column Parallax Photo Grid + Kinetic Outlined Menu -->
+    <!-- First Layer: Parallax Photo Mosaic + Kinetic Outlined Menu -->
     <section class="content--first" aria-label="主视觉导航幕布">
       <div class="content__move">
         <div class="columns" aria-hidden="true">
           {
-            site.homeColumns.map((col) => (
-              <div class:list={['column', col.bottom && 'column--bottom']}>
-                {col.images.map((imgPath, imgIdx) => {
-                  const len = col.images.length;
-                  const isTier1 = col.bottom ? imgIdx >= len - 2 : imgIdx < 2;
-                  const isTier2 = col.bottom
-                    ? imgIdx >= len - 4 && imgIdx < len - 2
-                    : imgIdx >= 2 && imgIdx < 4;
-                  const lqipIdx = homeLqipIndex.get(imgPath);
-                  const avifPath = toAvifPath(imgPath);
-                  return (
-                    <div
-                      class="column__img"
-                      style={lqipIdx !== undefined ? `background-image: var(--lqip-${lqipIdx});` : undefined}
-                    >
-                      <picture class="column__picture">
-                        {avifPath !== imgPath &&
-                          (isTier1 ? (
-                            <source type="image/avif" srcset={withBase(avifPath)} />
+            site.homeColumns.map((col, colIdx) => {
+              const isDesktopOnlyCol = colIdx >= 4;
+              return (
+                <div
+                  class:list={['column', col.bottom && 'column--bottom']}
+                  data-desktop-only={isDesktopOnlyCol ? '1' : undefined}
+                >
+                  {col.images.map((imgPath, imgIdx) => {
+                    const len = col.images.length;
+                    const isTier1 = !isDesktopOnlyCol && (col.bottom ? imgIdx >= len - 2 : imgIdx < 2);
+                    const isWave1 = isDesktopOnlyCol
+                      ? col.bottom
+                        ? imgIdx >= len - 4
+                        : imgIdx < 4
+                      : col.bottom
+                        ? imgIdx >= len - 4 && imgIdx < len - 2
+                        : imgIdx >= 2 && imgIdx < 4;
+                    const lqipIdx = homeLqipIndex.get(imgPath);
+                    const avifPath = toAvifPath(imgPath);
+                    return (
+                      <div
+                        class="column__img"
+                        style={lqipIdx !== undefined ? `background-image: var(--lqip-${lqipIdx});` : undefined}
+                      >
+                        <picture class="column__picture">
+                          {avifPath !== imgPath &&
+                            (isTier1 ? (
+                              <source type="image/avif" srcset={withBase(avifPath)} />
+                            ) : (
+                              <source type="image/avif" data-srcset={withBase(avifPath)} />
+                            ))}
+                          {isTier1 ? (
+                            <img
+                              src={withBase(imgPath)}
+                              alt=""
+                              loading="eager"
+                              decoding="async"
+                              fetchpriority="high"
+                              class="column__photo"
+                            />
                           ) : (
-                            <source type="image/avif" data-srcset={withBase(avifPath)} />
-                          ))}
-                        {isTier1 ? (
-                          <img
-                            src={withBase(imgPath)}
-                            alt=""
-                            loading="eager"
-                            decoding="async"
-                            fetchpriority="high"
-                            class="column__photo"
-                          />
-                        ) : (
-                          <img
-                            data-src={withBase(imgPath)}
-                            data-wave={isTier2 ? '1' : '2'}
-                            alt=""
-                            decoding="async"
-                            fetchpriority="low"
-                            class="column__photo"
-                            data-pending=""
-                          />
-                        )}
-                      </picture>
-                    </div>
-                  );
-                })}
-              </div>
-            ))
+                            <img
+                              data-src={withBase(imgPath)}
+                              data-wave={isWave1 ? '1' : '2'}
+                              alt=""
+                              decoding="async"
+                              fetchpriority="low"
+                              class="column__photo"
+                              data-pending=""
+                            />
+                          )}
+                        </picture>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })
           }
         </div>
 
@@ -184,6 +229,7 @@ const quickLinks = [
             var tier1 = document.querySelectorAll('.column__photo[src]');
             var remaining = 0;
             var doneWaves = { '1': false, '2': false };
+            var doneDesktopWaves = { '1': false, '2': false };
             var waveTimer1 = 0;
             var tier1ReadyDispatched = false;
 
@@ -210,9 +256,12 @@ const quickLinks = [
               window.dispatchEvent(new Event('home-tier1-ready'));
             }
 
-            function hydrateWave(wave) {
-              if (doneWaves[wave]) return;
+            function hydrateWave(wave, forceDesktop) {
+              var desktopNow = Boolean(forceDesktop) || window.innerWidth >= 848;
+              if (doneWaves[wave] && (!desktopNow || doneDesktopWaves[wave])) return;
               doneWaves[wave] = true;
+              if (desktopNow) doneDesktopWaves[wave] = true;
+
               if (wave === '1') {
                 if (waveTimer1) {
                   clearTimeout(waveTimer1);
@@ -220,9 +269,14 @@ const quickLinks = [
                 }
                 emitTier1Ready();
               }
+
               var targets = document.querySelectorAll('.column__photo[data-wave="' + wave + '"][data-src]');
               for (var i = 0; i < targets.length; i++) {
                 var img = targets[i];
+                var colEl = img.closest('.column');
+                if (!desktopNow && colEl && colEl.getAttribute('data-desktop-only') === '1') {
+                  continue;
+                }
                 var url = img.getAttribute('data-src');
                 if (!url) continue;
                 var pic = img.parentElement;
@@ -248,6 +302,17 @@ const quickLinks = [
               hydrateWave('2');
             };
 
+            function onResizeWide() {
+              if (window.innerWidth >= 848) {
+                hydrateWave('1', true);
+                hydrateWave('2', true);
+                window.removeEventListener('resize', onResizeWide);
+              }
+            }
+            if (window.innerWidth < 848) {
+              window.addEventListener('resize', onResizeWide, { passive: true });
+            }
+
             function onTier1Settle() {
               remaining -= 1;
               if (remaining <= 0) hydrateWave('1');
@@ -265,7 +330,7 @@ const quickLinks = [
             if (remaining === 0) {
               hydrateWave('1');
             } else {
-              var waitMs = window.innerWidth < 848 ? 220 : 420;
+              var waitMs = window.innerWidth < 848 ? 220 : 180;
               waveTimer1 = window.setTimeout(function () {
                 hydrateWave('1');
               }, waitMs);
@@ -304,9 +369,6 @@ const quickLinks = [
               </button>
             ))
           }
-          <p class="stage-touch-hint" aria-hidden="true">
-            <BiText zh="轻点标题展开 · 滑动触发视差" en="Tap title to explore · Drag for parallax" />
-          </p>
         </nav>
       </div>
     </section>
@@ -354,7 +416,23 @@ const quickLinks = [
 
   @media (max-width: 52.99em) {
     .stage-frame {
-      padding: 1rem 1rem;
+      padding: 0.9rem 1rem;
+    }
+
+    .stage-frame__title {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .stage-frame__links {
+      display: none;
     }
 
     :global(body.stage-panel-open) .stage-frame {
@@ -365,7 +443,7 @@ const quickLinks = [
 
   .stage-frame__top {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: flex-start;
     justify-content: space-between;
     gap: 0.75rem 1.5rem;
@@ -413,10 +491,10 @@ const quickLinks = [
     position: absolute;
     inset: 0;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     grid-template-rows: 100%;
-    gap: 1.25rem;
-    padding: 0 6vw;
+    gap: 0.875rem;
+    padding: 0 4vw;
   }
 
   .column {
@@ -472,15 +550,23 @@ const quickLinks = [
     }
 
     .column:nth-child(2) {
-      animation-delay: 0.05s;
+      animation-delay: 0.04s;
     }
 
     .column:nth-child(3) {
-      animation-delay: 0.1s;
+      animation-delay: 0.08s;
     }
 
     .column:nth-child(4) {
-      animation-delay: 0.15s;
+      animation-delay: 0.12s;
+    }
+
+    .column:nth-child(5) {
+      animation-delay: 0.16s;
+    }
+
+    .column:nth-child(6) {
+      animation-delay: 0.2s;
     }
 
     .menu__item {
@@ -511,13 +597,13 @@ const quickLinks = [
     background-color: rgba(37, 37, 40, 0.08);
     background-size: cover;
     background-position: center;
-    height: clamp(140px, 24vw, 380px);
+    height: clamp(140px, 15vw, 235px);
     border-radius: 2px;
     overflow: hidden;
   }
 
   .column__img:nth-child(odd) {
-    height: clamp(170px, 29vw, 460px);
+    height: clamp(170px, 18.5vw, 285px);
   }
 
   .column__picture {
@@ -539,13 +625,18 @@ const quickLinks = [
   }
 
   .column__img:not(:last-child) {
-    margin-bottom: 1.25rem;
+    margin-bottom: 0.875rem;
   }
 
   @media (max-width: 52.99em) {
     .columns {
+      grid-template-columns: repeat(4, 1fr);
       padding: 0 2.5vw;
       gap: 0.625rem;
+    }
+
+    .column:nth-child(n + 5) {
+      display: none;
     }
 
     .column__img {
@@ -566,7 +657,7 @@ const quickLinks = [
     width: 100%;
     height: 100vh;
     height: 100dvh;
-    padding: 6rem 1.5rem 2.5rem;
+    padding: 3.5rem 1.5rem 2rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -575,21 +666,9 @@ const quickLinks = [
     z-index: 2;
   }
 
-  .stage-touch-hint {
-    display: none;
-    margin-top: 1.5rem;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: rgba(37, 37, 40, 0.58);
-    text-align: center;
-    pointer-events: none;
-  }
-
-  @media (hover: none), (pointer: coarse) {
-    .stage-touch-hint {
-      display: block;
+  @media (min-width: 53em) {
+    .menu {
+      padding: 6rem 1.5rem 2.5rem;
     }
   }
 
@@ -639,28 +718,49 @@ const quickLinks = [
   }
 
   .stage-item__img {
+    position: relative;
     height: 34vh;
     min-height: 210px;
     width: 100%;
     flex: none;
     background-color: rgba(37, 37, 40, 0.08);
-    background-size: cover;
-    background-position: 50% 35%;
-    opacity: 0.48;
+    opacity: 0.9;
+    overflow: hidden;
   }
 
   .stage-item__img--contain {
-    background-size: 92% auto;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-    opacity: 0.96;
+    opacity: 0.98;
+  }
+
+  .stage-item__picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .stage-item__photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 35%;
+    display: block;
+    transition: opacity 0.35s ease-out;
+  }
+
+  .stage-item__photo--contain {
+    object-fit: contain;
+    object-position: 50% 50%;
+    padding: 1rem 1.25rem;
+  }
+
+  .stage-item__photo[data-pending] {
+    opacity: 0;
   }
 
   @media (max-width: 52.99em) {
     .stage-item__img--contain {
       height: 30vh;
       min-height: 175px;
-      background-size: 94% auto;
     }
   }
 
@@ -721,7 +821,10 @@ const quickLinks = [
     .stage-item__img {
       height: 100%;
       width: 44%;
-      background-position: 50% 50%;
+    }
+
+    .stage-item__photo {
+      object-position: 50% 50%;
     }
 
     .stage-item__content {
