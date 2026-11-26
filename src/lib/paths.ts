@@ -31,7 +31,7 @@ export function toAvifPath(imagePath: string): string {
     return imagePath.replace(/\.(?:webp|jpe?g|png)(\?.*)?$/i, '.avif$1');
   }
   if (
-    !/^\/media\/(?:home\/|profile\/academic-cover\.webp$|life\/covers\/|life\/thumbs\/|life\/ahu\/header\.webp$)/i.test(
+    !/^\/media\/(?:home\/|profile\/academic-cover\.webp$|projects\/ual-dt-cesium\.webp$|life\/covers\/|life\/thumbs\/|life\/ahu\/header\.webp$)/i.test(
       imagePath,
     )
   ) {

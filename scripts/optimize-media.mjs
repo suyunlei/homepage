@@ -292,6 +292,21 @@ async function generateAvifSidecars(forceAvif, scopes) {
     }
   }
 
+  if (scopes.includes('projects')) {
+    const ualCover = path.join(MEDIA_ROOT, 'projects', 'ual-dt-cesium.webp');
+    try {
+      await fs.stat(ualCover);
+      candidates.push({
+        srcPath: ualCover,
+        maxWidth: 1000,
+        maxHeight: 800,
+        quality: 74,
+      });
+    } catch {
+      // optional cover
+    }
+  }
+
   if (scopes.includes('life/covers')) {
     for (const filePath of await walkFiles(path.join(MEDIA_ROOT, 'life', 'covers'))) {
       if (filePath.toLowerCase().endsWith('.webp')) {
@@ -579,6 +594,9 @@ async function main() {
   }
   if (filters.length === 0 || filters.some((f) => f === 'profile' || f.startsWith('profile/'))) {
     avifScopes.push('profile');
+  }
+  if (filters.length === 0 || filters.some((f) => f === 'projects' || f.startsWith('projects/'))) {
+    avifScopes.push('projects');
   }
   if (filters.length === 0 || filters.some((f) => f === 'life' || f.startsWith('life/covers'))) {
     avifScopes.push('life/covers');

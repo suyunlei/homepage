@@ -70,7 +70,9 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
   let touchOffset = { x: 0, y: 0 };
   const tiltOffset = { x: 0, y: 0 };
 
-  const startTime = performance.now();
+  let revealTime = document.documentElement.classList.contains('stage-revealed')
+    ? performance.now()
+    : 0;
   let entranceDone = prefersReducedMotion;
   let parallaxRaf = 0;
 
@@ -141,7 +143,14 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
   };
 
   const scheduleParallaxLoop = () => {
-    if (prefersReducedMotion || !activeTilt.columns || !entranceDone || document.hidden || parallaxRaf) {
+    if (
+      prefersReducedMotion ||
+      !activeTilt.columns ||
+      !entranceDone ||
+      !revealTime ||
+      document.hidden ||
+      parallaxRaf
+    ) {
       return;
     }
     parallaxRaf = requestAnimationFrame(stepParallax);
@@ -152,7 +161,7 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
     (ev) => {
       mousePos = { x: ev.clientX, y: ev.clientY };
       hasPointerMoved = true;
-      if (!entranceDone && performance.now() - startTime >= 250) {
+      if (!entranceDone && revealTime > 0 && performance.now() - revealTime >= 250) {
         entranceDone = true;
       }
       scheduleParallaxLoop();
@@ -168,7 +177,7 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
       const t = ev.touches[0];
       touchOrigin = { x: t.clientX, y: t.clientY };
       isTouching = true;
-      if (!entranceDone && performance.now() - startTime >= 250) {
+      if (!entranceDone && revealTime > 0 && performance.now() - revealTime >= 250) {
         entranceDone = true;
       }
       scheduleParallaxLoop();
@@ -215,12 +224,21 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
   }
 
   if (!prefersReducedMotion && columnStates.length > 0) {
-    window.setTimeout(() => {
-      entranceDone = true;
-      if (isTouchDevice || hasPointerMoved) {
-        scheduleParallaxLoop();
-      }
-    }, 520);
+    const startEntranceHandoff = () => {
+      revealTime = performance.now();
+      window.setTimeout(() => {
+        entranceDone = true;
+        if (isTouchDevice || hasPointerMoved) {
+          scheduleParallaxLoop();
+        }
+      }, 520);
+    };
+
+    if (document.documentElement.classList.contains('stage-revealed')) {
+      startEntranceHandoff();
+    } else {
+      window.addEventListener('home-stage-revealed', startEntranceHandoff, { once: true });
+    }
 
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
@@ -231,7 +249,9 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
     });
   }
 
-  // Silently preload GSAP right after Tier-1 images settle or page load without blocking first paint
+  // Expose lazy GSAP loader for the homepage preloader and warm on idle/tier1 fallback
+  (window as unknown as { __loadHomeGsap?: () => Promise<unknown> }).__loadHomeGsap = () =>
+    loadGsap();
   window.addEventListener('home-tier1-ready', () => void loadGsap(), { once: true });
   const warmGsapIdle = () => {
     const requestIdle = (

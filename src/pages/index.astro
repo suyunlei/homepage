@@ -22,16 +22,13 @@ homeLqipEntries.forEach(([imgPath, uri], idx) => {
 });
 const homeLqipCss = lqipVars.length > 0 ? `:root{${lqipVars.join(';')}}` : '';
 
-const panelAssets = await Promise.all(
-  site.homePanels.map(async (panel) => {
-    const avifPath = toAvifPath(panel.image);
-    return {
-      lqip: panel.imageFit === 'contain' ? '' : await getLqipDataUri(panel.image),
-      avifUrl: avifPath !== panel.image ? withBase(avifPath) : '',
-      webpUrl: withBase(panel.image),
-    };
-  }),
-);
+const panelAssets = site.homePanels.map((panel) => {
+  const avifPath = toAvifPath(panel.image);
+  return {
+    avifUrl: avifPath !== panel.image ? withBase(avifPath) : '',
+    webpUrl: withBase(panel.image),
+  };
+});
 
 const quickLinks = [
   { label: 'Academic', href: '/academic/' },
@@ -47,8 +44,137 @@ const quickLinks = [
   description={site.siteDescription}
   bodyClass="stage-body"
 >
+  <script is:inline slot="head">
+    (function () {
+      try {
+        var root = document.documentElement;
+        var reduce =
+          window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var navEntries =
+          window.performance && performance.getEntriesByType
+            ? performance.getEntriesByType('navigation')
+            : null;
+        var navType = navEntries && navEntries[0] ? navEntries[0].type : '';
+        var seen = false;
+        try {
+          seen = sessionStorage.getItem('home-preloaded') === '1';
+        } catch (e) {}
+        var sameOrigin = false;
+        if (document.referrer) {
+          try {
+            sameOrigin = new URL(document.referrer).origin === window.location.origin;
+          } catch (e) {}
+        }
+        if (reduce || (seen && navType !== 'reload' && sameOrigin)) {
+          root.classList.add('preloader-skip', 'stage-revealed');
+        } else {
+          root.classList.add('preloader-active');
+        }
+      } catch (e) {
+        document.documentElement.classList.add('preloader-skip', 'stage-revealed');
+      }
+    })();
+  </script>
   {homeLqipCss && <style slot="head" is:inline set:html={homeLqipCss} />}
   <main class="stage-main">
+    <!-- Playful Editorial Preloader Curtain (first load / reload only) -->
+    <div
+      id="stage-preloader"
+      class="preloader"
+      role="status"
+      aria-live="polite"
+      aria-label="正在加载首页内容"
+    >
+      <div class="preloader__grid" aria-hidden="true"></div>
+      <div id="preloader-ripples" class="preloader__ripples" aria-hidden="true"></div>
+
+      <div
+        class="preloader__corners font-mono text-[10px] tracking-[0.18em] uppercase text-[#252528]/70"
+        aria-hidden="true"
+      >
+        <span class="preloader__corner preloader__corner--tl">YUNLEI SU · STUDIO ARCHIVE</span>
+        <span id="preloader-coord" class="preloader__corner preloader__corner--tr">
+          22.89°N · 113.48°E · HKUST(GZ)
+        </span>
+        <span class="preloader__corner preloader__corner--bl flex items-center gap-2">
+          <span class="preloader__dot"></span>
+          <span>LOADING ARCHIVE</span>
+        </span>
+        <span class="preloader__corner preloader__corner--br">
+          <BiText zh="点按任意处互动 ✦" en="Tap anywhere ✦" />
+        </span>
+      </div>
+
+      <div id="preloader-core" class="preloader__core">
+        <div class="preloader__compass">
+          <svg
+            class="preloader__svg"
+            viewBox="0 0 120 120"
+            width="116"
+            height="116"
+            aria-hidden="true"
+          >
+            <g class="preloader__ring-outer">
+              <circle
+                cx="60"
+                cy="60"
+                r="54"
+                fill="none"
+                stroke="rgba(37,37,40,0.22)"
+                stroke-width="1"
+                stroke-dasharray="3 4"
+              />
+              <line x1="60" y1="2" x2="60" y2="9" stroke="#252528" stroke-width="1.2" />
+              <line x1="60" y1="111" x2="60" y2="118" stroke="rgba(37,37,40,0.45)" stroke-width="1" />
+              <line x1="2" y1="60" x2="9" y2="60" stroke="rgba(37,37,40,0.45)" stroke-width="1" />
+              <line x1="111" y1="60" x2="118" y2="60" stroke="rgba(37,37,40,0.45)" stroke-width="1" />
+            </g>
+            <g class="preloader__ring-inner">
+              <circle
+                cx="60"
+                cy="60"
+                r="44"
+                fill="none"
+                stroke="rgba(37,37,40,0.12)"
+                stroke-width="1.75"
+              />
+              <circle
+                id="preloader-arc"
+                cx="60"
+                cy="60"
+                r="44"
+                fill="none"
+                stroke="#27445d"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-dasharray="276.46"
+                stroke-dashoffset="276.46"
+                transform="rotate(-90 60 60)"
+              />
+            </g>
+          </svg>
+          <img
+            src={withBase('/favicon.svg?v=su')}
+            alt="苏"
+            width="44"
+            height="44"
+            class="preloader__seal"
+            decoding="async"
+          />
+        </div>
+
+        <div class="preloader__pct font-mono" id="preloader-pct">00%</div>
+
+        <div class="preloader__track" aria-hidden="true">
+          <div id="preloader-bar" class="preloader__bar"></div>
+        </div>
+
+        <p class="preloader__status">
+          <span id="preloader-status-zh" data-i18n="zh">正在唤醒 36 帧生活切片...</span>
+          <span id="preloader-status-en" data-i18n="en">Waking up 36 visual slices...</span>
+        </p>
+      </div>
+    </div>
     <!-- Fixed Editorial Frame -->
     <header class="stage-frame">
       <div class="stage-frame__top">
@@ -96,15 +222,7 @@ const quickLinks = [
                   'stage-item__img',
                   panel.imageFit === 'contain' && 'stage-item__img--contain',
                 ]}
-                style={
-                  panel.imageFit === 'contain'
-                    ? panel.imageBg
-                      ? `background-color: ${panel.imageBg};`
-                      : undefined
-                    : media.lqip
-                      ? `background-image: url("${media.lqip}"); background-size: cover; background-position: center;`
-                      : undefined
-                }
+                style={panel.imageBg ? `background-color: ${panel.imageBg};` : 'background-color: #252528;'}
                 aria-hidden="true"
               >
                 <picture class="stage-item__picture">
@@ -226,12 +344,13 @@ const quickLinks = [
 
         <script is:inline>
           (function () {
-            var tier1 = document.querySelectorAll('.column__photo[src]');
-            var remaining = 0;
+            var rootEl = document.documentElement;
+            var isPreloader = rootEl.classList.contains('preloader-active');
             var doneWaves = { '1': false, '2': false };
             var doneDesktopWaves = { '1': false, '2': false };
             var waveTimer1 = 0;
             var tier1ReadyDispatched = false;
+            var panelsHydrated = false;
 
             function markLoaded(el) {
               el.removeAttribute('data-pending');
@@ -250,6 +369,49 @@ const quickLinks = [
               if (el.complete) finish();
             }
 
+            function waitDecode(img) {
+              return new Promise(function (resolve) {
+                var done = false;
+                var finish = function () {
+                  if (done) return;
+                  done = true;
+                  markLoaded(img);
+                  if (typeof img.decode === 'function') {
+                    img.decode().catch(function () {}).finally(resolve);
+                  } else {
+                    resolve();
+                  }
+                };
+                if (img.complete) {
+                  finish();
+                  return;
+                }
+                img.addEventListener('load', finish, { once: true });
+                img.addEventListener('error', finish, { once: true });
+              });
+            }
+
+            function activatePicture(img) {
+              var url = img.getAttribute('data-src');
+              if (!url) return false;
+              var pic = img.parentElement;
+              if (pic && pic.tagName === 'PICTURE') {
+                var sources = pic.querySelectorAll('source[data-srcset]');
+                for (var j = 0; j < sources.length; j++) {
+                  var sUrl = sources[j].getAttribute('data-srcset');
+                  if (sUrl) {
+                    sources[j].setAttribute('srcset', sUrl);
+                    sources[j].removeAttribute('data-srcset');
+                  }
+                }
+              }
+              img.removeAttribute('data-src');
+              bindClear(img, null);
+              img.setAttribute('src', url);
+              if (img.complete) markLoaded(img);
+              return true;
+            }
+
             function emitTier1Ready() {
               if (tier1ReadyDispatched) return;
               tier1ReadyDispatched = true;
@@ -258,7 +420,7 @@ const quickLinks = [
 
             function hydrateWave(wave, forceDesktop) {
               var desktopNow = Boolean(forceDesktop) || window.innerWidth >= 848;
-              if (doneWaves[wave] && (!desktopNow || doneDesktopWaves[wave])) return;
+              if (doneWaves[wave] && (!desktopNow || doneDesktopWaves[wave])) return [];
               doneWaves[wave] = true;
               if (desktopNow) doneDesktopWaves[wave] = true;
 
@@ -270,6 +432,7 @@ const quickLinks = [
                 emitTier1Ready();
               }
 
+              var hydrated = [];
               var targets = document.querySelectorAll('.column__photo[data-wave="' + wave + '"][data-src]');
               for (var i = 0; i < targets.length; i++) {
                 var img = targets[i];
@@ -277,29 +440,28 @@ const quickLinks = [
                 if (!desktopNow && colEl && colEl.getAttribute('data-desktop-only') === '1') {
                   continue;
                 }
-                var url = img.getAttribute('data-src');
-                if (!url) continue;
-                var pic = img.parentElement;
-                if (pic && pic.tagName === 'PICTURE') {
-                  var sources = pic.querySelectorAll('source[data-srcset]');
-                  for (var j = 0; j < sources.length; j++) {
-                    var sUrl = sources[j].getAttribute('data-srcset');
-                    if (sUrl) {
-                      sources[j].setAttribute('srcset', sUrl);
-                      sources[j].removeAttribute('data-srcset');
-                    }
-                  }
+                if (activatePicture(img)) {
+                  hydrated.push(img);
                 }
-                img.removeAttribute('data-src');
-                bindClear(img, null);
-                img.setAttribute('src', url);
-                if (img.complete) markLoaded(img);
               }
+              return hydrated;
             }
 
             window.__hydrateHomeWall = function () {
               hydrateWave('1');
               hydrateWave('2');
+            };
+
+            window.__hydrateAllPanels = function () {
+              if (panelsHydrated) return [];
+              panelsHydrated = true;
+              var imgs = document.querySelectorAll('.stage-item__photo[data-src]');
+              var list = [];
+              for (var i = 0; i < imgs.length; i++) {
+                activatePicture(imgs[i]);
+                list.push(imgs[i]);
+              }
+              return list;
             };
 
             function onResizeWide() {
@@ -313,46 +475,294 @@ const quickLinks = [
               window.addEventListener('resize', onResizeWide, { passive: true });
             }
 
-            function onTier1Settle() {
-              remaining -= 1;
-              if (remaining <= 0) hydrateWave('1');
-            }
+            if (isPreloader) {
+              var preloaderEl = document.getElementById('stage-preloader');
+              var coreEl = document.getElementById('preloader-core');
+              var sealEl = preloaderEl ? preloaderEl.querySelector('.preloader__seal') : null;
+              var ripplesEl = document.getElementById('preloader-ripples');
+              var coordEl = document.getElementById('preloader-coord');
+              var arcEl = document.getElementById('preloader-arc');
+              var pctEl = document.getElementById('preloader-pct');
+              var barEl = document.getElementById('preloader-bar');
+              var statusZhEl = document.getElementById('preloader-status-zh');
+              var statusEnEl = document.getElementById('preloader-status-en');
 
-            for (var i = 0; i < tier1.length; i++) {
-              var img = tier1[i];
-              if (!img.complete) {
-                remaining += 1;
-                img.setAttribute('data-pending', '');
-                bindClear(img, onTier1Settle);
+              var coords = [
+                '31.77°N · 117.18°E · AHU',
+                '1.30°N · 103.78°E · NUS',
+                '22.89°N · 113.48°E · HKUST(GZ)',
+              ];
+              var coordIdx = 0;
+              var stagesZh = [
+                '正在唤醒 36 帧生活切片...',
+                '正在校准城市数字孪生坐标...',
+                '正在给猫猫顺毛 & 铺好高清展板...',
+                '欢迎来到苏云雷的世界 ✦',
+              ];
+              var stagesEn = [
+                'Waking up 36 visual slices...',
+                'Calibrating urban digital twin coords...',
+                'Petting the cats & unrolling HD panels...',
+                "Welcome to Yunlei Su's World ✦",
+              ];
+              var lastStageIdx = 0;
+
+              var wallImgs = Array.prototype.slice.call(
+                document.querySelectorAll('.column__photo[src]'),
+              );
+              var wave1Imgs = hydrateWave('1');
+              for (var k = 0; k < wave1Imgs.length; k++) {
+                wallImgs.push(wave1Imgs[k]);
               }
-            }
 
-            if (remaining === 0) {
-              hydrateWave('1');
-            } else {
-              var waitMs = window.innerWidth < 848 ? 220 : 180;
-              waveTimer1 = window.setTimeout(function () {
-                hydrateWave('1');
-              }, waitMs);
-            }
+              var panelImgs = window.__hydrateAllPanels();
+              if (panelImgs.length === 0) {
+                panelImgs = Array.prototype.slice.call(
+                  document.querySelectorAll('.stage-item__photo'),
+                );
+              }
 
-            var scheduleWave2 = function () {
-              hydrateWave('1');
-              if ('requestIdleCallback' in window) {
-                window.requestIdleCallback(function () {
-                  hydrateWave('2');
-                }, { timeout: 1200 });
+              var wallDone = 0;
+              var wallTotal = Math.max(1, wallImgs.length);
+              wallImgs.forEach(function (img) {
+                waitDecode(img).then(function () {
+                  wallDone += 1;
+                });
+              });
+
+              var panelDone = 0;
+              var panelTotal = Math.max(1, panelImgs.length);
+              panelImgs.forEach(function (img) {
+                waitDecode(img).then(function () {
+                  panelDone += 1;
+                });
+              });
+
+              var extrasDone = 0;
+              var extrasTotal = 2;
+              if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(function () {
+                  extrasDone += 1;
+                });
               } else {
-                window.setTimeout(function () {
-                  hydrateWave('2');
-                }, 600);
+                extrasDone += 1;
               }
-            };
 
-            if (document.readyState === 'complete') {
-              scheduleWave2();
+              var gsapStarted = false;
+              var triggerGsapLoad = function () {
+                if (gsapStarted) return;
+                if (typeof window.__loadHomeGsap === 'function') {
+                  gsapStarted = true;
+                  Promise.resolve(window.__loadHomeGsap())
+                    .catch(function () {})
+                    .finally(function () {
+                      extrasDone += 1;
+                    });
+                }
+              };
+              triggerGsapLoad();
+              window.addEventListener('DOMContentLoaded', triggerGsapLoad, { once: true });
+              var gsapFallback = window.setTimeout(function () {
+                if (!gsapStarted) {
+                  gsapStarted = true;
+                  if (typeof window.__loadHomeGsap === 'function') {
+                    Promise.resolve(window.__loadHomeGsap())
+                      .catch(function () {})
+                      .finally(function () {
+                        extrasDone += 1;
+                      });
+                  } else {
+                    extrasDone += 1;
+                  }
+                }
+              }, 350);
+
+              var coordTimer = window.setInterval(function () {
+                coordIdx = (coordIdx + 1) % coords.length;
+                if (coordEl) coordEl.textContent = coords[coordIdx];
+              }, 560);
+
+              var onPreloaderMove = function (ev) {
+                if (!coreEl || (preloaderEl && preloaderEl.classList.contains('is-leaving'))) return;
+                var nx = (ev.clientX / Math.max(1, window.innerWidth) - 0.5) * 2;
+                var ny = (ev.clientY / Math.max(1, window.innerHeight) - 0.5) * 2;
+                coreEl.style.transform =
+                  'perspective(720px) rotateX(' +
+                  (-ny * 7).toFixed(2) +
+                  'deg) rotateY(' +
+                  (nx * 7).toFixed(2) +
+                  'deg)';
+              };
+
+              var onPreloaderTap = function (ev) {
+                if (ripplesEl) {
+                  var cx = ev.clientX || window.innerWidth / 2;
+                  var cy = ev.clientY || window.innerHeight / 2;
+                  var ring = document.createElement('span');
+                  ring.className = 'preloader__ripple';
+                  ring.style.left = cx + 'px';
+                  ring.style.top = cy + 'px';
+                  ripplesEl.appendChild(ring);
+                  window.setTimeout(function () {
+                    if (ring.parentNode) ring.parentNode.removeChild(ring);
+                  }, 720);
+                }
+                if (sealEl) {
+                  sealEl.classList.remove('is-pop');
+                  void sealEl.offsetWidth;
+                  sealEl.classList.add('is-pop');
+                }
+              };
+
+              if (preloaderEl) {
+                preloaderEl.addEventListener('pointermove', onPreloaderMove, { passive: true });
+                preloaderEl.addEventListener('pointerdown', onPreloaderTap, { passive: true });
+              }
+
+              var t0 = performance.now();
+              var minDuration = 1050;
+              var maxWait = 3200;
+              var displayPct = 0;
+              var finished = false;
+
+              var scheduleWave2After = function () {
+                if ('requestIdleCallback' in window) {
+                  window.requestIdleCallback(function () {
+                    hydrateWave('2');
+                  }, { timeout: 1200 });
+                } else {
+                  window.setTimeout(function () {
+                    hydrateWave('2');
+                  }, 450);
+                }
+              };
+
+              var finishReveal = function () {
+                if (finished) return;
+                finished = true;
+                clearInterval(coordTimer);
+                clearTimeout(gsapFallback);
+                try {
+                  sessionStorage.setItem('home-preloaded', '1');
+                } catch (e) {}
+
+                if (pctEl) pctEl.textContent = '100%';
+                if (barEl) barEl.style.transform = 'scaleX(1)';
+                if (arcEl) arcEl.style.strokeDashoffset = '0';
+                if (statusZhEl) statusZhEl.textContent = stagesZh[3];
+                if (statusEnEl) statusEnEl.textContent = stagesEn[3];
+
+                window.setTimeout(function () {
+                  rootEl.classList.add('stage-revealed');
+                  rootEl.classList.remove('preloader-active');
+                  window.dispatchEvent(new Event('home-stage-revealed'));
+                  if (preloaderEl) {
+                    preloaderEl.classList.add('is-leaving');
+                    preloaderEl.removeEventListener('pointermove', onPreloaderMove);
+                    preloaderEl.removeEventListener('pointerdown', onPreloaderTap);
+                    window.setTimeout(function () {
+                      preloaderEl.style.display = 'none';
+                      scheduleWave2After();
+                    }, 740);
+                  } else {
+                    scheduleWave2After();
+                  }
+                }, 220);
+              };
+
+              var tickPreloader = function (now) {
+                if (finished) return;
+                var elapsed = now - t0;
+                var realPct =
+                  55 * (wallDone / wallTotal) +
+                  30 * (panelDone / panelTotal) +
+                  15 * (extrasDone / extrasTotal);
+
+                if (elapsed >= maxWait) {
+                  realPct = 100;
+                }
+
+                var minRatio = Math.min(1, elapsed / minDuration);
+                var cappedTarget =
+                  minRatio < 1
+                    ? Math.min(realPct, 12 + minRatio * 80)
+                    : realPct >= 99.5
+                      ? 100
+                      : Math.min(96, realPct);
+
+                displayPct += (Math.max(displayPct, cappedTarget) - displayPct) * 0.16;
+                if (cappedTarget >= 100 && displayPct > 98.6) {
+                  displayPct = 100;
+                }
+
+                if (pctEl) pctEl.textContent = String(Math.round(displayPct)).padStart(2, '0') + '%';
+                if (barEl) barEl.style.transform = 'scaleX(' + (displayPct / 100).toFixed(4) + ')';
+                if (arcEl) {
+                  arcEl.style.strokeDashoffset = (276.46 * (1 - displayPct / 100)).toFixed(2);
+                }
+
+                var stageIdx = displayPct >= 88 ? 3 : displayPct >= 60 ? 2 : displayPct >= 30 ? 1 : 0;
+                if (stageIdx !== lastStageIdx) {
+                  lastStageIdx = stageIdx;
+                  if (statusZhEl) statusZhEl.textContent = stagesZh[stageIdx];
+                  if (statusEnEl) statusEnEl.textContent = stagesEn[stageIdx];
+                }
+
+                if (displayPct >= 99.9 && elapsed >= minDuration) {
+                  finishReveal();
+                  return;
+                }
+                requestAnimationFrame(tickPreloader);
+              };
+
+              requestAnimationFrame(tickPreloader);
             } else {
-              window.addEventListener('load', scheduleWave2, { once: true });
+              var tier1 = document.querySelectorAll('.column__photo[src]');
+              var remaining = 0;
+
+              var onTier1Settle = function () {
+                remaining -= 1;
+                if (remaining <= 0) hydrateWave('1');
+              };
+
+              for (var i = 0; i < tier1.length; i++) {
+                var img = tier1[i];
+                if (!img.complete) {
+                  remaining += 1;
+                  img.setAttribute('data-pending', '');
+                  bindClear(img, onTier1Settle);
+                }
+              }
+
+              if (remaining === 0) {
+                hydrateWave('1');
+              } else {
+                var waitMs = window.innerWidth < 848 ? 220 : 180;
+                waveTimer1 = window.setTimeout(function () {
+                  hydrateWave('1');
+                }, waitMs);
+              }
+
+              var scheduleSkipBg = function () {
+                hydrateWave('1');
+                if ('requestIdleCallback' in window) {
+                  window.requestIdleCallback(function () {
+                    hydrateWave('2');
+                    window.__hydrateAllPanels();
+                  }, { timeout: 1200 });
+                } else {
+                  window.setTimeout(function () {
+                    hydrateWave('2');
+                    window.__hydrateAllPanels();
+                  }, 500);
+                }
+              };
+
+              if (document.readyState === 'complete') {
+                scheduleSkipBg();
+              } else {
+                window.addEventListener('load', scheduleSkipBg, { once: true });
+              }
             }
           })();
         </script>
@@ -541,52 +951,298 @@ const quickLinks = [
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .column {
+    :global(html.stage-revealed) .column {
       animation: stage-col-top 0.72s cubic-bezier(0.22, 1, 0.36, 1) backwards;
     }
 
-    .column--bottom {
+    :global(html.stage-revealed) .column--bottom {
       animation-name: stage-col-bottom;
     }
 
-    .column:nth-child(2) {
+    :global(html.stage-revealed) .column:nth-child(2) {
       animation-delay: 0.04s;
     }
 
-    .column:nth-child(3) {
+    :global(html.stage-revealed) .column:nth-child(3) {
       animation-delay: 0.08s;
     }
 
-    .column:nth-child(4) {
+    :global(html.stage-revealed) .column:nth-child(4) {
       animation-delay: 0.12s;
     }
 
-    .column:nth-child(5) {
+    :global(html.stage-revealed) .column:nth-child(5) {
       animation-delay: 0.16s;
     }
 
-    .column:nth-child(6) {
+    :global(html.stage-revealed) .column:nth-child(6) {
       animation-delay: 0.2s;
     }
 
-    .menu__item {
+    :global(html.stage-revealed) .menu__item {
       animation: stage-menu-in 0.62s cubic-bezier(0.22, 1, 0.36, 1) backwards;
     }
 
-    .menu__item:nth-child(2) {
+    :global(html.stage-revealed) .menu__item:nth-child(2) {
       animation-delay: 0.04s;
     }
 
-    .menu__item:nth-child(3) {
+    :global(html.stage-revealed) .menu__item:nth-child(3) {
       animation-delay: 0.08s;
     }
 
-    .menu__item:nth-child(4) {
+    :global(html.stage-revealed) .menu__item:nth-child(4) {
       animation-delay: 0.12s;
     }
 
-    .menu__item:nth-child(5) {
+    :global(html.stage-revealed) .menu__item:nth-child(5) {
       animation-delay: 0.16s;
+    }
+  }
+
+  /* Playful Editorial & GIS Preloader Curtain */
+  .preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-slate);
+    color: var(--ink-primary);
+    overflow: hidden;
+    user-select: none;
+    cursor: pointer;
+    transition: transform 0.72s cubic-bezier(0.76, 0, 0.24, 1);
+    will-change: transform;
+  }
+
+  :global(html.preloader-active) .preloader {
+    display: flex;
+  }
+
+  .preloader.is-leaving {
+    display: flex;
+    pointer-events: none;
+    transform: translate3d(0, -100%, 0);
+  }
+
+  .preloader__grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: radial-gradient(rgba(37, 37, 40, 0.14) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .preloader__ripples {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  :global(.preloader__ripple) {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    margin-left: -9px;
+    margin-top: -9px;
+    border-radius: 9999px;
+    border: 1.5px solid rgba(39, 68, 93, 0.55);
+    animation: preloader-sonar 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .preloader__corners {
+    position: absolute;
+    inset: 1.15rem 1.25rem;
+    pointer-events: none;
+  }
+
+  @media (min-width: 53em) {
+    .preloader__corners {
+      inset: 2rem 3rem;
+    }
+  }
+
+  .preloader__corner {
+    position: absolute;
+  }
+
+  .preloader__corner--tl {
+    top: 0;
+    left: 0;
+  }
+
+  .preloader__corner--tr {
+    top: 0;
+    right: 0;
+    text-align: right;
+  }
+
+  .preloader__corner--bl {
+    bottom: 0;
+    left: 0;
+  }
+
+  .preloader__corner--br {
+    bottom: 0;
+    right: 0;
+    text-align: right;
+  }
+
+  @media (max-width: 52.99em) {
+    .preloader__corner--tr {
+      max-width: 48vw;
+      white-space: normal;
+      line-height: 1.35;
+    }
+  }
+
+  .preloader__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background-color: var(--accent);
+    animation: preloader-blink 1.1s ease-in-out infinite;
+  }
+
+  .preloader__core {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 1.5rem;
+    transition: transform 0.2s ease-out;
+  }
+
+  .preloader__compass {
+    position: relative;
+    width: 116px;
+    height: 116px;
+    display: grid;
+    place-items: center;
+  }
+
+  .preloader__svg {
+    width: 116px;
+    height: 116px;
+  }
+
+  .preloader__ring-outer {
+    transform-box: view-box;
+    transform-origin: center;
+    animation: preloader-spin-cw 18s linear infinite;
+  }
+
+  .preloader__ring-inner {
+    transform-box: view-box;
+    transform-origin: center;
+    animation: preloader-spin-ccw 12s linear infinite;
+  }
+
+  .preloader__seal {
+    position: absolute;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(37, 37, 40, 0.14);
+    animation: preloader-breathe 2.2s ease-in-out infinite;
+  }
+
+  .preloader__seal.is-pop {
+    animation: preloader-pop 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .preloader__pct {
+    margin-top: 1.25rem;
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    color: var(--ink-primary);
+  }
+
+  .preloader__track {
+    margin-top: 0.9rem;
+    width: min(220px, 60vw);
+    height: 2px;
+    border-radius: 9999px;
+    background: rgba(37, 37, 40, 0.15);
+    overflow: hidden;
+  }
+
+  .preloader__bar {
+    width: 100%;
+    height: 100%;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+
+  .preloader__status {
+    margin-top: 0.95rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    color: var(--ink-secondary);
+    text-align: center;
+    min-height: 1.3em;
+  }
+
+  @keyframes preloader-spin-cw {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes preloader-spin-ccw {
+    to {
+      transform: rotate(-360deg);
+    }
+  }
+
+  @keyframes preloader-breathe {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.06);
+    }
+  }
+
+  @keyframes preloader-pop {
+    0% {
+      transform: scale(1) rotate(0deg);
+    }
+    40% {
+      transform: scale(1.22) rotate(-8deg);
+    }
+    100% {
+      transform: scale(1) rotate(0deg);
+    }
+  }
+
+  @keyframes preloader-blink {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.3;
+    }
+  }
+
+  @keyframes preloader-sonar {
+    from {
+      transform: scale(0.4);
+      opacity: 0.85;
+    }
+    to {
+      transform: scale(7.5);
+      opacity: 0;
     }
   }
 

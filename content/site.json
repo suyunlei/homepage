@@ -155,7 +155,9 @@
       "titleEn": "Projects & Podcast",
       "subtitle": "产品 · 空间工程 · 《待会儿再说》",
       "subtitleEn": "Indie Product · WebGIS · Podcast \"Talk Later\"",
-      "image": "/media/panels/project.jpg",
+      "image": "/media/projects/ual-dt-cesium.webp",
+      "imageFit": "contain",
+      "imageBg": "#1c2026",
       "paragraphs": [
         "Still Young, Still Creative.",
         "既有独立全栈健康产品「阿薄（BOJI）」、Urban Morphology Studio (UMS) 课题组官网、WebGIS 与企业前端工程实践，也有我和朋友们在小宇宙一起成长的播客节目《待会儿再说》。",
