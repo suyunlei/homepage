@@ -29,8 +29,15 @@ function isActive(itemHref: string): boolean {
   <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3.5 sm:px-8">
     <a
       href={withBase('/')}
-      class="group flex items-baseline gap-2.5 text-sm font-semibold tracking-tight text-[#252528] transition-opacity hover:opacity-75"
+      class="group flex items-center gap-2.5 text-sm font-semibold tracking-tight text-[#252528] transition-opacity hover:opacity-75"
     >
+      <img
+        src={withBase('/favicon.svg?v=su')}
+        alt="苏"
+        width="22"
+        height="22"
+        class="h-[22px] w-[22px] rounded-md shadow-xs transition-transform duration-200 group-hover:scale-105"
+      />
       <span class="font-mono text-xs uppercase tracking-[0.2em]">Yunlei Su</span>
       <span class="text-xs font-normal text-[#4a4f57]" data-i18n="zh">苏云雷</span>
     </a>
