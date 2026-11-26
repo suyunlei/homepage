@@ -76,6 +76,7 @@ export interface ExperienceEntry {
   location: string;
   role: string;
   details: string;
+  highlights?: string[];
 }
 
 export interface HonorEntry {

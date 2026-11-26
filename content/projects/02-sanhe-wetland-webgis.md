@@ -1,20 +1,20 @@
 ---
-order: 2
-title: "三河湿地 WebGIS 管理系统"
-subtitle: "大学生创新创业训练计划项目"
-category: "GIS & Spatial"
-organization: "安徽大学"
+order: 1
+title: "三河湿地多源空间信息 WebGIS 平台"
+subtitle: "大学生创新创业训练计划 · 生态监测空间数据基础设施"
+category: "Spatial Systems & WebGIS"
+organization: "安徽大学 · Anhui University"
 date: "2020-06"
 cover: "/media/projects/img-2.jpg"
-summary: "面向安徽三河湿地生态监测的 WebGIS 管理平台，推动传统纸质生态档案向多源空间数据在线化、服务化管理转型。"
+summary: "面向安徽三河湿地生态保护与野外巡护需求构建的一体化 WebGIS 空间信息管理平台，推动传统纸质与分散式监测记录向标准化、服务化、可交互的空间数据底座演进。"
 tags:
   - "OpenLayers"
   - "GeoServer"
   - "WMS / WFS"
-  - "WebGIS"
+  - "Multi-Source Spatial Fusion"
 highlights:
-  - "采用 OpenLayers + GeoServer 架构实现空间数据的在线上传与地图渲染"
-  - "集成矢量边界、遥感栅格底图与人工巡护监测等多源异构信息"
-  - "封装并调用 WMS、WFS 等 OGC 标准空间数据服务"
-archiveNote: "注：在线演示依赖独立 GeoServer 空间数据库节点，当前展示项目设计架构与归档说明。"
+  - "架构 OpenLayers + GeoServer 前后端空间服务链路，支持异构空间数据在线上传、入库发布与动态渲染"
+  - "统一融合矢量边界、高分辨率遥感栅格底图与现场生态监测指标等多源时空图层"
+  - "基于 OGC 标准封装并编排 WMS、WFS 等地理信息网络服务，支撑跨部门数据共享与查询分析"
+archiveNote: "注：完整空间服务依赖独立 GeoServer 地图服务器节点，此处展示系统空间架构与工程成果归档。"
 ---

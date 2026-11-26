@@ -3,7 +3,7 @@
   "affiliation": "The Hong Kong University of Science and Technology (Guangzhou) · Urban Morphology Studio",
   "cvPdf": "",
   "bioParagraphs": [
-    "苏云雷（Yunlei Su），香港科技大学（广州）社会枢纽城市治理与设计学域（UGOD）Urban Morphology Studio 在读博士生；先后于安徽大学（地理信息科学）获本科学位、新加坡国立大学（NUS，应用地理信息系统）获理学硕士学位，并曾与新加坡国立大学 Urban Analytics Lab 合作开展三维城市数字孪生研究。",
+    "苏云雷（Yunlei Su），香港科技大学（广州）社会枢纽城市治理与设计学域（UGOD）Urban Morphology Studio 在读博士生；先后于安徽大学（地理信息科学）获本科学位、新加坡国立大学（NUS，应用地理信息系统）获理学硕士学位，并曾于工业界担任前端开发与项目经理及科研助理。",
     "研究兴趣聚焦于 WebGIS、城市数字孪生（Urban Digital Twins）、人-建筑交互（Human-Building Interaction）、虚拟现实（VR）城市建模与眼动感知实验，以及结合街景与卫星多视角影像和多模态大语言模型的城市建筑精细化表征。"
   ],
   "researchInterests": [
@@ -32,8 +32,8 @@
       "code": "04",
       "title": "WebGIS & Urban Spatial Dynamics",
       "titleZh": "WebGIS 系统与城市空间格局演替",
-      "summary": "基于 OpenLayers、GeoServer 与空间统计模型构建生态与城市多源空间管理平台，定量分析快速城镇化区域的土地利用转移与驱动力机制。",
-      "keywords": ["WebGIS", "OpenLayers", "GeoServer", "LEI / UGI"]
+      "summary": "基于 OpenLayers、Cesium、GeoServer 与空间统计模型构建生态与城市多源空间管理平台，定量分析快速城镇化区域的土地利用转移与驱动力机制。",
+      "keywords": ["WebGIS", "CesiumJS", "OpenLayers", "GeoServer"]
     }
   ],
   "education": [
@@ -61,11 +61,36 @@
   ],
   "experience": [
     {
-      "period": "2021.07 – 2021.08",
-      "organization": "阿里云创新中心 · Alibaba Cloud Innovation Center",
-      "location": "实习 · Internship",
-      "role": "前端开发实习生",
-      "details": "参与电商直播 PC 端界面及企业 Web 项目开发，负责响应式布局与多页面动态交互实现。"
+      "period": "2024.09 – 2025.01",
+      "organization": "香港科技大学（广州）AI4City 实验室 · AI4City Lab, HKUST(GZ)",
+      "location": "广州 · Guangzhou",
+      "role": "科研助理 · Research Assistant",
+      "details": "参与城市人工智能与地理信息交叉方向科研工作，围绕多视角城市建筑语义表征、多模态大模型空间数据管线与人-建筑交互实验提供研究与工程支持。",
+      "highlights": []
+    },
+    {
+      "period": "2023.09 – 2024.09",
+      "organization": "中国建筑国际集团有限公司 · China State Construction International (CSCI)",
+      "location": "海之子 · Full-time",
+      "role": "前端开发工程师 & 项目经理（海之子）· Frontend Engineer & Project Manager",
+      "details": "作为「海之子」管培生，统筹前端架构研发与数字化系统项目管理，推动多套企业级研发与运维平台落地。",
+      "highlights": [
+        "主导并开发企业级科技管理平台，支撑科研立项、技术成果与研发流程数字化管理",
+        "设计并开发多款飞书小程序应用，打通企业内部移动协同与业务审批链路",
+        "负责公司舆情监测系统的统筹管理与持续迭代优化",
+        "负责智能楼宇系统的运行管理、数据接入与数字化协同对接"
+      ]
+    },
+    {
+      "period": "2021.07 – 2022.01",
+      "organization": "合肥泰瑞数创科技有限公司 · TerraIT (SmartEarth)",
+      "location": "合肥 · Hefei",
+      "role": "WebGIS 开发实习生 · WebGIS Development Intern",
+      "details": "大三暑期起进行为期 6 个月的深度 WebGIS 工程实习，参与多行业三维地理信息系统研发及底层 SDK 能力沉淀。",
+      "highlights": [
+        "参与交付多套三维 WebGIS 业务系统，涵盖面向军工研究所等高可靠性场景的空间可视化与应用开发",
+        "基于 Cesium 底层引擎参与研发泰瑞自研三维地理信息 SDK，封装常用空间标绘、场景控制与数据加载能力"
+      ]
     }
   ],
   "honorsAndProjects": [
@@ -95,7 +120,7 @@
     },
     {
       "group": "GeoAI & GIS Engineering",
-      "items": ["Multimodal LLMs", "Street View Analytics", "ArcGIS", "QGIS", "OpenLayers", "GeoServer"]
+      "items": ["Multimodal LLMs", "Street View Analytics", "CesiumJS", "ArcGIS", "QGIS", "OpenLayers", "GeoServer"]
     },
     {
       "group": "Programming & Publishing",

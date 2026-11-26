@@ -1,19 +1,20 @@
 ---
-order: 5
-title: "小桔科技企业展示站点"
-subtitle: "前端工程实习项目"
-category: "Frontend"
-organization: "阿里云创新中心"
+order: 3
+title: "小橘科技 · 企业级多模块门户前端工程实践"
+subtitle: "阿里云创新中心 · 企业客户生产级 Web 门户交付"
+category: "Enterprise Web Systems"
+organization: "阿里云创新中心 · Alibaba Cloud Innovation Center"
 date: "2021-08"
 cover: "/media/projects/img-5.jpg"
-summary: "企业级 PC 网页前端开发实习项目，整合多模块交互组件并对接真实企业展示需求，是早期前端工程编码量最大的实战训练。"
+summary: "深度参与企业级生产环境 Web 门户的全流程前端交付，在真实商业需求与多端兼容约束下完成大规模模块化站点架构、复杂交互集成与跨浏览器工程化调优。"
 tags:
-  - "Frontend"
-  - "UI Integration"
+  - "Enterprise Portal"
+  - "Modular Architecture"
+  - "UI Orchestration"
   - "Web Engineering"
 highlights:
-  - "独立承接多页面企业官网模块搭建与交互联调"
-  - "在真实企业业务场景下完成较高代码量的前端工程实践"
-  - "积累了组件复用、样式隔离与浏览器兼容性调试经验"
-archiveNote: "历史归档项目（原高校临时托管地址已过期）。"
+  - "承接企业核心业务门户的多模块前端开发与交付，实现复杂页面结构在高代码量下的清晰组织与可维护性"
+  - "集成并二次调优多套交互式视图与动效组件，统一视觉语言并消除多插件并存时的事件与样式冲突"
+  - "针对主流桌面浏览器开展兼容性与渲染性能优化，积累完整的企业级 Web 项目工程化落地经验"
+archiveNote: "历史工程归档（原高校临时展示节点已过期）。"
 ---

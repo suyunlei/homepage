@@ -1,19 +1,20 @@
 ---
-order: 4
-title: "阿里云电商直播 PC 端界面"
-subtitle: "前端工程实习项目"
-category: "Frontend"
-organization: "阿里云创新中心"
+order: 2
+title: "阿里云电商直播 · 桌面端交互引擎与响应式架构"
+subtitle: "阿里云创新中心 · 直播电商业务桌面端前端工程"
+category: "Interactive Web Engineering"
+organization: "阿里云创新中心 · Alibaba Cloud Innovation Center"
 date: "2021-08"
 cover: "/media/projects/img-1.jpg"
-summary: "在阿里云创新中心实习期间参与开发的电商直播业务 PC 端前端界面，聚焦多分辨率自适应布局与流畅的交互反馈。"
+summary: "在阿里云创新中心实习期间参与打造的新零售直播电商桌面端核心门户与控制台，聚焦高信息密度业务场景下的自适应栅格架构、模块解耦与实时交互体验。"
 tags:
+  - "Responsive Architecture"
+  - "Interactive Modules"
   - "HTML5 / CSS3"
-  - "Responsive UI"
-  - "JavaScript"
+  - "Desktop Portal"
 highlights:
-  - "完成阿里云创新中心电商直播业务桌面端核心页面构建"
-  - "实现不同桌面视口尺寸下的自适应排版与组件对齐"
-  - "负责页面动态交互逻辑与基础视觉动效联调"
-archiveNote: "历史归档项目（原外网演示地址已随实习环境调整下线）。"
+  - "构建面向多分辨率桌面视口的自适应栅格与弹性排版体系，保障高密度商品与直播流视图的视觉一致性"
+  - "采用事件驱动方式解耦直播状态切换、数据展示与交互反馈逻辑，提升复杂业务模块的响应流畅度"
+  - "沉淀可复用的前端视图组件与样式规范，支撑业务功能快速迭代与多端兼容联调"
+archiveNote: "历史工程归档（原企业测试环境域名已随实习阶段结束下线）。"
 ---

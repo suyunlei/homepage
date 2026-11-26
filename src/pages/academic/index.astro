@@ -286,7 +286,19 @@ const filterTypes = [
                 </div>
                 <h4 class="mt-2 text-lg font-semibold text-[#252528]">{exp.organization}</h4>
                 <p class="mt-0.5 text-sm font-medium text-[#4a4f57]">{exp.role}</p>
-                <p class="mt-2 text-sm leading-relaxed text-[#4a4f57]">{exp.details}</p>
+                {exp.details && (
+                  <p class="mt-2 text-sm leading-relaxed text-[#4a4f57]">{exp.details}</p>
+                )}
+                {exp.highlights && exp.highlights.length > 0 && (
+                  <ul class="mt-3 space-y-1.5 text-sm leading-relaxed text-[#4a4f57]">
+                    {exp.highlights.map((item) => (
+                      <li class="flex gap-2">
+                        <span class="font-mono text-[#27445d]">—</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             ))
           }
