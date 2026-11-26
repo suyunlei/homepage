@@ -300,6 +300,25 @@ const quickLinks = [
     margin-bottom: 1.25rem;
   }
 
+  @media (max-width: 52.99em) {
+    .columns {
+      padding: 0 2.5vw;
+      gap: 0.625rem;
+    }
+
+    .column__img {
+      height: clamp(165px, 24vw, 380px);
+    }
+
+    .column__img:nth-child(odd) {
+      height: clamp(195px, 29vw, 460px);
+    }
+
+    .column__img:not(:last-child) {
+      margin-bottom: 0.625rem;
+    }
+  }
+
   .menu {
     grid-area: 1 / 1 / 2 / 2;
     width: 100%;
