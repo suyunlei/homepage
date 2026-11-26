@@ -108,7 +108,53 @@ if (modal && dataHolder && imgEl) {
   });
 }
 
-// Optional gallery tag filtering (e.g., 05-food album)
+// Deferred album thumbnail hydration so initial load fetches only above-the-fold cards
+const deferredImgs = Array.from(document.querySelectorAll<HTMLImageElement>('img[data-src]'));
+
+const hydrateImg = (img: HTMLImageElement) => {
+  const src = img.dataset.src;
+  if (!src) return;
+  const pic = img.parentElement;
+  if (pic && pic.tagName === 'PICTURE') {
+    pic.querySelectorAll<HTMLSourceElement>('source[data-srcset]').forEach((source) => {
+      const sUrl = source.dataset.srcset;
+      if (sUrl) {
+        source.srcset = sUrl;
+        delete source.dataset.srcset;
+      }
+    });
+  }
+  delete img.dataset.src;
+  const reveal = () => img.classList.remove('opacity-0');
+  img.addEventListener('load', reveal, { once: true });
+  img.addEventListener('error', reveal, { once: true });
+  img.src = src;
+  if (img.complete) reveal();
+};
+
+if (deferredImgs.length > 0) {
+  if ('IntersectionObserver' in window) {
+    const thumbObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const img = entry.target as HTMLImageElement;
+          hydrateImg(img);
+          thumbObserver.unobserve(img);
+        }
+      },
+      {
+        rootMargin: '280px 0px',
+        threshold: 0.01,
+      },
+    );
+    deferredImgs.forEach((img) => thumbObserver.observe(img));
+  } else {
+    deferredImgs.forEach((img) => hydrateImg(img));
+  }
+}
+
+// Optional gallery tag filtering
 const tagBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-album-tag]'));
 const tagCards = Array.from(document.querySelectorAll<HTMLElement>('[data-item-tags]'));
 
@@ -123,6 +169,10 @@ if (tagBtns.length > 0 && tagCards.length > 0) {
         const list = raw ? raw.split('|') : [];
         const match = chosen === 'all' || list.includes(chosen);
         card.classList.toggle('hidden', !match);
+        if (match) {
+          const pendingImg = card.querySelector<HTMLImageElement>('img[data-src]');
+          if (pendingImg) hydrateImg(pendingImg);
+        }
       });
     });
   });

@@ -8,14 +8,116 @@ const counterEl = document.getElementById('life-mobile-counter');
 const scrollRail = document.getElementById('life-scroll-rail');
 const scrollThumb = document.getElementById('life-scroll-thumb');
 
+const warmedCards = new WeakSet<HTMLElement>();
+let avifSupported: boolean | null = null;
+let avifProbePromise: Promise<boolean> | null = null;
+
+const detectAvif = (): Promise<boolean> => {
+  if (avifSupported !== null) return Promise.resolve(avifSupported);
+  if (!avifProbePromise) {
+    avifProbePromise = new Promise((resolve) => {
+      const probe = new Image();
+      probe.onload = () => {
+        avifSupported = probe.width > 0 && probe.height > 0;
+        resolve(avifSupported);
+      };
+      probe.onerror = () => {
+        avifSupported = false;
+        resolve(false);
+      };
+      probe.src =
+        'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAIAAAACAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQ0MAAAAABNjb2xybmNseAACAAIAAYAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAACVtZGF0EgAKCBgANogQEAwgMg8f8D///8WfhwB8+ErK42A=';
+    });
+  }
+  return avifProbePromise;
+};
+
+const hydrateCardImage = (card: HTMLElement | undefined) => {
+  if (!card) return;
+  const img = card.querySelector<HTMLImageElement>('img[data-src]');
+  if (!img) return;
+  const src = img.dataset.src;
+  if (!src) return;
+  const pic = img.parentElement;
+  if (pic && pic.tagName === 'PICTURE') {
+    pic.querySelectorAll<HTMLSourceElement>('source[data-srcset]').forEach((source) => {
+      const sUrl = source.dataset.srcset;
+      if (sUrl) {
+        source.srcset = sUrl;
+        delete source.dataset.srcset;
+      }
+    });
+  }
+  delete img.dataset.src;
+  const show = () => img.classList.remove('opacity-0');
+  img.addEventListener('load', show, { once: true });
+  img.addEventListener('error', show, { once: true });
+  img.src = src;
+  if (img.complete) show();
+};
+
+const warmChapterThumbs = (card: HTMLElement) => {
+  if (warmedCards.has(card)) return;
+  warmedCards.add(card);
+  void detectAvif().then((useAvif) => {
+    const raw = (useAvif ? card.dataset.preloadThumbsAvif : null) || card.dataset.preloadThumbs;
+    if (!raw) return;
+    try {
+      const urls = JSON.parse(raw) as string[];
+      for (const url of urls) {
+        if (url) {
+          const pre = new Image();
+          pre.src = url;
+        }
+      }
+    } catch {
+      // ignore invalid preload payload
+    }
+  });
+};
+
+if (backdrop) {
+  let ambientHydrated = false;
+  const revealInitialAmbient = () => {
+    if (ambientHydrated) return;
+    ambientHydrated = true;
+    void detectAvif().then((useAvif) => {
+      const initialCover =
+        (useAvif ? backdrop.dataset.initialCoverAvif : null) || backdrop.dataset.initialCover;
+      if (initialCover && !backdrop.style.backgroundImage) {
+        backdrop.style.backgroundImage = `url('${initialCover}')`;
+      }
+      backdrop.classList.remove('opacity-0');
+      backdrop.classList.add('opacity-15');
+    });
+  };
+
+  const firstCardImg = cards[0]?.querySelector<HTMLImageElement>('img');
+  if (firstCardImg && !firstCardImg.complete) {
+    firstCardImg.addEventListener('load', revealInitialAmbient, { once: true });
+    firstCardImg.addEventListener('error', revealInitialAmbient, { once: true });
+    window.setTimeout(revealInitialAmbient, 250);
+  } else {
+    revealInitialAmbient();
+  }
+}
+
 if (cards.length > 0) {
-  const setAmbient = (cover: string | undefined) => {
+  const getPreferredCover = (card: HTMLElement | undefined) =>
+    card ? ((avifSupported ? card.dataset.coverAvif : null) || card.dataset.cover) : undefined;
+
+  const setAmbient = (card: HTMLElement | undefined) => {
+    const cover = getPreferredCover(card);
     if (backdrop && cover) {
       backdrop.style.backgroundImage = `url('${cover}')`;
+      backdrop.classList.remove('opacity-0');
+      backdrop.classList.add('opacity-15');
     }
   };
 
   const setActiveCard = (activeIndex: number) => {
+    hydrateCardImage(cards[activeIndex]);
+    hydrateCardImage(cards[activeIndex + 1]);
     cards.forEach((card, i) => card.classList.toggle('is-active-card', i === activeIndex));
     dots.forEach((dot, i) => {
       const isCurrent = i === activeIndex;
@@ -32,21 +134,48 @@ if (cards.length > 0) {
 
   cards.forEach((card, idx) => {
     const activate = () => {
-      setAmbient(card.dataset.cover);
+      hydrateCardImage(card);
+      warmChapterThumbs(card);
+      setAmbient(card);
       setActiveCard(idx);
     };
     card.addEventListener('mouseenter', activate);
     card.addEventListener('focusin', activate);
+    card.addEventListener(
+      'touchstart',
+      () => {
+        hydrateCardImage(card);
+        warmChapterThumbs(card);
+      },
+      { passive: true },
+    );
   });
 
   if (track && 'IntersectionObserver' in window) {
+    const hydrateObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const card = entry.target as HTMLElement;
+          hydrateCardImage(card);
+          hydrateObserver.unobserve(card);
+        }
+      },
+      {
+        root: track,
+        rootMargin: '0px 480px 0px 0px',
+        threshold: 0.01,
+      },
+    );
+    cards.forEach((card) => hydrateObserver.observe(card));
+
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
           const idx = cards.indexOf(entry.target as HTMLElement);
           if (idx >= 0) {
-            setAmbient(cards[idx].dataset.cover);
+            setAmbient(cards[idx]);
             setActiveCard(idx);
           }
         }
@@ -57,11 +186,36 @@ if (cards.length > 0) {
       },
     );
     cards.forEach((card) => observer.observe(card));
+  } else {
+    cards.forEach((card) => hydrateCardImage(card));
+  }
+
+  const hydrateAllIdle = () => {
+    const run = () => {
+      cards.forEach((card) => hydrateCardImage(card));
+    };
+    const requestIdle = (
+      window as unknown as {
+        requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      }
+    ).requestIdleCallback;
+    if (typeof requestIdle === 'function') {
+      requestIdle(run, { timeout: 1500 });
+    } else {
+      window.setTimeout(run, 800);
+    }
+  };
+
+  if (document.readyState === 'complete') {
+    hydrateAllIdle();
+  } else {
+    window.addEventListener('load', hydrateAllIdle, { once: true });
   }
 
   dots.forEach((dot, idx) => {
     dot.addEventListener('click', () => {
-      setAmbient(cards[idx]?.dataset.cover);
+      hydrateCardImage(cards[idx]);
+      setAmbient(cards[idx]);
       setActiveCard(idx);
       cards[idx]?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
     });
@@ -94,6 +248,7 @@ if (track) {
 
   if (prevBtn && nextBtn) {
     const scrollByCard = (direction: number) => {
+      cards.forEach((card) => hydrateCardImage(card));
       const firstCard = track.querySelector<HTMLElement>('.life-album-card');
       const step = firstCard ? firstCard.getBoundingClientRect().width + 20 : 340;
       track.scrollBy({ left: direction * step, behavior: 'smooth' });
@@ -107,6 +262,7 @@ if (track) {
   if (scrollRail) {
     let scrubbing = false;
     const scrubToClientX = (clientX: number) => {
+      cards.forEach((card) => hydrateCardImage(card));
       const rect = scrollRail.getBoundingClientRect();
       if (rect.width <= 0) return;
       const maxScroll = track.scrollWidth - track.clientWidth;
@@ -179,3 +335,5 @@ if (track) {
     true,
   );
 }
+
+export {};

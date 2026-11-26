@@ -1,4 +1,18 @@
-import gsap from 'gsap';
+type GsapInstance = (typeof import('gsap'))['default'];
+
+let gsapLib: GsapInstance | null = null;
+let gsapPromise: Promise<GsapInstance> | null = null;
+
+function loadGsap(): Promise<GsapInstance> {
+  if (gsapLib) return Promise.resolve(gsapLib);
+  if (!gsapPromise) {
+    gsapPromise = import('gsap').then((m) => {
+      gsapLib = m.default;
+      return gsapLib;
+    });
+  }
+  return gsapPromise;
+}
 
 const MathUtils = {
   lineEq: (y2: number, y1: number, x2: number, x1: number, currentVal: number) => {
@@ -56,11 +70,90 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
   let touchOffset = { x: 0, y: 0 };
   const tiltOffset = { x: 0, y: 0 };
 
+  const startTime = performance.now();
+  let entranceDone = prefersReducedMotion;
+  let parallaxRaf = 0;
+
+  // Column parallax state + mobile ambient drift parameters
+  const columnStates = columnEls.map((el, i) => {
+    const isBottom = el.classList.contains('column--bottom');
+    return {
+      el,
+      isBottom,
+      tx: 0,
+      ty: 0,
+      randX: MathUtils.rand(6, 18),
+      rY1: isBottom ? MathUtils.rand(10, 28) : MathUtils.rand(26, 68),
+      rY2: isBottom ? MathUtils.rand(26, 68) : MathUtils.rand(10, 28),
+      driftPhase: i * 1.45,
+      driftSpeed: 0.55 + (i % 2) * 0.14,
+      driftAmpY: isBottom ? -18 : 18,
+    };
+  });
+
+  const stopParallaxLoop = () => {
+    if (parallaxRaf) {
+      cancelAnimationFrame(parallaxRaf);
+      parallaxRaf = 0;
+    }
+  };
+
+  const stepParallax = (now: number) => {
+    parallaxRaf = 0;
+    if (!activeTilt.columns || !entranceDone || document.hidden) return;
+
+    if (!isTouchDevice) {
+      if (!hasPointerMoved) return;
+      let moving = false;
+      for (const col of columnStates) {
+        const targetTx = MathUtils.lineEq(-col.randX, col.randX, winsize.width, 0, mousePos.x);
+        const targetTy = MathUtils.lineEq(-col.rY1, col.rY2, winsize.height, 0, mousePos.y);
+        if (Math.abs(targetTx - col.tx) < 0.06 && Math.abs(targetTy - col.ty) < 0.06) {
+          continue;
+        }
+        col.tx = MathUtils.lerp(col.tx, targetTx, 0.035);
+        col.ty = MathUtils.lerp(col.ty, targetTy, 0.035);
+        col.el.style.transform = `translate3d(${col.tx.toFixed(2)}px, ${col.ty.toFixed(2)}px, 0)`;
+        moving = true;
+      }
+      if (moving) {
+        parallaxRaf = requestAnimationFrame(stepParallax);
+      }
+      return;
+    }
+
+    const t = now * 0.001;
+    const factor = isTouching ? 0.08 : 0.032;
+    for (const col of columnStates) {
+      const waveY = Math.sin(t * col.driftSpeed + col.driftPhase) * col.driftAmpY;
+      const waveX = Math.cos(t * col.driftSpeed * 0.8 + col.driftPhase) * 4;
+      const targetTx =
+        waveX + touchOffset.x * col.randX * 1.4 + tiltOffset.x * col.randX * 0.8;
+      const targetTy =
+        waveY + touchOffset.y * col.rY1 * 0.7 + tiltOffset.y * col.rY1 * 0.4;
+      col.tx = MathUtils.lerp(col.tx, targetTx, factor);
+      col.ty = MathUtils.lerp(col.ty, targetTy, factor);
+      col.el.style.transform = `translate3d(${col.tx.toFixed(2)}px, ${col.ty.toFixed(2)}px, 0)`;
+    }
+    parallaxRaf = requestAnimationFrame(stepParallax);
+  };
+
+  const scheduleParallaxLoop = () => {
+    if (prefersReducedMotion || !activeTilt.columns || !entranceDone || document.hidden || parallaxRaf) {
+      return;
+    }
+    parallaxRaf = requestAnimationFrame(stepParallax);
+  };
+
   window.addEventListener(
     'mousemove',
     (ev) => {
       mousePos = { x: ev.clientX, y: ev.clientY };
       hasPointerMoved = true;
+      if (!entranceDone && performance.now() - startTime >= 250) {
+        entranceDone = true;
+      }
+      scheduleParallaxLoop();
     },
     { passive: true },
   );
@@ -73,6 +166,10 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
       const t = ev.touches[0];
       touchOrigin = { x: t.clientX, y: t.clientY };
       isTouching = true;
+      if (!entranceDone && performance.now() - startTime >= 250) {
+        entranceDone = true;
+      }
+      scheduleParallaxLoop();
     },
     { passive: true },
   );
@@ -115,103 +212,41 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
     );
   }
 
-  // Column parallax state + mobile ambient drift parameters
-  const columnStates = columnEls.map((el, i) => {
-    const isBottom = el.classList.contains('column--bottom');
-    return {
-      el,
-      isBottom,
-      tx: 0,
-      ty: 0,
-      randX: MathUtils.rand(6, 18),
-      rY1: isBottom ? MathUtils.rand(10, 28) : MathUtils.rand(26, 68),
-      rY2: isBottom ? MathUtils.rand(26, 68) : MathUtils.rand(10, 28),
-      driftPhase: i * 1.45,
-      driftSpeed: 0.55 + (i % 2) * 0.14,
-      driftAmpY: isBottom ? -18 : 18,
-    };
-  });
+  if (!prefersReducedMotion && columnStates.length > 0) {
+    window.setTimeout(() => {
+      entranceDone = true;
+      if (isTouchDevice || hasPointerMoved) {
+        scheduleParallaxLoop();
+      }
+    }, 520);
 
-  // Choreographed entrance reveal on page load
-  let entranceDone = prefersReducedMotion;
-  let introTl: gsap.core.Timeline | null = null;
-  if (!prefersReducedMotion) {
-    introTl = gsap.timeline({
-      onComplete: () => {
-        entranceDone = true;
-      },
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        stopParallaxLoop();
+      } else if (isTouchDevice || hasPointerMoved) {
+        scheduleParallaxLoop();
+      }
     });
-    introTl
-      .fromTo(
-        columnEls,
-        {
-          y: (i: number) => (i % 2 === 0 ? -24 : 24),
-          opacity: 0.6,
-        },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.75,
-          stagger: 0.06,
-          ease: 'power3.out',
-        },
-        0,
-      )
-      .fromTo(
-        menuBtns,
-        { y: 22, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.65,
-          stagger: 0.055,
-          ease: 'power3.out',
-        },
-        0.05,
-      );
   }
 
-  if (!prefersReducedMotion && columnStates.length > 0) {
-    gsap.ticker.add(() => {
-      if (!activeTilt.columns || !entranceDone || document.hidden) return;
-
-      if (!isTouchDevice) {
-        if (!hasPointerMoved) return;
-        for (const col of columnStates) {
-          const targetTx = MathUtils.lineEq(-col.randX, col.randX, winsize.width, 0, mousePos.x);
-          const targetTy = MathUtils.lineEq(-col.rY1, col.rY2, winsize.height, 0, mousePos.y);
-          if (Math.abs(targetTx - col.tx) < 0.06 && Math.abs(targetTy - col.ty) < 0.06) {
-            continue;
-          }
-          col.tx = MathUtils.lerp(col.tx, targetTx, 0.035);
-          col.ty = MathUtils.lerp(col.ty, targetTy, 0.035);
-          gsap.set(col.el, {
-            x: col.tx,
-            y: col.ty,
-            rotation: 0.01,
-          });
-        }
-        return;
+  // Silently preload GSAP right after Tier-1 images settle or page load without blocking first paint
+  window.addEventListener('home-tier1-ready', () => void loadGsap(), { once: true });
+  const warmGsapIdle = () => {
+    const requestIdle = (
+      window as unknown as {
+        requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
       }
-
-      const t = gsap.ticker.time;
-      const factor = isTouching ? 0.08 : 0.032;
-      for (const col of columnStates) {
-        const waveY = Math.sin(t * col.driftSpeed + col.driftPhase) * col.driftAmpY;
-        const waveX = Math.cos(t * col.driftSpeed * 0.8 + col.driftPhase) * 4;
-        const targetTx =
-          waveX + touchOffset.x * col.randX * 1.4 + tiltOffset.x * col.randX * 0.8;
-        const targetTy =
-          waveY + touchOffset.y * col.rY1 * 0.7 + tiltOffset.y * col.rY1 * 0.4;
-        col.tx = MathUtils.lerp(col.tx, targetTx, factor);
-        col.ty = MathUtils.lerp(col.ty, targetTy, factor);
-        gsap.set(col.el, {
-          x: col.tx,
-          y: col.ty,
-          rotation: 0.01,
-        });
-      }
-    });
+    ).requestIdleCallback;
+    if (typeof requestIdle === 'function') {
+      requestIdle(() => void loadGsap(), { timeout: 1600 });
+    } else {
+      window.setTimeout(() => void loadGsap(), 900);
+    }
+  };
+  if (document.readyState === 'complete') {
+    warmGsapIdle();
+  } else {
+    window.addEventListener('load', warmGsapIdle, { once: true });
   }
 
   // Split letters separately for ZH and EN title variants so toggling never concatenates languages
@@ -261,15 +296,16 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
 
     if (!prefersReducedMotion) {
       el.addEventListener('mouseenter', () => {
+        void loadGsap();
         randLetters = pickRandomLetters(letters, totalRand);
       });
 
       el.addEventListener('mousemove', () => {
-        if (!activeTilt.letters || randLetters.length === 0) return;
+        if (!activeTilt.letters || randLetters.length === 0 || !gsapLib) return;
         const bounds = el.getBoundingClientRect();
         const relY = mousePos.y - bounds.top;
         randLetters.forEach((letter, idx) => {
-          gsap.to(letter, {
+          gsapLib?.to(letter, {
             duration: 1.5,
             ease: 'expo.out',
             y: MathUtils.lineEq(translations[idx][1], translations[idx][0], bounds.height, 0, relY),
@@ -280,8 +316,8 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
       });
 
       el.addEventListener('mouseleave', () => {
-        if (!activeTilt.letters || randLetters.length === 0) return;
-        gsap
+        if (!activeTilt.letters || randLetters.length === 0 || !gsapLib) return;
+        gsapLib
           .timeline()
           .to(
             randLetters,
@@ -319,7 +355,9 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
   if (isTouchDevice && !prefersReducedMotion && menuMeta.length > 0) {
     let pulseCursor = 0;
     window.setInterval(() => {
-      if (currentIndex !== -1 || isAnimating || !entranceDone || document.hidden) return;
+      if (currentIndex !== -1 || isAnimating || !entranceDone || document.hidden || !gsapLib) {
+        return;
+      }
       const targetMenu = menuMeta[pulseCursor % menuMeta.length];
       pulseCursor += 1;
 
@@ -331,7 +369,7 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
       const sample = pickRandomLetters(targetMenu.letters, targetMenu.totalRand);
       if (sample.length === 0) return;
 
-      gsap
+      gsapLib
         .timeline()
         .to(sample, {
           duration: 0.22,
@@ -350,9 +388,9 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
     }, 3400);
   }
 
-  function openItem(index: number) {
+  async function openItem(index: number) {
     if (isAnimating || index < 0 || index >= stageMeta.length) return;
-    introTl?.kill();
+    (window as unknown as { __hydrateHomeWall?: () => void }).__hydrateHomeWall?.();
     ensurePanelImage(index);
     currentIndex = index;
     const activeStage = stageMeta[index];
@@ -362,8 +400,8 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
     document.body.classList.add('stage-panel-open');
 
     if (prefersReducedMotion) {
-      gsap.set(contentFirst, { y: '100%' });
-      gsap.set(contentMove, { y: '-100%' });
+      contentFirst!.style.transform = 'translate3d(0, 100%, 0)';
+      contentMove!.style.transform = 'translate3d(0, -100%, 0)';
       activeStage.backEl?.focus({ preventScroll: true });
       return;
     }
@@ -372,6 +410,18 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
     activeTilt.columns = false;
     activeTilt.letters = false;
     entranceDone = true;
+    stopParallaxLoop();
+
+    let gsap: GsapInstance;
+    try {
+      gsap = await loadGsap();
+    } catch {
+      contentFirst!.style.transform = 'translate3d(0, 100%, 0)';
+      contentMove!.style.transform = 'translate3d(0, -100%, 0)';
+      isAnimating = false;
+      activeStage.backEl?.focus({ preventScroll: true });
+      return;
+    }
 
     const duration = 0.95;
     const otherMenus = menuMeta.filter((_, i) => i !== index).map((m) => m.el);
@@ -433,7 +483,7 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
       );
   }
 
-  function closeItem() {
+  async function closeItem() {
     if (isAnimating || currentIndex < 0) return;
     const activeStage = stageMeta[currentIndex];
     const activeMenu = menuMeta[currentIndex];
@@ -442,24 +492,53 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
     if (prefersReducedMotion) {
       activeStage.el.classList.remove('is-current');
       document.body.classList.remove('stage-panel-open');
-      gsap.set([contentFirst, contentMove], { y: '0%' });
+      contentFirst!.style.transform = '';
+      contentMove!.style.transform = '';
       currentIndex = -1;
       menuMeta[closingIndex]?.el.focus({ preventScroll: true });
       return;
     }
 
     isAnimating = true;
+    let gsap: GsapInstance;
+    try {
+      gsap = await loadGsap();
+    } catch {
+      activeStage.el.classList.remove('is-current');
+      document.body.classList.remove('stage-panel-open');
+      contentFirst!.style.transform = '';
+      contentMove!.style.transform = '';
+      columnEls.forEach((el) => {
+        el.style.transform = '';
+        el.style.opacity = '';
+      });
+      activeTilt.columns = true;
+      activeTilt.letters = true;
+      isAnimating = false;
+      currentIndex = -1;
+      menuMeta[closingIndex]?.el.focus({ preventScroll: true });
+      return;
+    }
+
     const duration = 0.85;
 
     gsap
       .timeline({
         onComplete: () => {
+          gsap.set(columnEls, { clearProps: 'transform,opacity' });
+          for (const col of columnStates) {
+            col.tx = 0;
+            col.ty = 0;
+          }
           activeTilt.columns = true;
           activeTilt.letters = true;
           isAnimating = false;
           currentIndex = -1;
           document.body.classList.remove('stage-panel-open');
           menuMeta[closingIndex]?.el.focus({ preventScroll: true });
+          if (isTouchDevice) {
+            scheduleParallaxLoop();
+          }
         },
       })
       .to(
@@ -521,17 +600,21 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
   }
 
   menuMeta.forEach((m, idx) => {
-    const preload = () => ensurePanelImage(idx);
+    const preload = () => {
+      ensurePanelImage(idx);
+      void loadGsap();
+      (window as unknown as { __hydrateHomeWall?: () => void }).__hydrateHomeWall?.();
+    };
     const clearPressed = () => m.el.classList.remove('is-pressed');
 
     m.el.addEventListener('mouseenter', preload);
     m.el.addEventListener('focus', preload);
     m.el.addEventListener('pointerdown', (ev) => {
-      ensurePanelImage(idx);
+      preload();
       m.el.classList.add('is-pressed');
-      if (ev.pointerType === 'touch' && !prefersReducedMotion) {
+      if (ev.pointerType === 'touch' && !prefersReducedMotion && gsapLib) {
         const sample = pickRandomLetters(m.letters, m.totalRand);
-        gsap.to(sample, {
+        gsapLib.to(sample, {
           duration: 0.25,
           ease: 'power2.out',
           y: -6,
@@ -545,12 +628,12 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
     m.el.addEventListener('pointerleave', clearPressed);
     m.el.addEventListener('click', () => {
       clearPressed();
-      openItem(idx);
+      void openItem(idx);
     });
   });
 
   stageMeta.forEach((s) => {
-    s.backEl?.addEventListener('click', () => closeItem());
+    s.backEl?.addEventListener('click', () => void closeItem());
 
     // Mobile swipe-right to close panel
     let swipeStart = { x: 0, y: 0 };
@@ -569,7 +652,7 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
         const dx = ev.changedTouches[0].clientX - swipeStart.x;
         const dy = ev.changedTouches[0].clientY - swipeStart.y;
         if (dx > 75 && Math.abs(dx) > Math.abs(dy) * 1.5) {
-          closeItem();
+          void closeItem();
         }
       },
       { passive: true },
@@ -578,7 +661,9 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
 
   window.addEventListener('keydown', (ev) => {
     if (ev.key === 'Escape' && currentIndex >= 0) {
-      closeItem();
+      void closeItem();
     }
   });
 }
+
+export {};

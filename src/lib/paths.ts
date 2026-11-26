@@ -24,3 +24,11 @@ export function getLifeThumbPath(imagePath: string): string {
   if (folder === 'covers' || folder === 'thumbs') return imagePath;
   return `/media/life/thumbs/${folder}/${stem}.webp`;
 }
+
+export function toAvifPath(imagePath: string): string {
+  if (!imagePath) return '';
+  if (!/^\/media\/(?:home\/|life\/covers\/|life\/thumbs\/|life\/ahu\/header\.webp$)/i.test(imagePath)) {
+    return imagePath;
+  }
+  return imagePath.replace(/\.webp(\?.*)?$/i, '.avif$1');
+}

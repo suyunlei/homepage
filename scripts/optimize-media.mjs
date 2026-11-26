@@ -15,11 +15,11 @@ function getPreset(relPath) {
 
   if (normalized.startsWith('home/')) {
     return {
-      maxWidth: 520,
-      maxHeight: 780,
-      quality: 68,
-      effort: 5,
-      skipSizeBytes: 95 * 1024,
+      maxWidth: 400,
+      maxHeight: 600,
+      quality: 58,
+      effort: 6,
+      skipSizeBytes: 18 * 1024,
     };
   }
 
@@ -53,11 +53,11 @@ function getPreset(relPath) {
 
   if (normalized.startsWith('life/covers/')) {
     return {
-      maxWidth: 720,
-      maxHeight: 900,
-      quality: 72,
-      effort: 5,
-      skipSizeBytes: 85 * 1024,
+      maxWidth: 560,
+      maxHeight: 700,
+      quality: 64,
+      effort: 6,
+      skipSizeBytes: 22 * 1024,
     };
   }
 
@@ -196,8 +196,8 @@ async function generateLifeThumbnails(forceThumbs) {
     }
 
     const isStory = STORY_ALBUM_FOLDERS.has(folder);
-    const maxDim = isStory ? 760 : 540;
-    const quality = isStory ? 70 : 66;
+    const maxDim = isStory ? 720 : 500;
+    const quality = isStory ? 68 : 62;
     const srcBuf = await fs.readFile(srcPath);
     const outBuf = await sharp(srcBuf)
       .rotate()
@@ -209,7 +209,7 @@ async function generateLifeThumbnails(forceThumbs) {
       })
       .webp({
         quality,
-        effort: 5,
+        effort: 6,
       })
       .toBuffer();
 
@@ -219,11 +219,12 @@ async function generateLifeThumbnails(forceThumbs) {
     totalBytes += outBuf.length;
   }
 
-  // Prune orphaned thumbnails whose source file was removed
+  // Prune orphaned WebP thumbnails whose source file was removed
   let removed = 0;
   const existingThumbs = await walkFiles(thumbsRoot);
   for (const thumbPath of existingThumbs) {
     const rel = path.relative(thumbsRoot, thumbPath).replace(/\\/g, '/');
+    if (!rel.toLowerCase().endsWith('.webp')) continue;
     if (!expectedThumbs.has(rel)) {
       await fs.unlink(thumbPath);
       removed += 1;
@@ -236,9 +237,132 @@ async function generateLifeThumbnails(forceThumbs) {
   );
 }
 
+async function generateAvifSidecars(forceAvif, scopes) {
+  const candidates = [];
+
+  if (scopes.includes('home')) {
+    for (const filePath of await walkFiles(path.join(MEDIA_ROOT, 'home'))) {
+      if (filePath.toLowerCase().endsWith('.webp')) {
+        candidates.push({
+          srcPath: filePath,
+          maxWidth: 400,
+          maxHeight: 600,
+          quality: 45,
+        });
+      }
+    }
+  }
+
+  if (scopes.includes('life/covers')) {
+    for (const filePath of await walkFiles(path.join(MEDIA_ROOT, 'life', 'covers'))) {
+      if (filePath.toLowerCase().endsWith('.webp')) {
+        candidates.push({
+          srcPath: filePath,
+          maxWidth: 560,
+          maxHeight: 700,
+          quality: 48,
+        });
+      }
+    }
+    const ahuHeader = path.join(MEDIA_ROOT, 'life', 'ahu', 'header.webp');
+    try {
+      await fs.stat(ahuHeader);
+      candidates.push({
+        srcPath: ahuHeader,
+        maxWidth: 1200,
+        maxHeight: 900,
+        quality: 50,
+      });
+    } catch {
+      // optional hero banner
+    }
+  }
+
+  if (scopes.includes('life/thumbs')) {
+    const thumbsRoot = path.join(MEDIA_ROOT, 'life', 'thumbs');
+    for (const filePath of await walkFiles(thumbsRoot)) {
+      if (!filePath.toLowerCase().endsWith('.webp')) continue;
+      const rel = path.relative(thumbsRoot, filePath).replace(/\\/g, '/');
+      const folder = rel.split('/')[0];
+      const isStory = STORY_ALBUM_FOLDERS.has(folder);
+      candidates.push({
+        srcPath: filePath,
+        maxWidth: isStory ? 720 : 500,
+        maxHeight: isStory ? 720 : 500,
+        quality: isStory ? 50 : 46,
+      });
+    }
+  }
+
+  let generated = 0;
+  let skipped = 0;
+  let totalBytes = 0;
+  const expectedAvifs = new Set();
+
+  for (const item of candidates) {
+    const avifPath = item.srcPath.replace(/\.webp$/i, '.avif');
+    expectedAvifs.add(avifPath);
+
+    const srcStat = await fs.stat(item.srcPath);
+    let destStat = null;
+    try {
+      destStat = await fs.stat(avifPath);
+    } catch {
+      destStat = null;
+    }
+
+    if (!forceAvif && destStat && destStat.mtimeMs >= srcStat.mtimeMs) {
+      skipped += 1;
+      totalBytes += destStat.size;
+      continue;
+    }
+
+    const srcBuf = await fs.readFile(item.srcPath);
+    const outBuf = await sharp(srcBuf)
+      .rotate()
+      .resize({
+        width: item.maxWidth,
+        height: item.maxHeight,
+        fit: 'inside',
+        withoutEnlargement: true,
+      })
+      .avif({
+        quality: item.quality,
+        effort: 6,
+      })
+      .toBuffer();
+
+    await fs.writeFile(avifPath, outBuf);
+    generated += 1;
+    totalBytes += outBuf.length;
+  }
+
+  // Prune orphaned .avif files whose .webp counterpart was removed
+  let removed = 0;
+  const dirsToPrune = [];
+  if (scopes.includes('home')) dirsToPrune.push(path.join(MEDIA_ROOT, 'home'));
+  if (scopes.includes('life/covers')) dirsToPrune.push(path.join(MEDIA_ROOT, 'life', 'covers'));
+  if (scopes.includes('life/thumbs')) dirsToPrune.push(path.join(MEDIA_ROOT, 'life', 'thumbs'));
+
+  for (const dir of dirsToPrune) {
+    for (const filePath of await walkFiles(dir)) {
+      if (filePath.toLowerCase().endsWith('.avif') && !expectedAvifs.has(filePath)) {
+        await fs.unlink(filePath);
+        removed += 1;
+      }
+    }
+  }
+
+  console.log('\n=== AVIF Sidecars Summary ===');
+  console.log(
+    `AVIF files: ${expectedAvifs.size} total (${generated} generated, ${skipped} up-to-date, ${removed} pruned), ${(totalBytes / 1024).toFixed(1)} KB total`,
+  );
+}
+
 async function main() {
   const rawArgs = process.argv.slice(2).filter((arg) => arg !== '--');
   const forceThumbs = rawArgs.includes('--force-thumbs');
+  const forceAvif = forceThumbs || rawArgs.includes('--force-avif');
   const filters = rawArgs
     .filter((arg) => !arg.startsWith('--'))
     .map((arg) => arg.replace(/\\/g, '/').replace(/^\/+|\/+$/g, ''));
@@ -246,7 +370,7 @@ async function main() {
   const allFiles = (await walkFiles(MEDIA_ROOT)).sort();
   const targetFiles = allFiles.filter((filePath) => {
     const rel = path.relative(MEDIA_ROOT, filePath).replace(/\\/g, '/');
-    if (rel.startsWith('life/thumbs/')) return false;
+    if (rel.startsWith('life/thumbs/') || rel.toLowerCase().endsWith('.avif')) return false;
     if (filters.length === 0) return true;
     return filters.some((f) => rel === f || rel.startsWith(`${f}/`));
   });
@@ -404,6 +528,20 @@ async function main() {
     filters.some((f) => f === 'life' || f.startsWith('life/'))
   ) {
     await generateLifeThumbnails(forceThumbs);
+  }
+
+  const avifScopes = [];
+  if (filters.length === 0 || filters.some((f) => f === 'home' || f.startsWith('home/'))) {
+    avifScopes.push('home');
+  }
+  if (filters.length === 0 || filters.some((f) => f === 'life' || f.startsWith('life/covers'))) {
+    avifScopes.push('life/covers');
+  }
+  if (filters.length === 0 || filters.some((f) => f === 'life' || f.startsWith('life/thumbs'))) {
+    avifScopes.push('life/thumbs');
+  }
+  if (avifScopes.length > 0) {
+    await generateAvifSidecars(forceAvif, avifScopes);
   }
 }
 

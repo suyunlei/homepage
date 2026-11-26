@@ -2,10 +2,25 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import LangToggle from '@/components/LangToggle.astro';
 import BiText from '@/components/BiText.astro';
-import { withBase } from '@/lib/paths';
+import { toAvifPath, withBase } from '@/lib/paths';
+import { getLqipDataUri } from '@/lib/lqip';
 import { loadSiteAndCvData } from '@/lib/site-data';
 
 const { site } = loadSiteAndCvData();
+
+const uniqueHomeImgs = Array.from(new Set(site.homeColumns.flatMap((col) => col.images)));
+const homeLqipEntries = await Promise.all(
+  uniqueHomeImgs.map(async (imgPath) => [imgPath, await getLqipDataUri(imgPath)] as const),
+);
+const homeLqipIndex = new Map<string, number>();
+const lqipVars: string[] = [];
+homeLqipEntries.forEach(([imgPath, uri], idx) => {
+  if (uri) {
+    homeLqipIndex.set(imgPath, idx);
+    lqipVars.push(`--lqip-${idx}:url("${uri}")`);
+  }
+});
+const homeLqipCss = lqipVars.length > 0 ? `:root{${lqipVars.join(';')}}` : '';
 
 const quickLinks = [
   { label: 'Academic', href: '/academic/' },
@@ -21,6 +36,7 @@ const quickLinks = [
   description={site.siteDescription}
   bodyClass="stage-body"
 >
+  {homeLqipCss && <style slot="head" is:inline set:html={homeLqipCss} />}
   <main class="stage-main">
     <!-- Fixed Editorial Frame -->
     <header class="stage-frame">
@@ -115,19 +131,46 @@ const quickLinks = [
             site.homeColumns.map((col) => (
               <div class:list={['column', col.bottom && 'column--bottom']}>
                 {col.images.map((imgPath, imgIdx) => {
-                  const isAboveFold = col.bottom
-                    ? imgIdx >= col.images.length - 2
-                    : imgIdx < 2;
+                  const len = col.images.length;
+                  const isTier1 = col.bottom ? imgIdx >= len - 2 : imgIdx < 2;
+                  const isTier2 = col.bottom
+                    ? imgIdx >= len - 4 && imgIdx < len - 2
+                    : imgIdx >= 2 && imgIdx < 4;
+                  const lqipIdx = homeLqipIndex.get(imgPath);
+                  const avifPath = toAvifPath(imgPath);
                   return (
-                    <div class="column__img">
-                      <img
-                        src={withBase(imgPath)}
-                        alt=""
-                        loading={isAboveFold ? 'eager' : 'lazy'}
-                        decoding="async"
-                        fetchpriority={isAboveFold ? 'high' : 'auto'}
-                        class="column__photo"
-                      />
+                    <div
+                      class="column__img"
+                      style={lqipIdx !== undefined ? `background-image: var(--lqip-${lqipIdx});` : undefined}
+                    >
+                      <picture class="column__picture">
+                        {avifPath !== imgPath &&
+                          (isTier1 ? (
+                            <source type="image/avif" srcset={withBase(avifPath)} />
+                          ) : (
+                            <source type="image/avif" data-srcset={withBase(avifPath)} />
+                          ))}
+                        {isTier1 ? (
+                          <img
+                            src={withBase(imgPath)}
+                            alt=""
+                            loading="eager"
+                            decoding="async"
+                            fetchpriority="high"
+                            class="column__photo"
+                          />
+                        ) : (
+                          <img
+                            data-src={withBase(imgPath)}
+                            data-wave={isTier2 ? '1' : '2'}
+                            alt=""
+                            decoding="async"
+                            fetchpriority="low"
+                            class="column__photo"
+                            data-pending=""
+                          />
+                        )}
+                      </picture>
                     </div>
                   );
                 })}
@@ -138,20 +181,113 @@ const quickLinks = [
 
         <script is:inline>
           (function () {
-            var imgs = document.querySelectorAll('.column__photo');
-            for (var i = 0; i < imgs.length; i++) {
-              var img = imgs[i];
-              if (!img.complete) {
-                img.setAttribute('data-pending', '');
-                var clear = (function (el) {
-                  return function () {
-                    el.removeAttribute('data-pending');
-                  };
-                })(img);
-                img.addEventListener('load', clear, { once: true });
-                img.addEventListener('error', clear, { once: true });
-                if (img.complete) img.removeAttribute('data-pending');
+            var tier1 = document.querySelectorAll('.column__photo[src]');
+            var remaining = 0;
+            var doneWaves = { '1': false, '2': false };
+            var waveTimer1 = 0;
+            var tier1ReadyDispatched = false;
+
+            function markLoaded(el) {
+              el.removeAttribute('data-pending');
+            }
+
+            function bindClear(el, onSettle) {
+              var settled = false;
+              var finish = function () {
+                if (settled) return;
+                settled = true;
+                markLoaded(el);
+                if (onSettle) onSettle();
+              };
+              el.addEventListener('load', finish, { once: true });
+              el.addEventListener('error', finish, { once: true });
+              if (el.complete) finish();
+            }
+
+            function emitTier1Ready() {
+              if (tier1ReadyDispatched) return;
+              tier1ReadyDispatched = true;
+              window.dispatchEvent(new Event('home-tier1-ready'));
+            }
+
+            function hydrateWave(wave) {
+              if (doneWaves[wave]) return;
+              doneWaves[wave] = true;
+              if (wave === '1') {
+                if (waveTimer1) {
+                  clearTimeout(waveTimer1);
+                  waveTimer1 = 0;
+                }
+                emitTier1Ready();
               }
+              var targets = document.querySelectorAll('.column__photo[data-wave="' + wave + '"][data-src]');
+              for (var i = 0; i < targets.length; i++) {
+                var img = targets[i];
+                var url = img.getAttribute('data-src');
+                if (!url) continue;
+                var pic = img.parentElement;
+                if (pic && pic.tagName === 'PICTURE') {
+                  var sources = pic.querySelectorAll('source[data-srcset]');
+                  for (var j = 0; j < sources.length; j++) {
+                    var sUrl = sources[j].getAttribute('data-srcset');
+                    if (sUrl) {
+                      sources[j].setAttribute('srcset', sUrl);
+                      sources[j].removeAttribute('data-srcset');
+                    }
+                  }
+                }
+                img.removeAttribute('data-src');
+                bindClear(img, null);
+                img.setAttribute('src', url);
+                if (img.complete) markLoaded(img);
+              }
+            }
+
+            window.__hydrateHomeWall = function () {
+              hydrateWave('1');
+              hydrateWave('2');
+            };
+
+            function onTier1Settle() {
+              remaining -= 1;
+              if (remaining <= 0) hydrateWave('1');
+            }
+
+            for (var i = 0; i < tier1.length; i++) {
+              var img = tier1[i];
+              if (!img.complete) {
+                remaining += 1;
+                img.setAttribute('data-pending', '');
+                bindClear(img, onTier1Settle);
+              }
+            }
+
+            if (remaining === 0) {
+              hydrateWave('1');
+            } else {
+              var waitMs = window.innerWidth < 848 ? 220 : 420;
+              waveTimer1 = window.setTimeout(function () {
+                hydrateWave('1');
+              }, waitMs);
+            }
+
+            var scheduleWave2 = function () {
+              hydrateWave('1');
+              if ('requestIdleCallback' in window) {
+                window.requestIdleCallback(function () {
+                  hydrateWave('2');
+                }, { timeout: 1200 });
+              } else {
+                window.setTimeout(function () {
+                  hydrateWave('2');
+                }, 600);
+              }
+            };
+
+            if (document.readyState === 'complete') {
+              scheduleWave2();
+            } else {
+              window.addEventListener('load', scheduleWave2, { once: true });
             }
           })();
         </script>
@@ -293,11 +429,88 @@ const quickLinks = [
     align-self: end;
   }
 
+  @keyframes stage-col-top {
+    from {
+      opacity: 0.6;
+      transform: translate3d(0, -22px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes stage-col-bottom {
+    from {
+      opacity: 0.6;
+      transform: translate3d(0, 22px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes stage-menu-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 18px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .column {
+      animation: stage-col-top 0.72s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    }
+
+    .column--bottom {
+      animation-name: stage-col-bottom;
+    }
+
+    .column:nth-child(2) {
+      animation-delay: 0.05s;
+    }
+
+    .column:nth-child(3) {
+      animation-delay: 0.1s;
+    }
+
+    .column:nth-child(4) {
+      animation-delay: 0.15s;
+    }
+
+    .menu__item {
+      animation: stage-menu-in 0.62s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    }
+
+    .menu__item:nth-child(2) {
+      animation-delay: 0.04s;
+    }
+
+    .menu__item:nth-child(3) {
+      animation-delay: 0.08s;
+    }
+
+    .menu__item:nth-child(4) {
+      animation-delay: 0.12s;
+    }
+
+    .menu__item:nth-child(5) {
+      animation-delay: 0.16s;
+    }
+  }
+
   .column__img {
     width: 100%;
     display: block;
     opacity: 0.42;
-    background: rgba(37, 37, 40, 0.08);
+    background-color: rgba(37, 37, 40, 0.08);
+    background-size: cover;
+    background-position: center;
     height: clamp(140px, 24vw, 380px);
     border-radius: 2px;
     overflow: hidden;
@@ -305,6 +518,12 @@ const quickLinks = [
 
   .column__img:nth-child(odd) {
     height: clamp(170px, 29vw, 460px);
+  }
+
+  .column__picture {
+    display: block;
+    width: 100%;
+    height: 100%;
   }
 
   .column__photo {

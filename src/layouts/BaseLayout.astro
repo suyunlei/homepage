@@ -28,6 +28,7 @@ const {
     <link rel="icon" type="image/png" sizes="32x32" href={withBase('/favicon-32x32.png?v=su')} />
     <link rel="apple-touch-icon" sizes="180x180" href={withBase('/apple-touch-icon.png?v=su')} />
     <title>{title}</title>
+    <slot name="head" />
     <script is:inline>
       (function () {
         try {

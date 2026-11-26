@@ -2,10 +2,18 @@
 import { getCollection } from 'astro:content';
 import EditorialLayout from '@/layouts/EditorialLayout.astro';
 import BiText from '@/components/BiText.astro';
-import { getAlbumSlug, withBase } from '@/lib/paths';
+import { getAlbumSlug, getLifeThumbPath, toAvifPath, withBase } from '@/lib/paths';
+import { getLqipDataUri } from '@/lib/lqip';
 
 const albums = (await getCollection('albums')).sort((a, b) => a.data.order - b.data.order);
-const initialCover = albums[0] ? withBase(albums[0].data.cover) : '';
+const initialCoverPath = albums[0] ? albums[0].data.cover : '';
+const initialCover = initialCoverPath ? withBase(initialCoverPath) : '';
+const initialCoverAvifPath = initialCoverPath ? toAvifPath(initialCoverPath) : '';
+const initialCoverAvif =
+  initialCoverAvifPath && initialCoverAvifPath !== initialCoverPath
+    ? withBase(initialCoverAvifPath)
+    : '';
+const albumLqips = await Promise.all(albums.map((a) => getLqipDataUri(a.data.cover)));
 ---
 
 <EditorialLayout
@@ -18,8 +26,9 @@ const initialCover = albums[0] ? withBase(albums[0].data.cover) : '';
     <div
       id="life-ambient-bg"
       aria-hidden="true"
-      class="pointer-events-none fixed inset-0 -z-10 bg-cover bg-center opacity-15 grayscale transition-all duration-700"
-      style={initialCover ? `background-image: url('${initialCover}')` : undefined}
+      class="pointer-events-none fixed inset-0 -z-10 bg-cover bg-center opacity-0 grayscale transition-all duration-700"
+      data-initial-cover={initialCover}
+      data-initial-cover-avif={initialCoverAvif || undefined}
     />
 
     <div class="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
@@ -67,21 +76,54 @@ const initialCover = albums[0] ? withBase(albums[0].data.cover) : '';
         {
           albums.map((album, idx) => {
             const coverUrl = withBase(album.data.cover);
+            const coverAvifPath = toAvifPath(album.data.cover);
+            const coverAvifUrl = coverAvifPath !== album.data.cover ? withBase(coverAvifPath) : '';
+            const lqip = albumLqips[idx] || '';
+            const preloadThumbs = album.data.items
+              .slice(0, 3)
+              .map((it) => withBase(getLifeThumbPath(it.image)));
+            const preloadThumbsAvif = album.data.items.slice(0, 3).map((it) => {
+              const thumb = getLifeThumbPath(it.image);
+              return withBase(toAvifPath(thumb));
+            });
             return (
               <a
                 href={withBase(`/life/${getAlbumSlug(album.id)}/`)}
                 data-cover={coverUrl}
+                data-cover-avif={coverAvifUrl || undefined}
+                data-preload-thumbs={JSON.stringify(preloadThumbs)}
+                data-preload-thumbs-avif={JSON.stringify(preloadThumbsAvif)}
+                style={lqip ? `background-image: url("${lqip}"); background-size: cover; background-position: center;` : undefined}
                 class="life-album-card group relative flex min-h-[430px] w-[82vw] shrink-0 snap-start flex-col justify-between overflow-hidden rounded-2xl border border-[#252528]/20 bg-[#252528] p-6 text-[#f4f6f8] shadow-lg transition-transform duration-300 hover:-translate-y-1 sm:w-[340px] lg:w-[360px]"
               >
-                <img
-                  src={coverUrl}
-                  alt={album.data.title}
-                  loading={idx < 3 ? 'eager' : 'lazy'}
-                  fetchpriority={idx === 0 ? 'high' : 'auto'}
-                  decoding="async"
-                  draggable="false"
-                  class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
+                <picture class="absolute inset-0 block h-full w-full">
+                  {coverAvifUrl &&
+                    (idx < 3 ? (
+                      <source type="image/avif" srcset={coverAvifUrl} />
+                    ) : (
+                      <source type="image/avif" data-srcset={coverAvifUrl} />
+                    ))}
+                  {idx < 3 ? (
+                    <img
+                      src={coverUrl}
+                      alt={album.data.title}
+                      loading="eager"
+                      fetchpriority={idx === 0 ? 'high' : 'auto'}
+                      decoding="async"
+                      draggable="false"
+                      class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <img
+                      data-src={coverUrl}
+                      alt={album.data.title}
+                      fetchpriority="low"
+                      decoding="async"
+                      draggable="false"
+                      class="h-full w-full object-cover opacity-0 transition-[transform,opacity] duration-700 group-hover:scale-105"
+                    />
+                  )}
+                </picture>
                 <div
                   aria-hidden="true"
                   class="absolute inset-0 bg-gradient-to-t from-[#19232c]/90 via-[#19232c]/35 to-[#19232c]/25 transition-opacity duration-300 group-hover:opacity-95"

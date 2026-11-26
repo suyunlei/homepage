@@ -3,7 +3,8 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import EditorialLayout from '@/layouts/EditorialLayout.astro';
 import Lightbox from '@/components/Lightbox.astro';
 import BiText from '@/components/BiText.astro';
-import { getAlbumSlug, getLifeThumbPath, withBase } from '@/lib/paths';
+import { getAlbumSlug, getLifeThumbPath, toAvifPath, withBase } from '@/lib/paths';
+import { getLqipDataUri } from '@/lib/lqip';
 import type { LightboxSlide } from '@/scripts/lightbox';
 
 export async function getStaticPaths() {
@@ -26,7 +27,14 @@ interface Props {
 
 const { album, prevAlbum, nextAlbum } = Astro.props;
 const { data } = album;
-const bannerImage = withBase(data.heroImage || data.cover);
+const bannerSourcePath = data.heroImage || data.cover;
+const bannerImage = withBase(bannerSourcePath);
+const bannerAvifPath = toAvifPath(bannerSourcePath);
+const bannerAvif = bannerAvifPath !== bannerSourcePath ? withBase(bannerAvifPath) : '';
+const bannerLqip = await getLqipDataUri(bannerSourcePath);
+const thumbLqips = await Promise.all(
+  data.items.map((item) => getLqipDataUri(getLifeThumbPath(item.image))),
+);
 
 const allTags = Array.from(new Set(data.items.flatMap((it) => it.tags)));
 
@@ -57,13 +65,23 @@ for (const item of data.items) {
   <article class="mx-auto max-w-6xl px-5 py-10 sm:px-8 sm:py-14">
     <!-- Album Hero Banner -->
     <header class="reveal-section relative overflow-hidden rounded-3xl border border-[#252528]/20 bg-[#252528] p-7 text-[#f4f6f8] sm:p-12">
-      <img
-        src={bannerImage}
-        alt={data.title}
-        decoding="async"
-        fetchpriority="high"
-        class="absolute inset-0 h-full w-full object-cover opacity-35"
-      />
+      {bannerLqip && (
+        <div
+          aria-hidden="true"
+          class="absolute inset-0 bg-cover bg-center opacity-35"
+          style={`background-image: url("${bannerLqip}");`}
+        />
+      )}
+      <picture class="absolute inset-0 block h-full w-full">
+        {bannerAvif && <source type="image/avif" srcset={bannerAvif} />}
+        <img
+          src={bannerImage}
+          alt={data.title}
+          decoding="async"
+          fetchpriority="high"
+          class="h-full w-full object-cover opacity-35"
+        />
+      </picture>
       <div
         aria-hidden="true"
         class="absolute inset-0 bg-gradient-to-t from-[#1a1d21]/95 via-[#1a1d21]/60 to-[#1a1d21]/40"
@@ -98,48 +116,74 @@ for (const item of data.items) {
     {
       data.layout === 'editorial-stories' ? (
         <section class="reveal-section mt-12 space-y-10">
-          {data.items.map((item, idx) => (
-            <div class="editorial-card grid overflow-hidden rounded-3xl lg:grid-cols-12">
-              <button
-                type="button"
-                class:list={[
-                  'group relative block aspect-[4/3] w-full cursor-zoom-in overflow-hidden bg-[#252528] text-left lg:col-span-6 lg:aspect-auto lg:min-h-[340px]',
-                  idx % 2 === 1 && 'lg:order-2',
-                ]}
-                data-lightbox-trigger
-                data-lightbox-index={itemSlideStartIndex[idx]}
-              >
-                <img
-                  src={withBase(getLifeThumbPath(item.image))}
-                  alt={item.title}
-                  loading={idx < 2 ? 'eager' : 'lazy'}
-                  fetchpriority={idx === 0 ? 'high' : 'auto'}
-                  decoding="async"
-                  class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <span class="absolute bottom-3 right-3 rounded-full bg-black/60 px-2.5 py-1 font-mono text-[11px] text-white opacity-90 backdrop-blur-sm">
-                  <BiText zh="点击放大" en="Zoom" />
-                </span>
-              </button>
+          {data.items.map((item, idx) => {
+            const thumbPath = getLifeThumbPath(item.image);
+            const thumbAvifPath = toAvifPath(thumbPath);
+            const thumbUrl = withBase(thumbPath);
+            const thumbAvifUrl = thumbAvifPath !== thumbPath ? withBase(thumbAvifPath) : '';
+            const thumbLqip = thumbLqips[idx] || '';
+            return (
+              <div class="editorial-card grid overflow-hidden rounded-3xl lg:grid-cols-12">
+                <button
+                  type="button"
+                  class:list={[
+                    'group relative block aspect-[4/3] w-full cursor-zoom-in overflow-hidden bg-[#252528] text-left lg:col-span-6 lg:aspect-auto lg:min-h-[340px]',
+                    idx % 2 === 1 && 'lg:order-2',
+                  ]}
+                  style={thumbLqip ? `background-image: url("${thumbLqip}"); background-size: cover; background-position: center;` : undefined}
+                  data-lightbox-trigger
+                  data-lightbox-index={itemSlideStartIndex[idx]}
+                >
+                  <picture class="block h-full w-full">
+                    {thumbAvifUrl &&
+                      (idx < 2 ? (
+                        <source type="image/avif" srcset={thumbAvifUrl} />
+                      ) : (
+                        <source type="image/avif" data-srcset={thumbAvifUrl} />
+                      ))}
+                    {idx < 2 ? (
+                      <img
+                        src={thumbUrl}
+                        alt={item.title}
+                        loading="eager"
+                        fetchpriority={idx === 0 ? 'high' : 'auto'}
+                        decoding="async"
+                        class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <img
+                        data-src={thumbUrl}
+                        alt={item.title}
+                        fetchpriority="low"
+                        decoding="async"
+                        class="h-full w-full object-cover opacity-0 transition-[transform,opacity] duration-500 group-hover:scale-105"
+                      />
+                    )}
+                  </picture>
+                  <span class="absolute bottom-3 right-3 rounded-full bg-black/60 px-2.5 py-1 font-mono text-[11px] text-white opacity-90 backdrop-blur-sm">
+                    <BiText zh="点击放大" en="Zoom" />
+                  </span>
+                </button>
 
-              <div class="flex flex-col justify-center p-6 sm:p-10 lg:col-span-6">
-                <span class="font-mono text-xs text-[#27445d]">
-                  CHAPTER 0{idx + 1}
-                </span>
-                <h2 class="mt-2 text-2xl font-bold tracking-tight text-[#252528]">
-                  {item.title}
-                </h2>
-                {item.subtitle && (
-                  <p class="mt-1 text-sm font-medium text-[#4a4f57]">{item.subtitle}</p>
-                )}
-                <div class="mt-5 space-y-3 text-sm leading-relaxed text-[#252528]/90 sm:text-base">
-                  {item.paragraphs.map((para) => (
-                    <p>{para}</p>
-                  ))}
+                <div class="flex flex-col justify-center p-6 sm:p-10 lg:col-span-6">
+                  <span class="font-mono text-xs text-[#27445d]">
+                    CHAPTER 0{idx + 1}
+                  </span>
+                  <h2 class="mt-2 text-2xl font-bold tracking-tight text-[#252528]">
+                    {item.title}
+                  </h2>
+                  {item.subtitle && (
+                    <p class="mt-1 text-sm font-medium text-[#4a4f57]">{item.subtitle}</p>
+                  )}
+                  <div class="mt-5 space-y-3 text-sm leading-relaxed text-[#252528]/90 sm:text-base">
+                    {item.paragraphs.map((para) => (
+                      <p>{para}</p>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </section>
       ) : (
         <section class="reveal-section mt-10">
@@ -167,45 +211,73 @@ for (const item of data.items) {
           )}
 
           <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {data.items.map((item, idx) => (
-              <button
-                type="button"
-                class="group editorial-card-lite flex cursor-zoom-in flex-col overflow-hidden rounded-2xl text-left transition-colors hover:border-[#252528]/35"
-                data-lightbox-trigger
-                data-lightbox-index={itemSlideStartIndex[idx]}
-                data-item-tags={item.tags.join('|')}
-              >
-                <div class="relative aspect-[4/3] w-full overflow-hidden bg-[#9ea6ad]/40">
-                  <img
-                    src={withBase(getLifeThumbPath(item.image))}
-                    alt={item.title}
-                    loading={idx < 3 ? 'eager' : 'lazy'}
-                    fetchpriority={idx === 0 ? 'high' : 'auto'}
-                    decoding="async"
-                    class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  {item.gallery.length > 1 && (
-                    <span class="absolute right-3 bottom-3 rounded-full bg-[#252528]/80 px-2.5 py-0.5 font-mono text-[11px] text-white backdrop-blur-sm">
-                      +{item.gallery.length} photos
-                    </span>
-                  )}
-                </div>
-
-                <div class="flex flex-1 flex-col p-5">
-                  <div class="flex items-baseline justify-between gap-2">
-                    <h2 class="text-lg font-semibold text-[#252528]">{item.title}</h2>
-                    {item.subtitle && (
-                      <span class="font-mono text-xs text-[#5d636c]">{item.subtitle}</span>
+            {data.items.map((item, idx) => {
+              const thumbPath = getLifeThumbPath(item.image);
+              const thumbAvifPath = toAvifPath(thumbPath);
+              const thumbUrl = withBase(thumbPath);
+              const thumbAvifUrl = thumbAvifPath !== thumbPath ? withBase(thumbAvifPath) : '';
+              const thumbLqip = thumbLqips[idx] || '';
+              return (
+                <button
+                  type="button"
+                  class="group editorial-card-lite flex cursor-zoom-in flex-col overflow-hidden rounded-2xl text-left transition-colors hover:border-[#252528]/35"
+                  data-lightbox-trigger
+                  data-lightbox-index={itemSlideStartIndex[idx]}
+                  data-item-tags={item.tags.join('|')}
+                >
+                  <div
+                    class="relative aspect-[4/3] w-full overflow-hidden bg-[#9ea6ad]/40"
+                    style={thumbLqip ? `background-image: url("${thumbLqip}"); background-size: cover; background-position: center;` : undefined}
+                  >
+                    <picture class="block h-full w-full">
+                      {thumbAvifUrl &&
+                        (idx < 3 ? (
+                          <source type="image/avif" srcset={thumbAvifUrl} />
+                        ) : (
+                          <source type="image/avif" data-srcset={thumbAvifUrl} />
+                        ))}
+                      {idx < 3 ? (
+                        <img
+                          src={thumbUrl}
+                          alt={item.title}
+                          loading="eager"
+                          fetchpriority={idx === 0 ? 'high' : 'auto'}
+                          decoding="async"
+                          class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      ) : (
+                        <img
+                          data-src={thumbUrl}
+                          alt={item.title}
+                          fetchpriority="low"
+                          decoding="async"
+                          class="h-full w-full object-cover opacity-0 transition-[transform,opacity] duration-500 group-hover:scale-105"
+                        />
+                      )}
+                    </picture>
+                    {item.gallery.length > 1 && (
+                      <span class="absolute right-3 bottom-3 rounded-full bg-[#252528]/80 px-2.5 py-0.5 font-mono text-[11px] text-white backdrop-blur-sm">
+                        +{item.gallery.length} photos
+                      </span>
                     )}
                   </div>
-                  {item.caption && (
-                    <p class="mt-2 text-xs leading-relaxed text-[#4a4f57] sm:text-sm">
-                      {item.caption}
-                    </p>
-                  )}
-                </div>
-              </button>
-            ))}
+
+                  <div class="flex flex-1 flex-col p-5">
+                    <div class="flex items-baseline justify-between gap-2">
+                      <h2 class="text-lg font-semibold text-[#252528]">{item.title}</h2>
+                      {item.subtitle && (
+                        <span class="font-mono text-xs text-[#5d636c]">{item.subtitle}</span>
+                      )}
+                    </div>
+                    {item.caption && (
+                      <p class="mt-2 text-xs leading-relaxed text-[#4a4f57] sm:text-sm">
+                        {item.caption}
+                      </p>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </section>
       )

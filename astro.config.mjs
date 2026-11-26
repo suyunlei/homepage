@@ -6,6 +6,13 @@ export default defineConfig({
   base: process.env.SITE_BASE || '/',
   trailingSlash: 'ignore',
   output: 'static',
+  build: {
+    inlineStylesheets: 'always',
+  },
+  prefetch: {
+    prefetchAll: true,
+    defaultStrategy: 'hover',
+  },
   vite: {
     plugins: [tailwindcss()],
   },
