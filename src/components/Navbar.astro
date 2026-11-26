@@ -1,0 +1,116 @@
+---
+import { withBase } from '@/lib/paths';
+
+interface Props {
+  currentPath?: string;
+}
+
+const { currentPath = Astro.url.pathname } = Astro.props;
+
+const navItems = [
+  { label: 'Home', labelZh: '首页', href: '/' },
+  { label: 'Academic', labelZh: '学术', href: '/academic/' },
+  { label: 'Projects', labelZh: '项目', href: '/projects/' },
+  { label: 'Life', labelZh: '生活', href: '/life/' },
+  { label: 'Contact', labelZh: '联系', href: '/contact/' },
+];
+
+function isActive(itemHref: string): boolean {
+  const full = withBase(itemHref);
+  if (itemHref === '/') {
+    return currentPath === full || currentPath === full.replace(/\/$/, '') || currentPath === '/';
+  }
+  return currentPath.startsWith(full);
+}
+---
+
+<header class="sticky top-0 z-40 border-b editorial-hairline bg-[#afb6bc]/85 backdrop-blur-md">
+  <div class="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 sm:px-8">
+    <a
+      href={withBase('/')}
+      class="group flex items-baseline gap-2.5 text-sm font-semibold tracking-tight text-[#252528] transition-opacity hover:opacity-75"
+    >
+      <span class="font-mono text-xs uppercase tracking-[0.2em]">Yunlei Su</span>
+      <span class="text-xs font-normal text-[#4a4f57]">苏云雷</span>
+    </a>
+
+    <nav class="hidden items-center gap-7 md:flex" aria-label="主导航">
+      {
+        navItems.map((item) => {
+          const active = isActive(item.href);
+          return (
+            <a
+              href={withBase(item.href)}
+              class:list={[
+                'relative py-1 text-sm transition-colors',
+                active
+                  ? 'font-semibold text-[#252528]'
+                  : 'text-[#4a4f57] hover:text-[#252528]',
+              ]}
+              aria-current={active ? 'page' : undefined}
+            >
+              <span>{item.label}</span>
+              <span class="ml-1 text-xs opacity-65">{item.labelZh}</span>
+              {active && (
+                <span
+                  aria-hidden="true"
+                  class="absolute inset-x-0 -bottom-[15px] h-[2px] bg-[#252528]"
+                />
+              )}
+            </a>
+          );
+        })
+      }
+    </nav>
+
+    <button
+      type="button"
+      id="nav-mobile-toggle"
+      class="inline-flex items-center gap-2 rounded-full border border-[#252528]/25 px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-[#252528] md:hidden"
+      aria-expanded="false"
+      aria-controls="nav-mobile-drawer"
+    >
+      <span>Menu</span>
+    </button>
+  </div>
+
+  <div
+    id="nav-mobile-drawer"
+    class="hidden border-t editorial-hairline bg-[#afb6bc]/95 px-5 py-4 md:hidden"
+  >
+    <nav class="flex flex-col gap-2" aria-label="移动端导航">
+      {
+        navItems.map((item) => {
+          const active = isActive(item.href);
+          return (
+            <a
+              href={withBase(item.href)}
+              class:list={[
+                'flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
+                active
+                  ? 'bg-[#252528] font-medium text-[#f4f6f8]'
+                  : 'text-[#252528] hover:bg-white/30',
+              ]}
+            >
+              <span>{item.label}</span>
+              <span class="text-xs opacity-75">{item.labelZh}</span>
+            </a>
+          );
+        })
+      }
+    </nav>
+  </div>
+</header>
+
+<script>
+  const toggleBtn = document.getElementById('nav-mobile-toggle');
+  const drawer = document.getElementById('nav-mobile-drawer');
+
+  if (toggleBtn && drawer) {
+    toggleBtn.addEventListener('click', () => {
+      const expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+      toggleBtn.setAttribute('aria-expanded', String(!expanded));
+      drawer.classList.toggle('hidden', expanded);
+    });
+  }
+</script>

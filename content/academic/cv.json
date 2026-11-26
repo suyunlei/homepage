@@ -1,0 +1,105 @@
+{
+  "position": "PhD Student · Thrust of Urban Governance and Design (UGOD)",
+  "affiliation": "The Hong Kong University of Science and Technology (Guangzhou) · Urban Morphology Studio",
+  "cvPdf": "",
+  "bioParagraphs": [
+    "苏云雷（Yunlei Su），香港科技大学（广州）社会枢纽城市治理与设计学域（UGOD）Urban Morphology Studio 在读博士生；先后于安徽大学（地理信息科学）获本科学位、新加坡国立大学（NUS，应用地理信息系统）获理学硕士学位，并曾与新加坡国立大学 Urban Analytics Lab 合作开展三维城市数字孪生研究。",
+    "研究兴趣聚焦于 WebGIS、城市数字孪生（Urban Digital Twins）、人-建筑交互（Human-Building Interaction）、虚拟现实（VR）城市建模与眼动感知实验，以及结合街景与卫星多视角影像和多模态大语言模型的城市建筑精细化表征。"
+  ],
+  "researchInterests": [
+    {
+      "code": "01",
+      "title": "Urban Digital Twins & Human-Centric Sensing",
+      "titleZh": "城市数字孪生与以人为本的感知计算",
+      "summary": "探索「人即传感器（Humans as Sensors）」理念在城市数字孪生中的应用，将个体行为与步行舒适度等社会感知数据接入物理–社会–虚拟融合的城市信息系统。",
+      "keywords": ["Urban Digital Twins", "3D GeoInfo", "Humans as Sensors", "Urban Analytics"]
+    },
+    {
+      "code": "02",
+      "title": "Human-Building Interaction & VR Perception",
+      "titleZh": "人-建筑交互与 VR 城市建模感知",
+      "summary": "结合沉浸式虚拟现实与眼动追踪技术，量化建筑立面与建成环境元素对人类注视行为的吸引机制，并提出感知驱动的三维城市模型 LOD 优化框架。",
+      "keywords": ["Human-Building Interaction", "VR City Modeling", "Eye-Tracking", "LOD Design"]
+    },
+    {
+      "code": "03",
+      "title": "Multimodal GeoAI & Street-View Analytics",
+      "titleZh": "多模态 GeoAI 与街景/多视角影像分析",
+      "summary": "融合街景影像、遥感影像与 OpenStreetMap 空间信息，利用微调多模态大语言模型（MLLM）自动提取多尺度建筑属性，并量化连续街景序列异质性对感知的影响。",
+      "keywords": ["Multimodal LLM", "Street View Imagery", "Building Characterization", "GeoAI"]
+    },
+    {
+      "code": "04",
+      "title": "WebGIS & Urban Spatial Dynamics",
+      "titleZh": "WebGIS 系统与城市空间格局演替",
+      "summary": "基于 OpenLayers、GeoServer 与空间统计模型构建生态与城市多源空间管理平台，定量分析快速城镇化区域的土地利用转移与驱动力机制。",
+      "keywords": ["WebGIS", "OpenLayers", "GeoServer", "LEI / UGI"]
+    }
+  ],
+  "education": [
+    {
+      "period": "Current",
+      "institution": "香港科技大学（广州）· HKUST(GZ)",
+      "location": "广州 · Guangzhou",
+      "degree": "博士研究生 (PhD Student) · Thrust of Urban Governance and Design (UGOD)",
+      "details": "所属 Urban Morphology Studio，研究聚焦 VR 城市建模 LOD 感知设计、人-建筑交互（HBI）与多模态大模型驱动的城市空间表征。"
+    },
+    {
+      "period": "2022 – 2023",
+      "institution": "新加坡国立大学 · National University of Singapore (NUS)",
+      "location": "新加坡 · Singapore",
+      "degree": "理学硕士 (MSc in Applied GIS) · Department of Geography",
+      "details": "系统研习应用地理信息系统与城市分析方法，期间与 Urban Analytics Lab 合作开展以人为本的城市数字孪生研究。"
+    },
+    {
+      "period": "2018 – 2022",
+      "institution": "安徽大学 · Anhui University",
+      "location": "合肥 · Hefei",
+      "degree": "学士学位 (B.S. / B.A. in Geographic Information Science)",
+      "details": "资源与环境工程学院地理信息科学专业；主持参与湿地 WebGIS 创新创业项目并合作发表深圳城市扩张 EI 论文。"
+    }
+  ],
+  "experience": [
+    {
+      "period": "2021.07 – 2021.08",
+      "organization": "阿里云创新中心 · Alibaba Cloud Innovation Center",
+      "location": "实习 · Internship",
+      "role": "前端开发实习生",
+      "details": "参与电商直播 PC 端界面及企业 Web 项目开发，负责响应式布局与多页面动态交互实现。"
+    }
+  ],
+  "honorsAndProjects": [
+    {
+      "year": "2023",
+      "title": "Best Paper Award — 18th International 3D GeoInfo Conference",
+      "role": "Munich, Germany · Co-author (Humans as Sensors in Urban Digital Twins)",
+      "note": "提出的「Humans as Sensors」人本城市数字孪生框架及 NUS 校园步行舒适度实证获大会最佳论文奖。"
+    },
+    {
+      "year": "2020",
+      "title": "大学生创新创业训练计划：三河湿地 WebGIS 管理系统",
+      "role": "安徽大学 · 空间系统设计与全栈实现",
+      "note": "基于 OpenLayers + GeoServer 实现矢量、栅格与监测数据的在线上传与 WMS/WFS 服务发布。"
+    },
+    {
+      "year": "2019",
+      "title": "「一带一路」沿线国家健康指数与人均寿命专题地图集",
+      "role": "安徽大学 · 数据爬取与专题制图",
+      "note": "Python 自动采集公共医疗数据，结合 ArcGIS、QGIS 与 Adobe Illustrator 完成专题地图设计。"
+    }
+  ],
+  "serviceAndSkills": [
+    {
+      "group": "Urban Informatics & HBI",
+      "items": ["Urban Digital Twins", "VR City Modeling", "Eye-Tracking", "Human-Building Interaction", "3D GeoInfo / LOD"]
+    },
+    {
+      "group": "GeoAI & GIS Engineering",
+      "items": ["Multimodal LLMs", "Street View Analytics", "ArcGIS", "QGIS", "OpenLayers", "GeoServer"]
+    },
+    {
+      "group": "Programming & Publishing",
+      "items": ["Python", "TypeScript", "Astro", "Tailwind CSS", "LaTeX", "BibTeX"]
+    }
+  ]
+}

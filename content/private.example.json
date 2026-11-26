@@ -1,0 +1,12 @@
+{
+  "_comment": "复制本文件为 content/private.local.json（已加入 .gitignore，不会提交到公开仓库），用于在构建时注入敏感或私人联系信息。",
+  "email": "your-email@example.edu.cn",
+  "affiliation": "当前所在高校 / 实验室名称",
+  "position": "例如：硕士 / 博士研究生 · 地理信息科学方向",
+  "scholarUrl": "https://scholar.google.com/citations?user=YOUR_ID",
+  "orcidUrl": "https://orcid.org/0000-0000-0000-0000",
+  "cvPdf": "/papers/cv.pdf",
+  "wechatId": "your_wechat_id",
+  "wechatQr": "/media/profile/wechat.jpg",
+  "office": "实验室 / 所在城市"
+}

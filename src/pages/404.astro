@@ -1,0 +1,22 @@
+---
+import EditorialLayout from '@/layouts/EditorialLayout.astro';
+import { withBase } from '@/lib/paths';
+---
+
+<EditorialLayout title="404 · 页面未找到 · 苏云雷">
+  <div class="mx-auto flex max-w-3xl flex-col items-center px-5 py-24 text-center sm:px-8">
+    <p class="font-mono text-xs uppercase tracking-[0.25em] text-[#4a4f57]">Error 404</p>
+    <h1 class="mt-4 text-6xl font-bold tracking-tight text-[#252528] sm:text-7xl">404</h1>
+    <p class="mt-4 text-base text-[#4a4f57]">
+      抱歉，你访问的页面不存在或已在网站重构后迁移到新路径。
+    </p>
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
+      <a href={withBase('/')} class="editorial-btn editorial-btn--primary">
+        返回主页
+      </a>
+      <a href={withBase('/academic/')} class="editorial-btn">
+        前往学术成果页 →
+      </a>
+    </div>
+  </div>
+</EditorialLayout>

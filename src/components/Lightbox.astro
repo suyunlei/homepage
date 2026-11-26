@@ -1,0 +1,67 @@
+---
+import type { LightboxSlide } from '@/scripts/lightbox';
+
+interface Props {
+  slides: LightboxSlide[];
+}
+
+const { slides } = Astro.props;
+---
+
+<div id="lightbox-slides-data" class="hidden" data-slides={JSON.stringify(slides)} />
+
+<div
+  id="gallery-lightbox"
+  class="fixed inset-0 z-50 hidden items-center justify-center bg-[#18191c]/90 p-4 backdrop-blur-md sm:p-8"
+  role="dialog"
+  aria-modal="true"
+  aria-label="图片灯箱预览"
+>
+  <button
+    type="button"
+    id="lightbox-close"
+    class="fixed top-4 right-4 z-10 rounded-full border border-white/25 bg-black/40 px-3.5 py-1.5 font-mono text-xs text-white hover:bg-white hover:text-[#252528] sm:top-6 sm:right-6"
+    aria-label="关闭灯箱"
+  >
+    ESC · Close ✕
+  </button>
+
+  <button
+    type="button"
+    id="lightbox-prev"
+    class="fixed left-3 top-1/2 z-10 hidden -translate-y-1/2 rounded-full border border-white/20 bg-black/40 px-3.5 py-2.5 text-white hover:bg-white hover:text-[#252528] sm:inline-flex"
+    aria-label="上一张"
+  >
+    ←
+  </button>
+
+  <button
+    type="button"
+    id="lightbox-next"
+    class="fixed right-3 top-1/2 z-10 hidden -translate-y-1/2 rounded-full border border-white/20 bg-black/40 px-3.5 py-2.5 text-white hover:bg-white hover:text-[#252528] sm:inline-flex"
+    aria-label="下一张"
+  >
+    →
+  </button>
+
+  <figure class="flex max-h-[90vh] max-w-4xl flex-col items-center gap-4 text-center">
+    <img
+      id="lightbox-img"
+      src=""
+      alt=""
+      class="max-h-[70vh] w-auto max-w-full rounded-xl object-contain shadow-2xl"
+    />
+    <figcaption class="max-w-2xl space-y-1 text-[#f4f6f8]">
+      <div class="flex items-center justify-center gap-3">
+        <span id="lightbox-title" class="text-base font-semibold sm:text-lg"></span>
+        <span id="lightbox-subtitle" class="font-mono text-xs text-white/65"></span>
+        <span id="lightbox-counter" class="font-mono text-xs text-white/65"></span>
+      </div>
+      <p id="lightbox-caption" class="text-xs leading-relaxed text-white/80 sm:text-sm"></p>
+    </figcaption>
+  </figure>
+</div>
+
+<script>
+  import '../scripts/lightbox';
+</script>

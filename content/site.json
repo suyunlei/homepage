@@ -1,0 +1,161 @@
+{
+  "siteTitle": "苏云雷 · Yunlei Su",
+  "siteDescription": "苏云雷（Yunlei Su / Ray）的个人主页——HKUST(GZ) 在读博士生，研究方向涵盖 WebGIS、城市数字孪生（Urban Digital Twins）与人-建筑交互（Human-Building Interaction）。",
+  "heroFrameTitle": "Welcome to Yunlei Su's World",
+  "heroFrameSubtitle": "WebGIS · Urban Digital Twins · HBI",
+  "owner": {
+    "nameZh": "苏云雷",
+    "nameEn": "Yunlei Su",
+    "nickname": "Ray",
+    "handle": "@东曦不知道是什么东西",
+    "tagline": "PhD Student @ HKUST(GZ) · WebGIS · Urban Digital Twins · Human-Building Interaction",
+    "location": "Guangzhou, China",
+    "avatar": "/media/profile/avatar.jpg"
+  },
+  "homeColumns": [
+    {
+      "bottom": false,
+      "images": [
+        "/media/home/2.jpg",
+        "/media/home/21.jpg",
+        "/media/home/13.jpg",
+        "/media/home/14.jpg",
+        "/media/home/5.jpg",
+        "/media/home/6.jpg",
+        "/media/home/7.jpg",
+        "/media/home/8.jpg",
+        "/media/home/9.jpg"
+      ]
+    },
+    {
+      "bottom": true,
+      "images": [
+        "/media/home/22.jpg",
+        "/media/home/11.jpg",
+        "/media/home/1.jpg",
+        "/media/home/15.jpg",
+        "/media/home/14.jpg",
+        "/media/home/13.jpg",
+        "/media/home/12.jpg",
+        "/media/home/3.jpg",
+        "/media/home/15.jpg"
+      ]
+    },
+    {
+      "bottom": false,
+      "images": [
+        "/media/home/18.jpg",
+        "/media/home/4.jpg",
+        "/media/home/9.jpg",
+        "/media/home/11.jpg",
+        "/media/home/16.jpg",
+        "/media/home/20.jpg",
+        "/media/home/2.jpg",
+        "/media/home/1.jpg",
+        "/media/home/5.jpg",
+        "/media/home/14.jpg"
+      ]
+    },
+    {
+      "bottom": true,
+      "images": [
+        "/media/home/1.jpg",
+        "/media/home/2.jpg",
+        "/media/home/19.jpg",
+        "/media/home/7.jpg",
+        "/media/home/23.jpg",
+        "/media/home/19.jpg",
+        "/media/home/17.jpg",
+        "/media/home/8.jpg",
+        "/media/home/10.jpg"
+      ]
+    }
+  ],
+  "homePanels": [
+    {
+      "menuLabel": "Author",
+      "title": "苏云雷 Ray",
+      "subtitle": "HKUST(GZ) PhD Student · 一个善良的愣头青",
+      "image": "/media/home/11.jpg",
+      "paragraphs": [
+        "本科毕业于安徽大学地理信息科学专业，硕士就读于新加坡国立大学（NUS）应用地理信息系统专业，目前在香港科技大学（广州）城市治理与设计学域攻读博士学位。",
+        "Welcome to My World, My Lord, and My Lady.",
+        "我的朋友，我希望我们的友谊长久；如果与您初识，希望我们可以成为朋友。",
+        "这里既记录我的学术探索，也珍藏一路走来的生活影像与故事。"
+      ],
+      "ctaLabel": "查看学术档案与简介",
+      "ctaHref": "/academic/#about"
+    },
+    {
+      "menuLabel": "Academic",
+      "title": "学术成果",
+      "subtitle": "WebGIS · Urban Digital Twins · HBI",
+      "image": "/media/projects/img-3.jpg",
+      "paragraphs": [
+        "研究围绕城市数字孪生（Urban Digital Twins）、人-建筑交互（Human-Building Interaction）、VR 城市建模与眼动感知、以及多模态大语言模型驱动的城市建筑语义表征展开。",
+        "已同步收录 Google Scholar 上的 7 篇期刊与国际会议论文（涵盖 JAG、Cities、3D GeoInfo Best Paper Award、SpatialDI、CUPUM 与 E3S），附带 DOI、BibTeX 与开源代码链接。"
+      ],
+      "ctaLabel": "进入学术成果主页",
+      "ctaHref": "/academic/"
+    },
+    {
+      "menuLabel": "Life Style",
+      "title": "艺术篇章",
+      "subtitle": "Life is full of Art",
+      "image": "/media/home/19.jpg",
+      "paragraphs": [
+        "时间流逝得太快，许多事都记不清了。",
+        "谨以此篇记录那些叫做回忆的东西——球场、朋友、杭州、母校与烟火人间。",
+        "Always Remember."
+      ],
+      "ctaLabel": "浏览生活与摄影影集",
+      "ctaHref": "/life/"
+    },
+    {
+      "menuLabel": "Project",
+      "title": "实践项目",
+      "subtitle": "可视化自己的进步",
+      "image": "/media/home/8.jpg",
+      "paragraphs": [
+        "Still Young, Still Creative.",
+        "记录那些在科研训练、WebGIS 开发、专题地图制图与前端工程实践中创造的故事。",
+        "Time passed quickly."
+      ],
+      "ctaLabel": "查看全部项目档案",
+      "ctaHref": "/projects/"
+    },
+    {
+      "menuLabel": "Contact",
+      "title": "联系我",
+      "subtitle": "Let us begin our story",
+      "image": "/media/home/4.jpg",
+      "paragraphs": [
+        "可能我们许久未联系了，老朋友。",
+        "可能我们初次相识，新朋友。",
+        "可能我们仍未相识，陌生人。欢迎随时来信交流学术问题、项目合作或生活近况。"
+      ],
+      "ctaLabel": "前往联系方式",
+      "ctaHref": "/contact/"
+    }
+  ],
+  "contact": {
+    "introQuote": "Please allow me to offer you my greatest gratitude. I will continuously update my homepage — welcome back anytime.",
+    "bioLine": "PhD Student @ HKUST(GZ) · 持续记录科研探索与生活细节",
+    "email": "",
+    "githubUrl": "https://github.com/suyunlei",
+    "weiboUrl": "https://weibo.com/u/5807394780",
+    "scholarUrl": "https://scholar.google.com/citations?user=otnq_NsAAAAJ&hl=en",
+    "orcidUrl": "",
+    "wechatQr": "/media/profile/wechat.jpg",
+    "wechatId": "",
+    "wechatHint": "扫码添加微信，请备注来意（学术交流 / 朋友问候）",
+    "miniProgramNote": "微信小程序搜索「苏云雷」",
+    "chatNotes": [
+      { "side": "visitor", "text": "So upset these days :(" },
+      { "side": "visitor", "text": "Do you know someone that I can chat with?" },
+      { "side": "ray", "text": "Don't worry dude!" },
+      { "side": "ray", "text": "Contact Ray right now!" },
+      { "side": "ray", "text": "无论学术探讨还是叙旧闲聊，都很欢迎来找我。" }
+    ]
+  }
+}

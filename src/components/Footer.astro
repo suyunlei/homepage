@@ -1,0 +1,39 @@
+---
+import { withBase } from '@/lib/paths';
+import { loadSiteAndCvData } from '@/lib/site-data';
+
+const { site } = loadSiteAndCvData();
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-20 border-t editorial-hairline bg-[#9ea6ad]/35">
+  <div class="mx-auto flex max-w-6xl flex-col gap-6 px-5 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+    <div class="space-y-1">
+      <p class="font-mono text-xs uppercase tracking-[0.16em] text-[#252528]">
+        © {year} {site.owner.nameEn} · {site.owner.nameZh}
+      </p>
+      <p class="text-xs text-[#4a4f57]">
+        {site.owner.tagline}
+      </p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[#4a4f57]">
+      <a href={withBase('/academic/')} class="hover:text-[#252528]">Academic</a>
+      <a href={withBase('/projects/')} class="hover:text-[#252528]">Projects</a>
+      <a href={withBase('/life/')} class="hover:text-[#252528]">Life Style</a>
+      <a href={withBase('/contact/')} class="hover:text-[#252528]">Contact</a>
+      {
+        site.contact.githubUrl && (
+          <a
+            href={site.contact.githubUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hover:text-[#252528]"
+          >
+            GitHub ↗
+          </a>
+        )
+      }
+    </div>
+  </div>
+</footer>

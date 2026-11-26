@@ -1,0 +1,234 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import EditorialLayout from '@/layouts/EditorialLayout.astro';
+import Lightbox from '@/components/Lightbox.astro';
+import { getAlbumSlug, withBase } from '@/lib/paths';
+import type { LightboxSlide } from '@/scripts/lightbox';
+
+export async function getStaticPaths() {
+  const albums = (await getCollection('albums')).sort((a, b) => a.data.order - b.data.order);
+  return albums.map((album, idx) => ({
+    params: { slug: getAlbumSlug(album.id) },
+    props: {
+      album,
+      prevAlbum: albums[(idx - 1 + albums.length) % albums.length],
+      nextAlbum: albums[(idx + 1) % albums.length],
+    },
+  }));
+}
+
+interface Props {
+  album: CollectionEntry<'albums'>;
+  prevAlbum: CollectionEntry<'albums'>;
+  nextAlbum: CollectionEntry<'albums'>;
+}
+
+const { album, prevAlbum, nextAlbum } = Astro.props;
+const { data } = album;
+const bannerImage = withBase(data.heroImage || data.cover);
+
+const allTags = Array.from(new Set(data.items.flatMap((it) => it.tags)));
+
+// Build full Lightbox slide list, preserving card start indices and including extra gallery shots
+const slides: LightboxSlide[] = [];
+const itemSlideStartIndex: number[] = [];
+
+for (const item of data.items) {
+  itemSlideStartIndex.push(slides.length);
+  const rawImages =
+    item.gallery.length > 0 ? item.gallery : [item.image];
+  const uniqueImages = Array.from(new Set([item.image, ...rawImages]));
+  for (const imgPath of uniqueImages) {
+    slides.push({
+      src: withBase(imgPath),
+      title: item.title,
+      subtitle: item.subtitle,
+      caption: item.caption || item.paragraphs[0] || '',
+    });
+  }
+}
+---
+
+<EditorialLayout
+  title={`${data.title} · ${data.titleZh} · 苏云雷`}
+  description={data.description}
+>
+  <article class="mx-auto max-w-6xl px-5 py-10 sm:px-8 sm:py-14">
+    <!-- Album Hero Banner -->
+    <header class="reveal-section relative overflow-hidden rounded-3xl border border-[#252528]/20 bg-[#252528] p-7 text-[#f4f6f8] sm:p-12">
+      <img
+        src={bannerImage}
+        alt={data.title}
+        class="absolute inset-0 h-full w-full object-cover opacity-35"
+      />
+      <div
+        aria-hidden="true"
+        class="absolute inset-0 bg-gradient-to-t from-[#1a1d21]/95 via-[#1a1d21]/60 to-[#1a1d21]/40"
+      />
+
+      <div class="relative z-10 flex flex-col gap-6">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <a
+            href={withBase('/life/')}
+            class="inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/30 px-3.5 py-1.5 font-mono text-xs text-white transition-colors hover:bg-white hover:text-[#252528]"
+          >
+            ← Back to Life Style
+          </a>
+          <span class="font-mono text-xs uppercase tracking-[0.18em] text-white/75">
+            {data.number} · {data.location} · {data.items.length} entries
+          </span>
+        </div>
+
+        <div class="max-w-3xl space-y-2">
+          <p class="text-sm text-white/75">{data.titleZh}</p>
+          <h1 class="text-3xl font-bold tracking-tight text-white sm:text-5xl">
+            {data.headline}
+          </h1>
+          <p class="pt-2 text-sm leading-relaxed text-white/80 sm:text-base">
+            {data.description}
+          </p>
+        </div>
+      </div>
+    </header>
+
+    {
+      data.layout === 'editorial-stories' ? (
+        <section class="reveal-section mt-12 space-y-10">
+          {data.items.map((item, idx) => (
+            <div class="editorial-card grid overflow-hidden rounded-3xl lg:grid-cols-12">
+              <button
+                type="button"
+                class:list={[
+                  'group relative block aspect-[4/3] w-full cursor-zoom-in overflow-hidden bg-[#252528] text-left lg:col-span-6 lg:aspect-auto lg:min-h-[340px]',
+                  idx % 2 === 1 && 'lg:order-2',
+                ]}
+                data-lightbox-trigger
+                data-lightbox-index={itemSlideStartIndex[idx]}
+              >
+                <img
+                  src={withBase(item.image)}
+                  alt={item.title}
+                  loading="lazy"
+                  class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <span class="absolute bottom-3 right-3 rounded-full bg-black/60 px-2.5 py-1 font-mono text-[11px] text-white opacity-90 backdrop-blur-sm">
+                  点击放大
+                </span>
+              </button>
+
+              <div class="flex flex-col justify-center p-6 sm:p-10 lg:col-span-6">
+                <span class="font-mono text-xs text-[#27445d]">
+                  CHAPTER 0{idx + 1}
+                </span>
+                <h2 class="mt-2 text-2xl font-bold tracking-tight text-[#252528]">
+                  {item.title}
+                </h2>
+                {item.subtitle && (
+                  <p class="mt-1 text-sm font-medium text-[#4a4f57]">{item.subtitle}</p>
+                )}
+                <div class="mt-5 space-y-3 text-sm leading-relaxed text-[#252528]/90 sm:text-base">
+                  {item.paragraphs.map((para) => (
+                    <p>{para}</p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </section>
+      ) : (
+        <section class="reveal-section mt-10">
+          {allTags.length > 0 && (
+            <div class="mb-6 flex flex-wrap gap-2" role="group" aria-label="按标签筛选照片">
+              <button
+                type="button"
+                class="editorial-pill cursor-pointer hover:border-[#252528]"
+                data-album-tag="all"
+                aria-pressed="true"
+              >
+                All ({data.items.length})
+              </button>
+              {allTags.map((tag) => (
+                <button
+                  type="button"
+                  class="editorial-pill cursor-pointer hover:border-[#252528]"
+                  data-album-tag={tag}
+                  aria-pressed="false"
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {data.items.map((item, idx) => (
+              <button
+                type="button"
+                class="group editorial-card flex cursor-zoom-in flex-col overflow-hidden rounded-2xl text-left transition-colors hover:border-[#252528]/35"
+                data-lightbox-trigger
+                data-lightbox-index={itemSlideStartIndex[idx]}
+                data-item-tags={item.tags.join('|')}
+              >
+                <div class="relative aspect-[4/3] w-full overflow-hidden bg-[#9ea6ad]/40">
+                  <img
+                    src={withBase(item.image)}
+                    alt={item.title}
+                    loading="lazy"
+                    class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  {item.gallery.length > 1 && (
+                    <span class="absolute right-3 bottom-3 rounded-full bg-[#252528]/80 px-2.5 py-0.5 font-mono text-[11px] text-white backdrop-blur-sm">
+                      +{item.gallery.length} photos
+                    </span>
+                  )}
+                </div>
+
+                <div class="flex flex-1 flex-col p-5">
+                  <div class="flex items-baseline justify-between gap-2">
+                    <h2 class="text-lg font-semibold text-[#252528]">{item.title}</h2>
+                    {item.subtitle && (
+                      <span class="font-mono text-xs text-[#5d636c]">{item.subtitle}</span>
+                    )}
+                  </div>
+                  {item.caption && (
+                    <p class="mt-2 text-xs leading-relaxed text-[#4a4f57] sm:text-sm">
+                      {item.caption}
+                    </p>
+                  )}
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    <!-- Prev / Next Album Navigation -->
+    <nav
+      class="reveal-section mt-16 grid gap-4 border-t editorial-hairline pt-8 sm:grid-cols-2"
+      aria-label="切换相册"
+    >
+      <a
+        href={withBase(`/life/${getAlbumSlug(prevAlbum.id)}/`)}
+        class="editorial-card group rounded-2xl p-5 transition-colors hover:border-[#252528]/40"
+      >
+        <p class="font-mono text-xs text-[#5d636c]">← Previous Album</p>
+        <p class="mt-1 text-base font-semibold text-[#252528] group-hover:text-[#27445d]">
+          {prevAlbum.data.number} · {prevAlbum.data.titleZh}
+        </p>
+      </a>
+
+      <a
+        href={withBase(`/life/${getAlbumSlug(nextAlbum.id)}/`)}
+        class="editorial-card group rounded-2xl p-5 text-right transition-colors hover:border-[#252528]/40"
+      >
+        <p class="font-mono text-xs text-[#5d636c]">Next Album →</p>
+        <p class="mt-1 text-base font-semibold text-[#252528] group-hover:text-[#27445d]">
+          {nextAlbum.data.number} · {nextAlbum.data.titleZh}
+        </p>
+      </a>
+    </nav>
+  </article>
+
+  <Lightbox slides={slides} />
+</EditorialLayout>
