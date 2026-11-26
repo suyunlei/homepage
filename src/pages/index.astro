@@ -166,8 +166,8 @@ const quickLinks = [
         </div>
 
         <p class="preloader__status">
-          <span id="preloader-status-zh" data-i18n="zh">正在唤醒 36 帧生活切片...</span>
-          <span id="preloader-status-en" data-i18n="en">Waking up 36 visual slices...</span>
+          <span id="preloader-status-zh" data-i18n="zh">给奶思顺顺毛</span>
+          <span id="preloader-status-en" data-i18n="en">Brushing Naisi's fur...</span>
         </p>
       </div>
     </div>
@@ -342,6 +342,7 @@ const quickLinks = [
           (function () {
             var rootEl = document.documentElement;
             var isPreloader = rootEl.classList.contains('preloader-active');
+            var preloaderRunning = isPreloader;
             var doneWaves = { '1': false, '2': false };
             var doneDesktopWaves = { '1': false, '2': false };
             var waveTimer1 = 0;
@@ -354,6 +355,11 @@ const quickLinks = [
 
             function isReallyLoaded(img) {
               return Boolean(img.complete && img.naturalWidth > 0);
+            }
+
+            function appendRetryParam(url) {
+              if (!url) return url;
+              return url.indexOf('?') === -1 ? url + '?r=1' : url + '&r=1';
             }
 
             function bindClear(el, onSettle) {
@@ -375,15 +381,41 @@ const quickLinks = [
                 var finish = function () {
                   if (done) return;
                   done = true;
-                  markLoaded(img);
+                  img.removeEventListener('load', finish);
+                  img.removeEventListener('error', onError);
+                  if (isReallyLoaded(img)) {
+                    markLoaded(img);
+                  }
                   if (img.naturalWidth > 0 && typeof img.decode === 'function') {
                     img.decode().catch(function () {}).finally(resolve);
                   } else {
                     resolve();
                   }
                 };
-                img.addEventListener('load', finish, { once: true });
-                img.addEventListener('error', finish, { once: true });
+                var onError = function () {
+                  if (done) return;
+                  if (!img.dataset.retried) {
+                    img.dataset.retried = '1';
+                    var pic = img.parentElement;
+                    if (pic && pic.tagName === 'PICTURE') {
+                      var sources = pic.querySelectorAll('source[srcset]');
+                      for (var j = 0; j < sources.length; j++) {
+                        var sVal = sources[j].getAttribute('srcset');
+                        if (sVal) {
+                          sources[j].setAttribute('srcset', appendRetryParam(sVal));
+                        }
+                      }
+                    }
+                    var curSrc = img.getAttribute('src');
+                    if (curSrc) {
+                      img.setAttribute('src', appendRetryParam(curSrc));
+                      return;
+                    }
+                  }
+                  finish();
+                };
+                img.addEventListener('load', finish);
+                img.addEventListener('error', onError);
                 Promise.resolve().then(function () {
                   if (!done && isReallyLoaded(img)) {
                     finish();
@@ -398,7 +430,9 @@ const quickLinks = [
               if (priority) {
                 img.setAttribute('fetchpriority', priority);
               }
-              bindClear(img, null);
+              if (!preloaderRunning) {
+                bindClear(img, null);
+              }
               var pic = img.parentElement;
               if (pic && pic.tagName === 'PICTURE') {
                 var sources = pic.querySelectorAll('source[data-srcset]');
@@ -498,16 +532,16 @@ const quickLinks = [
               ];
               var coordIdx = 0;
               var stagesZh = [
-                '正在唤醒 36 帧生活切片...',
-                '正在校准城市数字孪生坐标...',
-                '正在给猫猫顺毛 & 铺好高清展板...',
-                '欢迎来到苏云雷的世界 ✦',
+                '给奶思顺顺毛',
+                '摸摸奶思的头',
+                '奶思翻了个身',
+                '欢迎来到苏云雷的世界',
               ];
               var stagesEn = [
-                'Waking up 36 visual slices...',
-                'Calibrating urban digital twin coords...',
-                'Petting the cats & unrolling HD panels...',
-                "Welcome to Yunlei Su's World ✦",
+                "Brushing Naisi's fur...",
+                "Patting Naisi's head...",
+                'Naisi rolled over...',
+                "Welcome to Yunlei Su's World",
               ];
               var lastStageIdx = 0;
 
@@ -523,31 +557,50 @@ const quickLinks = [
                 wallImgs.push(wave2Imgs[k2]);
               }
 
-              var panelImgs = window.__hydrateAllPanels('auto');
-              if (panelImgs.length === 0) {
-                panelImgs = Array.prototype.slice.call(
-                  document.querySelectorAll('.stage-item__photo'),
-                );
-              }
-
+              var allPanelEls = document.querySelectorAll('.stage-item__photo');
               var wallDone = 0;
               var wallTotal = Math.max(1, wallImgs.length);
+              var panelDone = 0;
+              var panelTotal = Math.max(1, allPanelEls.length);
+              var panelsStarted = false;
+              var panelTimer = 0;
+
+              var startPanelsPreload = function () {
+                if (panelsStarted) return;
+                panelsStarted = true;
+                if (panelTimer) {
+                  clearTimeout(panelTimer);
+                  panelTimer = 0;
+                }
+                var panelImgs = window.__hydrateAllPanels('high');
+                if (panelImgs.length === 0) {
+                  panelImgs = Array.prototype.slice.call(
+                    document.querySelectorAll('.stage-item__photo'),
+                  );
+                }
+                panelTotal = Math.max(1, panelImgs.length);
+                panelImgs.forEach(function (img) {
+                  waitDecode(img).then(function () {
+                    panelDone += 1;
+                  });
+                });
+              };
+
               wallImgs.forEach(function (img) {
                 if (!isReallyLoaded(img)) {
                   img.setAttribute('data-pending', '');
                 }
                 waitDecode(img).then(function () {
                   wallDone += 1;
+                  if (!panelsStarted && wallDone >= Math.ceil(wallTotal * 0.75)) {
+                    startPanelsPreload();
+                  }
                 });
               });
 
-              var panelDone = 0;
-              var panelTotal = Math.max(1, panelImgs.length);
-              panelImgs.forEach(function (img) {
-                waitDecode(img).then(function () {
-                  panelDone += 1;
-                });
-              });
+              if (!panelsStarted) {
+                panelTimer = window.setTimeout(startPanelsPreload, 900);
+              }
 
               var extrasDone = 0;
               var extrasTotal = 2;
@@ -631,16 +684,27 @@ const quickLinks = [
               }
 
               var t0 = performance.now();
-              var minDuration = 1050;
-              var maxWait = 7000;
+              var minDuration = 1400;
+              var maxWait = 25000;
               var displayPct = 0;
               var finished = false;
 
               var finishReveal = function () {
                 if (finished) return;
                 finished = true;
+                preloaderRunning = false;
                 clearInterval(coordTimer);
                 clearTimeout(gsapFallback);
+                if (panelTimer) {
+                  clearTimeout(panelTimer);
+                  panelTimer = 0;
+                }
+                var settleImgs = document.querySelectorAll('.column__photo, .stage-item__photo');
+                for (var s = 0; s < settleImgs.length; s++) {
+                  if (isReallyLoaded(settleImgs[s])) {
+                    markLoaded(settleImgs[s]);
+                  }
+                }
                 try {
                   sessionStorage.setItem('home-preloaded', '1');
                 } catch (e) {}
@@ -669,12 +733,15 @@ const quickLinks = [
               var tickPreloader = function (now) {
                 if (finished) return;
                 var elapsed = now - t0;
+                if (elapsed >= maxWait && !panelsStarted) {
+                  startPanelsPreload();
+                }
                 var allLoaded =
                   wallDone >= wallTotal && panelDone >= panelTotal && extrasDone >= extrasTotal;
                 var realPct =
-                  55 * (wallDone / wallTotal) +
+                  60 * (wallDone / wallTotal) +
                   30 * (panelDone / panelTotal) +
-                  15 * (extrasDone / extrasTotal);
+                  10 * (extrasDone / extrasTotal);
 
                 var minRatio = Math.min(1, elapsed / minDuration);
                 var cappedTarget;
@@ -696,7 +763,7 @@ const quickLinks = [
                   arcEl.style.strokeDashoffset = (276.46 * (1 - displayPct / 100)).toFixed(2);
                 }
 
-                var stageIdx = displayPct >= 88 ? 3 : displayPct >= 60 ? 2 : displayPct >= 30 ? 1 : 0;
+                var stageIdx = displayPct >= 90 ? 3 : displayPct >= 60 ? 2 : displayPct >= 30 ? 1 : 0;
                 if (stageIdx !== lastStageIdx) {
                   lastStageIdx = stageIdx;
                   if (statusZhEl) statusZhEl.textContent = stagesZh[stageIdx];

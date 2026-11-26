@@ -255,9 +255,9 @@ async function generateAvifSidecars(forceAvif, scopes) {
       if (filePath.toLowerCase().endsWith('.webp')) {
         candidates.push({
           srcPath: filePath,
-          maxWidth: 400,
-          maxHeight: 600,
-          quality: 45,
+          maxWidth: 360,
+          maxHeight: 520,
+          quality: 38,
         });
       }
     }
@@ -269,9 +269,9 @@ async function generateAvifSidecars(forceAvif, scopes) {
       if (SUPPORTED_EXTS.has(ext)) {
         candidates.push({
           srcPath: filePath,
-          maxWidth: 1200,
-          maxHeight: 1600,
-          quality: 68,
+          maxWidth: 960,
+          maxHeight: 1360,
+          quality: 56,
         });
       }
     }
@@ -285,7 +285,7 @@ async function generateAvifSidecars(forceAvif, scopes) {
         srcPath: academicCover,
         maxWidth: 1440,
         maxHeight: 900,
-        quality: 76,
+        quality: 64,
       });
     } catch {
       // optional cover
@@ -300,7 +300,7 @@ async function generateAvifSidecars(forceAvif, scopes) {
         srcPath: ualCover,
         maxWidth: 1000,
         maxHeight: 800,
-        quality: 74,
+        quality: 60,
       });
     } catch {
       // optional cover
