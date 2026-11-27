@@ -1,6 +1,12 @@
+import { initRollingCounter, setRollingCounter } from './rolling-counter';
+
 const filterButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-project-filter]'));
 const projectCards = Array.from(document.querySelectorAll<HTMLElement>('.project-card'));
 const countEl = document.getElementById('project-visible-count');
+
+if (countEl) {
+  initRollingCounter(countEl, { bounce: 42, stagger: 40, blur: 45 });
+}
 
 filterButtons.forEach((btn) => {
   btn.addEventListener('click', () => {
@@ -14,8 +20,6 @@ filterButtons.forEach((btn) => {
       if (match) visible += 1;
     }
 
-    if (countEl) {
-      countEl.textContent = String(visible);
-    }
+    setRollingCounter(countEl, visible);
   });
 });

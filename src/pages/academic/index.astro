@@ -138,19 +138,35 @@ const filterTypes = [
       <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:col-span-5 lg:grid-cols-2">
         <div class="editorial-card rounded-2xl p-4">
           <p class="font-mono text-[11px] uppercase tracking-wider text-[#5d636c]">Publications</p>
-          <p class="mt-2 text-2xl font-bold text-[#252528]">{publications.length}</p>
+          <p class="mt-2 text-2xl font-bold text-[#252528]">
+            <span class="roll-counter" data-roll-metric data-roll-value={String(publications.length)}>
+              {publications.length}
+            </span>
+          </p>
         </div>
         <div class="editorial-card rounded-2xl p-4">
           <p class="font-mono text-[11px] uppercase tracking-wider text-[#5d636c]">First / Co-First</p>
-          <p class="mt-2 text-2xl font-bold text-[#252528]">{firstAuthorCount}</p>
+          <p class="mt-2 text-2xl font-bold text-[#252528]">
+            <span class="roll-counter" data-roll-metric data-roll-value={String(firstAuthorCount)}>
+              {firstAuthorCount}
+            </span>
+          </p>
         </div>
         <div class="editorial-card rounded-2xl p-4">
           <p class="font-mono text-[11px] uppercase tracking-wider text-[#5d636c]">Research Areas</p>
-          <p class="mt-2 text-2xl font-bold text-[#252528]">{cv.researchInterests.length}</p>
+          <p class="mt-2 text-2xl font-bold text-[#252528]">
+            <span class="roll-counter" data-roll-metric data-roll-value={String(cv.researchInterests.length)}>
+              {cv.researchInterests.length}
+            </span>
+          </p>
         </div>
         <div class="editorial-card rounded-2xl p-4">
           <p class="font-mono text-[11px] uppercase tracking-wider text-[#5d636c]">Projects</p>
-          <p class="mt-2 text-2xl font-bold text-[#252528]">{projects.length}</p>
+          <p class="mt-2 text-2xl font-bold text-[#252528]">
+            <span class="roll-counter" data-roll-metric data-roll-value={String(projects.length)}>
+              {projects.length}
+            </span>
+          </p>
         </div>
       </div>
     </section>
@@ -207,7 +223,7 @@ const filterTypes = [
           <BiText zh="02 / 学术论文与成果 · Publications" en="02 / Publications" />
         </h2>
         <span class="font-mono text-xs text-[#4a4f57]">
-          Showing <strong id="pub-visible-count">{publications.length}</strong> of {publications.length}
+          Showing <strong id="pub-visible-count" class="roll-counter" data-roll-value={String(publications.length)}>{publications.length}</strong> of {publications.length}
         </span>
       </div>
 

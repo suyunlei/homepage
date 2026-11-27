@@ -1,5 +1,6 @@
 import { copyText } from './clipboard';
 import { getLang } from './i18n';
+import { initRollingCounter, initRollingMetrics, setRollingCounter } from './rolling-counter';
 
 const typeButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-filter-type]'));
 const yearSelect = document.getElementById('pub-year-select') as HTMLSelectElement | null;
@@ -7,6 +8,11 @@ const searchInput = document.getElementById('pub-search-input') as HTMLInputElem
 const cards = Array.from(document.querySelectorAll<HTMLElement>('.pub-card'));
 const emptyState = document.getElementById('pub-empty-state');
 const countDisplay = document.getElementById('pub-visible-count');
+
+initRollingMetrics();
+if (countDisplay) {
+  initRollingCounter(countDisplay, { bounce: 42, stagger: 40, blur: 45 });
+}
 
 let activeType = 'all';
 let activeYear = 'all';
@@ -28,9 +34,7 @@ function applyFilters() {
     if (show) visible += 1;
   }
 
-  if (countDisplay) {
-    countDisplay.textContent = String(visible);
-  }
+  setRollingCounter(countDisplay, visible);
   if (emptyState) {
     emptyState.classList.toggle('hidden', visible > 0);
   }

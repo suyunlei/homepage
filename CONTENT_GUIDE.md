@@ -122,12 +122,17 @@ npm run build            # 生成纯静态产物到 dist/
 
 ### 部署到线上服务器
 
-1. 在本地执行 `npm run check` 与 `npm run build`，生成纯静态目录 `dist/`（已包含加密邮箱等 `private.local.json` 注入内容）。
-2. 将 `dist/` 打包上传并原子替换服务器上的 `/opt/homepage/dist/`，再重启静态容器使挂载生效：
+1. **一键检查、构建并部署（推荐）**：
+   本地 SSH 别名 `homepage` 已在 `~/.ssh/config` 中绑定私钥 `~/.ssh/homepage_safe.pem`（密钥仅存本地，严禁提交进 Git 仓库）：
    ```bash
-   sudo docker restart homepage-web
+   npm run deploy
    ```
-3. 如果需要部署在子路径（例如 GitHub Pages 的 `/homepage/`），可通过环境变量构建：
+   若刚刚已经运行过 `npm run check` 与 `npm run build`，也可跳过重复构建直接发布：
+   ```bash
+   node scripts/deploy.mjs --skip-build
+   ```
+   > 脚本会自动打包 `dist/`，通过 `scp` 上传后原子替换服务器上的 `/opt/homepage/dist/`，并执行 `sudo docker restart homepage-web`。
+2. 如果需要部署在子路径（例如 GitHub Pages 的 `/homepage/`），可通过环境变量构建：
    ```bash
    SITE_BASE=/homepage/ npm run build
    ```

@@ -31,7 +31,7 @@ const categories = Array.from(new Set(projects.map((p) => p.data.category)));
           </p>
         </div>
         <span class="font-mono text-xs text-[#4a4f57]">
-          Showing <strong id="project-visible-count">{projects.length}</strong> / {projects.length}
+          Showing <strong id="project-visible-count" class="roll-counter" data-roll-value={String(projects.length)}>{projects.length}</strong> / {projects.length}
         </span>
       </div>
 

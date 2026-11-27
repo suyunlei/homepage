@@ -7,3 +7,5 @@ Thumbs.db
 .env.*
 content/private.local.json
 *.log
+*.pem
+*.key

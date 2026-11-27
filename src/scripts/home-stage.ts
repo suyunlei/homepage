@@ -1,3 +1,10 @@
+import {
+  clamp,
+  damp,
+  frameDelta,
+  prefersReducedMotion as checkReducedMotion,
+} from './spring';
+
 type GsapInstance = (typeof import('gsap'))['default'];
 
 let gsapLib: GsapInstance | null = null;
@@ -20,8 +27,7 @@ const MathUtils = {
     const b = y1 - m * x1;
     return m * currentVal + b;
   },
-  lerp: (a: number, b: number, n: number) => (1 - n) * a + n * b,
-  clamp: (val: number, min: number, max: number) => Math.max(min, Math.min(max, val)),
+  clamp,
   rand: (min: number, max: number) => Math.random() * (max - min) + min,
 };
 
@@ -38,7 +44,7 @@ function splitLetters(el: HTMLElement): HTMLSpanElement[] {
   return spans;
 }
 
-const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const prefersReducedMotion = checkReducedMotion();
 const isTouchDevice = window.matchMedia('(hover: none), (pointer: coarse)').matches;
 const contentFirst = document.querySelector<HTMLElement>('.content--first');
 const contentMove = document.querySelector<HTMLElement>('.content__move');
@@ -75,6 +81,7 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
     : 0;
   let entranceDone = prefersReducedMotion;
   let parallaxRaf = 0;
+  let prevParallaxTime = 0;
 
   // Column parallax state + mobile ambient drift parameters
   const columnStates = columnEls.map((el, i) => {
@@ -98,14 +105,23 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
       cancelAnimationFrame(parallaxRaf);
       parallaxRaf = 0;
     }
+    prevParallaxTime = 0;
   };
 
   const stepParallax = (now: number) => {
     parallaxRaf = 0;
-    if (!activeTilt.columns || !entranceDone || document.hidden) return;
+    if (!activeTilt.columns || !entranceDone || document.hidden) {
+      prevParallaxTime = 0;
+      return;
+    }
 
     if (!isTouchDevice) {
-      if (!hasPointerMoved) return;
+      if (!hasPointerMoved) {
+        prevParallaxTime = 0;
+        return;
+      }
+      const dt60 = frameDelta(now, prevParallaxTime);
+      prevParallaxTime = now;
       let moving = false;
       for (const col of columnStates) {
         if (col.el.offsetParent === null) continue;
@@ -114,17 +130,21 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
         if (Math.abs(targetTx - col.tx) < 0.06 && Math.abs(targetTy - col.ty) < 0.06) {
           continue;
         }
-        col.tx = MathUtils.lerp(col.tx, targetTx, 0.035);
-        col.ty = MathUtils.lerp(col.ty, targetTy, 0.035);
+        col.tx = damp(col.tx, targetTx, 0.035, dt60);
+        col.ty = damp(col.ty, targetTy, 0.035, dt60);
         col.el.style.transform = `translate3d(${col.tx.toFixed(2)}px, ${col.ty.toFixed(2)}px, 0)`;
         moving = true;
       }
       if (moving) {
         parallaxRaf = requestAnimationFrame(stepParallax);
+      } else {
+        prevParallaxTime = 0;
       }
       return;
     }
 
+    const dt60 = frameDelta(now, prevParallaxTime);
+    prevParallaxTime = now;
     const t = now * 0.001;
     const factor = isTouching ? 0.08 : 0.032;
     for (const col of columnStates) {
@@ -135,8 +155,8 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
         waveX + touchOffset.x * col.randX * 1.4 + tiltOffset.x * col.randX * 0.8;
       const targetTy =
         waveY + touchOffset.y * col.rY1 * 0.7 + tiltOffset.y * col.rY1 * 0.4;
-      col.tx = MathUtils.lerp(col.tx, targetTx, factor);
-      col.ty = MathUtils.lerp(col.ty, targetTy, factor);
+      col.tx = damp(col.tx, targetTx, factor, dt60);
+      col.ty = damp(col.ty, targetTy, factor, dt60);
       col.el.style.transform = `translate3d(${col.tx.toFixed(2)}px, ${col.ty.toFixed(2)}px, 0)`;
     }
     parallaxRaf = requestAnimationFrame(stepParallax);

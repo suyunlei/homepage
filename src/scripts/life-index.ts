@@ -1,3 +1,12 @@
+import {
+  clamp,
+  frameDelta,
+  mix,
+  prefersReducedMotion,
+  stepSpring,
+  type SpringState,
+} from './spring';
+
 const backdrop = document.getElementById('life-ambient-bg');
 const cards = Array.from(document.querySelectorAll<HTMLElement>('.life-album-card'));
 const track = document.getElementById('life-album-track');
@@ -6,7 +15,12 @@ const nextBtn = document.getElementById('life-next-btn');
 const dots = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-album-dot]'));
 const counterEl = document.getElementById('life-mobile-counter');
 const scrollRail = document.getElementById('life-scroll-rail');
-const scrollThumb = document.getElementById('life-scroll-thumb');
+const wakeBars = scrollRail
+  ? Array.from(scrollRail.querySelectorAll<HTMLElement>('[data-wake-bar]'))
+  : [];
+
+let isDraggingTrack = false;
+let releaseAllTilts: () => void = () => {};
 
 const warmedCards = new WeakSet<HTMLElement>();
 let avifSupported: boolean | null = null;
@@ -224,27 +238,255 @@ if (cards.length > 0) {
   setActiveCard(0);
 }
 
-if (track) {
-  const updateScrollRail = () => {
-    if (!scrollRail || !scrollThumb) return;
-    const maxScroll = track.scrollWidth - track.clientWidth;
-    if (maxScroll <= 2) {
-      scrollThumb.style.width = '100%';
-      scrollThumb.style.left = '0%';
-      scrollRail.setAttribute('aria-valuenow', '0');
-      return;
+const fineHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+if (cards.length > 0 && fineHover && !prefersReducedMotion()) {
+  const MAX_TILT = 7.5;
+  const SINK = 10;
+  const SHADE = 52;
+
+  interface TiltCardState {
+    card: HTMLElement;
+    surface: HTMLElement;
+    sheen: HTMLElement;
+    tx: number;
+    ty: number;
+    on: boolean;
+    sx: SpringState;
+    sy: SpringState;
+    lit: SpringState;
+  }
+
+  const activeTilts = new Set<TiltCardState>();
+  const tiltStates: TiltCardState[] = [];
+  let tiltRaf = 0;
+  let tiltPrev = 0;
+
+  const tiltTick = (now: number) => {
+    const dt60 = frameDelta(now, tiltPrev);
+    tiltPrev = now;
+
+    for (const s of activeTilts) {
+      const targetX = s.on ? s.tx : 0;
+      const targetY = s.on ? s.ty : 0;
+      const targetLit = s.on ? 1 : 0;
+
+      const mx = stepSpring(s.sx, targetX, dt60, 48, 0.002);
+      const my = stepSpring(s.sy, targetY, dt60, 48, 0.002);
+      const ml = stepSpring(s.lit, targetLit, dt60, 48, 0.002);
+      const moving = mx || my || ml;
+
+      const lit = clamp(s.lit.pos, 0, 1);
+
+      if (!s.on && !moving && lit < 0.003) {
+        s.surface.style.transform = '';
+        s.surface.style.boxShadow = '';
+        s.sheen.style.backgroundImage = '';
+        activeTilts.delete(s);
+        continue;
+      }
+
+      const rx = -s.sy.pos * MAX_TILT;
+      const ry = s.sx.pos * MAX_TILT;
+      const px = ((s.sx.pos + 1) / 2) * 100;
+      const py = ((s.sy.pos + 1) / 2) * 100;
+      const dark = (SHADE / 100) * 0.58 * lit;
+      const rim = (SHADE / 100) * 0.34 * lit;
+
+      s.surface.style.transform = `translateZ(${(-SINK * lit).toFixed(2)}px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
+      s.surface.style.boxShadow = `0 ${mix(20, 8, lit).toFixed(1)}px ${mix(40, 20, lit).toFixed(1)}px -8px rgba(15, 23, 42, ${mix(0.28, 0.16, lit).toFixed(3)})`;
+      s.sheen.style.backgroundImage = `radial-gradient(42% 34% at ${px.toFixed(1)}% ${py.toFixed(1)}%, rgba(9, 14, 28, ${dark.toFixed(3)}) 0%, rgba(9, 14, 28, 0) 100%), radial-gradient(52% 42% at ${(100 - px).toFixed(1)}% ${(100 - py).toFixed(1)}%, rgba(255, 255, 255, ${rim.toFixed(3)}) 0%, rgba(255, 255, 255, 0) 100%)`;
     }
-    const thumbPct = Math.max(16, Math.min(100, (track.clientWidth / track.scrollWidth) * 100));
-    const ratio = Math.max(0, Math.min(1, track.scrollLeft / maxScroll));
-    const leftPct = ratio * (100 - thumbPct);
-    scrollThumb.style.width = `${thumbPct.toFixed(2)}%`;
-    scrollThumb.style.left = `${leftPct.toFixed(2)}%`;
-    scrollRail.setAttribute('aria-valuenow', String(Math.round(ratio * 100)));
+
+    if (activeTilts.size > 0) {
+      tiltRaf = requestAnimationFrame(tiltTick);
+    } else {
+      tiltRaf = 0;
+      tiltPrev = 0;
+    }
   };
 
-  track.addEventListener('scroll', updateScrollRail, { passive: true });
-  window.addEventListener('resize', updateScrollRail, { passive: true });
-  requestAnimationFrame(updateScrollRail);
+  const startTiltLoop = () => {
+    if (!tiltRaf && activeTilts.size > 0) {
+      tiltPrev = 0;
+      tiltRaf = requestAnimationFrame(tiltTick);
+    }
+  };
+
+  releaseAllTilts = () => {
+    let any = false;
+    for (const s of tiltStates) {
+      if (s.on) {
+        s.on = false;
+        activeTilts.add(s);
+        any = true;
+      }
+    }
+    if (any) startTiltLoop();
+  };
+
+  for (const card of cards) {
+    const surface = card.querySelector<HTMLElement>('.life-album-card__surface');
+    const sheen = card.querySelector<HTMLElement>('.life-tilt-sheen');
+    if (!surface || !sheen) continue;
+
+    const state: TiltCardState = {
+      card,
+      surface,
+      sheen,
+      tx: 0,
+      ty: 0,
+      on: false,
+      sx: { pos: 0, vel: 0 },
+      sy: { pos: 0, vel: 0 },
+      lit: { pos: 0, vel: 0 },
+    };
+    tiltStates.push(state);
+
+    card.addEventListener('pointermove', (ev) => {
+      if (ev.pointerType !== 'mouse' || isDraggingTrack) return;
+      const r = card.getBoundingClientRect();
+      if (r.width <= 0 || r.height <= 0) return;
+      state.tx = clamp(((ev.clientX - r.left) / r.width) * 2 - 1, -1, 1);
+      state.ty = clamp(((ev.clientY - r.top) / r.height) * 2 - 1, -1, 1);
+      state.on = true;
+      activeTilts.add(state);
+      startTiltLoop();
+    });
+
+    card.addEventListener('pointerout', (ev) => {
+      const to = ev.relatedTarget as Node | null;
+      if (!to || !card.contains(to)) {
+        state.on = false;
+        if (activeTilts.has(state)) startTiltLoop();
+      }
+    });
+
+    const releaseCard = () => {
+      state.on = false;
+      if (activeTilts.has(state)) startTiltLoop();
+    };
+    card.addEventListener('pointercancel', releaseCard);
+    card.addEventListener('blur', releaseCard);
+  }
+}
+
+if (track) {
+  const wakeCount = wakeBars.length;
+  const wakeEnergy = new Float32Array(wakeCount);
+  let wakeRaf = 0;
+  let wakePrev = 0;
+  let wakeFrac = 0;
+  let scrubbing = false;
+  let scrubLastX = 0;
+  let scrubLastT = 0;
+  let scrubSpeed = 0;
+  let lastScrollLeft = track.scrollLeft;
+  let lastScrollTime = performance.now();
+  let scrollSpeed = 0;
+  let keyWakeBoostUntil = 0;
+
+  const paintWakeLit = (ratio: number) => {
+    if (!scrollRail || wakeCount === 0) return;
+    const clamped = clamp(ratio, 0, 1);
+    const litIdx = Math.round(clamped * (wakeCount - 1));
+    for (let i = 0; i < wakeCount; i++) {
+      const bar = wakeBars[i];
+      if (i <= litIdx) {
+        bar.dataset.on = 'true';
+      } else {
+        delete bar.dataset.on;
+      }
+      if (i === litIdx) {
+        bar.dataset.head = 'true';
+      } else {
+        delete bar.dataset.head;
+      }
+    }
+    scrollRail.setAttribute('aria-valuenow', String(Math.round(clamped * 100)));
+  };
+
+  const wakeLoop = () => {
+    if (wakeRaf || wakeCount === 0) return;
+    wakePrev = performance.now();
+    const tick = (now: number) => {
+      const dt = Math.min(0.05, Math.max(0, (now - wakePrev) / 1000));
+      wakePrev = now;
+      const fall = Math.exp(-dt * 6.5);
+      let live = false;
+
+      for (let i = 0; i < wakeCount; i++) {
+        wakeEnergy[i] *= fall;
+        if (wakeEnergy[i] < 0.002) {
+          wakeEnergy[i] = 0;
+          if (wakeBars[i].style.transform) {
+            wakeBars[i].style.transform = '';
+          }
+        } else {
+          live = true;
+          wakeBars[i].style.transform = `scaleY(${(1 + wakeEnergy[i] * 1.45).toFixed(3)})`;
+        }
+      }
+
+      if (live || scrubbing) {
+        wakeRaf = requestAnimationFrame(tick);
+      } else {
+        wakeRaf = 0;
+      }
+    };
+    wakeRaf = requestAnimationFrame(tick);
+  };
+
+  const wakeTo = (ratio: number, speedPxPerSec: number) => {
+    if (wakeCount === 0) return;
+    const f = clamp(ratio, 0, 1);
+    const a = Math.round(wakeFrac * (wakeCount - 1));
+    const b = Math.round(f * (wakeCount - 1));
+    wakeFrac = f;
+    paintWakeLit(f);
+
+    if (!prefersReducedMotion() && speedPxPerSec > 0) {
+      const push = (1 - Math.exp(-speedPxPerSec / 900)) * 0.95;
+      const lo = Math.min(a, b);
+      const hi = Math.max(a, b);
+      for (let i = lo; i <= hi; i++) {
+        wakeEnergy[i] = Math.max(wakeEnergy[i], push);
+      }
+      wakeLoop();
+    }
+  };
+
+  const updateScrollRail = (withWake = false) => {
+    if (!scrollRail || wakeCount === 0) return;
+    const maxScroll = track.scrollWidth - track.clientWidth;
+    if (maxScroll <= 2) {
+      wakeFrac = 0;
+      paintWakeLit(0);
+      return;
+    }
+    const ratio = clamp(track.scrollLeft / maxScroll, 0, 1);
+    if (!withWake) {
+      wakeFrac = ratio;
+      paintWakeLit(ratio);
+      return;
+    }
+    const now = performance.now();
+    const dx = Math.abs(track.scrollLeft - lastScrollLeft);
+    const dt = Math.max(0.008, (now - lastScrollTime) / 1000);
+    lastScrollLeft = track.scrollLeft;
+    lastScrollTime = now;
+
+    if (scrubbing) return;
+
+    const instant = dx < 0.5 ? 0 : dx / dt;
+    scrollSpeed = scrollSpeed * 0.5 + instant * 0.5;
+    const effectiveSpeed = now < keyWakeBoostUntil ? Math.max(scrollSpeed, 550) : scrollSpeed;
+    wakeTo(ratio, effectiveSpeed);
+  };
+
+  track.addEventListener('scroll', () => updateScrollRail(true), { passive: true });
+  window.addEventListener('resize', () => updateScrollRail(false), { passive: true });
+  requestAnimationFrame(() => updateScrollRail(false));
 
   if (prevBtn && nextBtn) {
     const scrollByCard = (direction: number) => {
@@ -258,25 +500,41 @@ if (track) {
     nextBtn.addEventListener('click', () => scrollByCard(1));
   }
 
-  // Click / drag directly on the editorial progress rail
+  // Click / drag directly on the editorial wake rail
   if (scrollRail) {
-    let scrubbing = false;
-    const scrubToClientX = (clientX: number) => {
+    const scrubToClientX = (clientX: number, speed: number) => {
       cards.forEach((card) => hydrateCardImage(card));
       const rect = scrollRail.getBoundingClientRect();
       if (rect.width <= 0) return;
       const maxScroll = track.scrollWidth - track.clientWidth;
-      const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-      track.scrollLeft = ratio * maxScroll;
+      const ratio = clamp((clientX - rect.left) / rect.width, 0, 1);
+      wakeTo(ratio, speed);
+      if (maxScroll > 0) {
+        track.scrollLeft = ratio * maxScroll;
+      }
+      lastScrollLeft = track.scrollLeft;
+      lastScrollTime = performance.now();
     };
 
     scrollRail.addEventListener('pointerdown', (ev) => {
       scrubbing = true;
-      scrollRail.setPointerCapture(ev.pointerId);
-      scrubToClientX(ev.clientX);
+      scrubLastX = ev.clientX;
+      scrubLastT = performance.now();
+      scrubSpeed = 0;
+      try {
+        scrollRail.setPointerCapture(ev.pointerId);
+      } catch {}
+      scrubToClientX(ev.clientX, 0);
     });
     scrollRail.addEventListener('pointermove', (ev) => {
-      if (scrubbing) scrubToClientX(ev.clientX);
+      if (!scrubbing) return;
+      const now = performance.now();
+      const dt = Math.max(0.008, (now - scrubLastT) / 1000);
+      const v = Math.abs(ev.clientX - scrubLastX) / dt;
+      scrubSpeed = scrubSpeed * 0.5 + v * 0.5;
+      scrubLastX = ev.clientX;
+      scrubLastT = now;
+      scrubToClientX(ev.clientX, scrubSpeed);
     });
     const endScrub = (ev: PointerEvent) => {
       if (!scrubbing) return;
@@ -289,8 +547,25 @@ if (track) {
     scrollRail.addEventListener('pointercancel', endScrub);
     scrollRail.addEventListener('keydown', (ev) => {
       const maxScroll = track.scrollWidth - track.clientWidth;
-      if (ev.key === 'ArrowRight') track.scrollBy({ left: maxScroll * 0.2, behavior: 'smooth' });
-      if (ev.key === 'ArrowLeft') track.scrollBy({ left: -maxScroll * 0.2, behavior: 'smooth' });
+      if (maxScroll <= 0) return;
+      const step = ev.shiftKey ? 0.25 : 0.1;
+      const curRatio = clamp(track.scrollLeft / maxScroll, 0, 1);
+      let nextRatio: number | null = null;
+      if (ev.key === 'ArrowRight' || ev.key === 'ArrowUp') nextRatio = curRatio + step;
+      if (ev.key === 'ArrowLeft' || ev.key === 'ArrowDown') nextRatio = curRatio - step;
+      if (ev.key === 'Home') nextRatio = 0;
+      if (ev.key === 'End') nextRatio = 1;
+      if (nextRatio === null) return;
+      ev.preventDefault();
+      nextRatio = clamp(nextRatio, 0, 1);
+      cards.forEach((card) => hydrateCardImage(card));
+      if (prefersReducedMotion()) {
+        track.scrollLeft = nextRatio * maxScroll;
+        paintWakeLit(nextRatio);
+      } else {
+        keyWakeBoostUntil = performance.now() + 350;
+        track.scrollTo({ left: nextRatio * maxScroll, behavior: 'smooth' });
+      }
     });
   }
 
@@ -304,6 +579,7 @@ if (track) {
     if (ev.pointerType !== 'mouse' || ev.button !== 0) return;
     mouseDown = true;
     dragMoved = false;
+    isDraggingTrack = false;
     dragStartX = ev.clientX;
     dragStartLeft = track.scrollLeft;
   });
@@ -312,13 +588,18 @@ if (track) {
     if (!mouseDown) return;
     const dx = ev.clientX - dragStartX;
     if (Math.abs(dx) > 6) {
-      dragMoved = true;
+      if (!dragMoved) {
+        dragMoved = true;
+        isDraggingTrack = true;
+        releaseAllTilts();
+      }
       track.scrollLeft = dragStartLeft - dx;
     }
   });
 
   const endMouseDrag = () => {
     mouseDown = false;
+    isDraggingTrack = false;
   };
   window.addEventListener('pointerup', endMouseDrag);
   window.addEventListener('pointercancel', endMouseDrag);

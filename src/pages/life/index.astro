@@ -6,6 +6,7 @@ import { getAlbumSlug, getLifeThumbPath, toAvifPath, withBase } from '@/lib/path
 import { getLqipDataUri } from '@/lib/lqip';
 
 const albums = (await getCollection('albums')).sort((a, b) => a.data.order - b.data.order);
+const wakeTicks = Math.max(25, Math.max(1, albums.length - 1) * 6 + 1);
 const initialCoverPath = albums[0] ? albums[0].data.cover : '';
 const initialCover = initialCoverPath ? withBase(initialCoverPath) : '';
 const initialCoverAvifPath = initialCoverPath ? toAvifPath(initialCoverPath) : '';
@@ -93,68 +94,73 @@ const albumLqips = await Promise.all(albums.map((a) => getLqipDataUri(a.data.cov
                 data-cover-avif={coverAvifUrl || undefined}
                 data-preload-thumbs={JSON.stringify(preloadThumbs)}
                 data-preload-thumbs-avif={JSON.stringify(preloadThumbsAvif)}
-                style={lqip ? `background-image: url("${lqip}"); background-size: cover; background-position: center;` : undefined}
-                class="life-album-card group relative flex min-h-[430px] w-[82vw] shrink-0 snap-start flex-col justify-between overflow-hidden rounded-2xl border border-[#252528]/20 bg-[#252528] p-6 text-[#f4f6f8] shadow-lg transition-transform duration-300 hover:-translate-y-1 sm:w-[340px] lg:w-[360px]"
+                class="life-album-card life-tilt-frame group relative block min-h-[430px] w-[82vw] shrink-0 snap-start rounded-2xl sm:w-[340px] lg:w-[360px]"
               >
-                <picture class="absolute inset-0 block h-full w-full">
-                  {coverAvifUrl &&
-                    (idx < 3 ? (
-                      <source type="image/avif" srcset={coverAvifUrl} />
-                    ) : (
-                      <source type="image/avif" data-srcset={coverAvifUrl} />
-                    ))}
-                  {idx < 3 ? (
-                    <img
-                      src={coverUrl}
-                      alt={album.data.title}
-                      loading="eager"
-                      fetchpriority={idx === 0 ? 'high' : 'auto'}
-                      decoding="async"
-                      draggable="false"
-                      class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                  ) : (
-                    <img
-                      data-src={coverUrl}
-                      alt={album.data.title}
-                      fetchpriority="low"
-                      decoding="async"
-                      draggable="false"
-                      class="h-full w-full object-cover opacity-0 transition-[transform,opacity] duration-700 group-hover:scale-105"
-                    />
-                  )}
-                </picture>
                 <div
-                  aria-hidden="true"
-                  class="absolute inset-0 bg-gradient-to-t from-[#19232c]/90 via-[#19232c]/35 to-[#19232c]/25 transition-opacity duration-300 group-hover:opacity-95"
-                />
+                  style={lqip ? `background-image: url("${lqip}"); background-size: cover; background-position: center;` : undefined}
+                  class="life-album-card__surface relative flex h-full min-h-[430px] w-full flex-col justify-between overflow-hidden rounded-2xl border border-[#252528]/20 bg-[#252528] p-6 text-[#f4f6f8] shadow-lg"
+                >
+                  <picture class="absolute inset-0 block h-full w-full">
+                    {coverAvifUrl &&
+                      (idx < 3 ? (
+                        <source type="image/avif" srcset={coverAvifUrl} />
+                      ) : (
+                        <source type="image/avif" data-srcset={coverAvifUrl} />
+                      ))}
+                    {idx < 3 ? (
+                      <img
+                        src={coverUrl}
+                        alt={album.data.title}
+                        loading="eager"
+                        fetchpriority={idx === 0 ? 'high' : 'auto'}
+                        decoding="async"
+                        draggable="false"
+                        class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                    ) : (
+                      <img
+                        data-src={coverUrl}
+                        alt={album.data.title}
+                        fetchpriority="low"
+                        decoding="async"
+                        draggable="false"
+                        class="h-full w-full object-cover opacity-0 transition-[transform,opacity] duration-700 group-hover:scale-105"
+                      />
+                    )}
+                  </picture>
+                  <div
+                    aria-hidden="true"
+                    class="absolute inset-0 bg-gradient-to-t from-[#19232c]/90 via-[#19232c]/35 to-[#19232c]/25 transition-opacity duration-300 group-hover:opacity-95"
+                  />
 
-                <div class="relative z-10 flex items-center justify-between font-mono text-xs">
-                  <span class="flex items-center gap-2 tracking-widest">
-                    <span>{album.data.number}</span>
-                    <span class="inline-block h-[1px] w-7 bg-white/70 transition-all duration-300 group-hover:w-10" />
-                  </span>
-                  <span class="rounded-full bg-white/15 px-2.5 py-0.5 text-[11px] backdrop-blur-sm">
-                    {album.data.items.length} stories
-                  </span>
-                </div>
-
-                <div class="relative z-10 space-y-2.5">
-                  <p class="font-mono text-xs uppercase tracking-wider text-white/75">
-                    {album.data.location}
-                  </p>
-                  <h2 class="text-2xl font-bold leading-tight tracking-tight text-white">
-                    {album.data.headline}
-                  </h2>
-                  <p class="text-xs leading-relaxed text-white/80">
-                    <BiText zh={album.data.description} en={album.data.descriptionEn || album.data.description} />
-                  </p>
-                  <div class="pt-2">
-                    <span class="inline-flex items-center gap-2 rounded-full bg-[#27445d] px-3.5 py-1.5 font-mono text-xs text-white transition-colors group-hover:bg-white group-hover:text-[#252528]">
-                      <span>Read the Story</span>
-                      <span aria-hidden="true">→</span>
+                  <div class="relative z-10 flex items-center justify-between font-mono text-xs">
+                    <span class="flex items-center gap-2 tracking-widest">
+                      <span>{album.data.number}</span>
+                      <span class="inline-block h-[1px] w-7 bg-white/70 transition-all duration-300 group-hover:w-10" />
+                    </span>
+                    <span class="rounded-full bg-white/15 px-2.5 py-0.5 text-[11px] backdrop-blur-sm">
+                      {album.data.items.length} stories
                     </span>
                   </div>
+
+                  <div class="relative z-10 space-y-2.5">
+                    <p class="font-mono text-xs uppercase tracking-wider text-white/75">
+                      {album.data.location}
+                    </p>
+                    <h2 class="text-2xl font-bold leading-tight tracking-tight text-white">
+                      {album.data.headline}
+                    </h2>
+                    <p class="text-xs leading-relaxed text-white/80">
+                      <BiText zh={album.data.description} en={album.data.descriptionEn || album.data.description} />
+                    </p>
+                    <div class="pt-2">
+                      <span class="inline-flex items-center gap-2 rounded-full bg-[#27445d] px-3.5 py-1.5 font-mono text-xs text-white transition-colors group-hover:bg-white group-hover:text-[#252528]">
+                        <span>Read the Story</span>
+                        <span aria-hidden="true">→</span>
+                      </span>
+                    </div>
+                  </div>
+                  <span class="life-tilt-sheen" aria-hidden="true" />
                 </div>
               </a>
             );
@@ -165,7 +171,7 @@ const albumLqips = await Promise.all(albums.map((a) => getLqipDataUri(a.data.cov
       <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" aria-label="影集进度与快捷切换">
         <div
           id="life-scroll-rail"
-          class="group relative flex h-6 flex-1 cursor-pointer items-center"
+          class="wake-rail flex-1"
           role="slider"
           aria-label="横向浏览进度"
           aria-valuemin="0"
@@ -173,13 +179,17 @@ const albumLqips = await Promise.all(albums.map((a) => getLqipDataUri(a.data.cov
           aria-valuenow="0"
           tabindex="0"
         >
-          <div class="relative h-[3px] w-full overflow-hidden rounded-full bg-[#252528]/15 transition-all group-hover:h-[5px]">
-            <div
-              id="life-scroll-thumb"
-              class="absolute top-0 bottom-0 left-0 rounded-full bg-[#252528] transition-colors group-hover:bg-[#27445d]"
-              style="width: 28%; left: 0%;"
-            />
-          </div>
+          {
+            Array.from({ length: wakeTicks }, (_, idx) => (
+              <span
+                class:list={['wake-bar', idx % 6 === 0 && 'wake-bar--major']}
+                data-wake-bar={idx}
+                data-on={idx === 0 ? 'true' : undefined}
+                data-head={idx === 0 ? 'true' : undefined}
+                aria-hidden="true"
+              />
+            ))
+          }
         </div>
 
         <div class="flex items-center justify-between gap-4 sm:justify-end">
