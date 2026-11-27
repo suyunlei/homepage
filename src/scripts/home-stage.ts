@@ -1,10 +1,3 @@
-import {
-  clamp,
-  damp,
-  frameDelta,
-  prefersReducedMotion as checkReducedMotion,
-} from './spring';
-
 type GsapInstance = (typeof import('gsap'))['default'];
 
 let gsapLib: GsapInstance | null = null;
@@ -20,6 +13,11 @@ function loadGsap(): Promise<GsapInstance> {
   }
   return gsapPromise;
 }
+
+const clamp = (val: number, min: number, max: number) => Math.max(min, Math.min(max, val));
+const frameDelta = (now: number, prev: number) => (prev ? clamp((now - prev) / 16.67, 0, 2.5) : 1);
+const damp = (cur: number, target: number, factor60: number, dt60: number) =>
+  cur + (target - cur) * (1 - Math.pow(1 - factor60, dt60));
 
 const MathUtils = {
   lineEq: (y2: number, y1: number, x2: number, x1: number, currentVal: number) => {
@@ -44,7 +42,7 @@ function splitLetters(el: HTMLElement): HTMLSpanElement[] {
   return spans;
 }
 
-const prefersReducedMotion = checkReducedMotion();
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const isTouchDevice = window.matchMedia('(hover: none), (pointer: coarse)').matches;
 const contentFirst = document.querySelector<HTMLElement>('.content--first');
 const contentMove = document.querySelector<HTMLElement>('.content__move');
@@ -181,7 +179,7 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
     (ev) => {
       mousePos = { x: ev.clientX, y: ev.clientY };
       hasPointerMoved = true;
-      if (!entranceDone && revealTime > 0 && performance.now() - revealTime >= 250) {
+      if (!entranceDone && revealTime > 0) {
         entranceDone = true;
       }
       scheduleParallaxLoop();
@@ -197,7 +195,7 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
       const t = ev.touches[0];
       touchOrigin = { x: t.clientX, y: t.clientY };
       isTouching = true;
-      if (!entranceDone && revealTime > 0 && performance.now() - revealTime >= 250) {
+      if (!entranceDone && revealTime > 0) {
         entranceDone = true;
       }
       scheduleParallaxLoop();
@@ -251,7 +249,7 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
         if (isTouchDevice || hasPointerMoved) {
           scheduleParallaxLoop();
         }
-      }, 520);
+      }, 120);
     };
 
     if (document.documentElement.classList.contains('stage-revealed')) {
@@ -269,9 +267,14 @@ if (contentFirst && contentMove && columnsWrap && menuBtns.length > 0 && stageIt
     });
   }
 
-  // Expose lazy GSAP loader for the homepage preloader and warm on idle/tier1 fallback
+  // Expose lazy GSAP loader for the homepage preloader and warm immediately during preloader
   (window as unknown as { __loadHomeGsap?: () => Promise<unknown> }).__loadHomeGsap = () =>
     loadGsap();
+  (window as unknown as { __homeStageReady?: boolean }).__homeStageReady = true;
+  window.dispatchEvent(new Event('home-stage-ready'));
+  if (document.documentElement.classList.contains('preloader-active')) {
+    void loadGsap();
+  }
   window.addEventListener('home-tier1-ready', () => void loadGsap(), { once: true });
   const warmGsapIdle = () => {
     const requestIdle = (

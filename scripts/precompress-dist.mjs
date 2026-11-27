@@ -4,7 +4,7 @@ import zlib from 'node:zlib';
 
 const DIST_DIR = path.join(process.cwd(), 'dist');
 const TARGET_EXTS = new Set(['.html', '.css', '.js', '.svg', '.json', '.xml', '.txt']);
-const MIN_BYTES = 1024;
+const MIN_BYTES = 256;
 
 async function walkFiles(dir) {
   const results = [];
